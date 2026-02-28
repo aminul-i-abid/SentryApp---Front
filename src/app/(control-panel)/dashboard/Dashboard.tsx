@@ -20,14 +20,22 @@ import LostBedsDetailSidebar from "./components/LostBedsDetailSidebar";
 import { getDashboardTest } from "./dashboardService";
 import { DashboardResponse } from "./models/DashboardResponse";
 
-const Root = styled(FusePageSimple)(({ theme: _theme }) => ({
+const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#FFFFFF",
     borderBottomWidth: 0,
     borderStyle: "none",
     borderColor: "transparent",
+    ...theme.applyStyles("dark", {
+      backgroundColor: theme.palette.background.paper,
+    }),
   },
-  "& .FusePageSimple-content": {},
+  "& .FusePageSimple-content": {
+    backgroundImage: "url(/assets/dashbg1.png), url(/assets/dashbg2.png)",
+    backgroundPosition: "top left, bottom right",
+    backgroundRepeat: "no-repeat, no-repeat",
+    backgroundSize: "30% auto, 70% auto",
+  },
   "& .FusePageSimple-content > .container": {
     maxWidth: "100% !important",
     padding: "0 !important",
@@ -159,14 +167,17 @@ const DashboardSkeleton = () => (
   <div className="p-6 space-y-6 animate-pulse">
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-28 rounded-2xl bg-slate-100" />
+        <div
+          key={i}
+          className="h-28 rounded-2xl bg-slate-100 dark:bg-white/[0.06]"
+        />
       ))}
     </div>
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div className="lg:col-span-2 h-64 rounded-2xl bg-slate-100" />
-      <div className="h-64 rounded-2xl bg-slate-100" />
+      <div className="lg:col-span-2 h-64 rounded-2xl bg-slate-100 dark:bg-white/[0.06]" />
+      <div className="h-64 rounded-2xl bg-slate-100 dark:bg-white/[0.06]" />
     </div>
-    <div className="h-72 rounded-2xl bg-slate-100" />
+    <div className="h-72 rounded-2xl bg-slate-100 dark:bg-white/[0.06]" />
   </div>
 );
 
@@ -364,7 +375,7 @@ function Dashboard() {
           <div className="p-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
               {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
-              <h2 className="text-2xl font-bold text-slate-800">
+              <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
                 Panel de Control
               </h2>
             </div>
@@ -394,52 +405,53 @@ function Dashboard() {
             <div className="flex items-center gap-4">
               {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
               <div>
-                <h2 className="text-2xl font-bold text-slate-800">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
                   ¡Bienvenido de nuevo, {firstName}!
                 </h2>
-                <p className="text-sm text-slate-400 mt-0.5">
+                <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">
                   Que tengas un buen dia. Consulte su Panel de Control.
                 </p>
               </div>
             </div>
 
-            <div className="relative hidden md:block flex-1 max-w-md mx-auto">
+            {/* <div className="relative hidden md:block flex-1 max-w-md mx-auto">
               <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
                 <IconSearch />
               </span>
               <input
                 type="text"
                 placeholder="Buscar cualquier cosa..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.06] text-sm text-slate-600 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               />
-            </div>
+            </div> */}
 
             <div className="flex items-center gap-3">
-              <button
+              {/* <button
                 type="button"
-                className="relative w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 bg-slate-100 transition"
+                className="relative w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 bg-slate-100 dark:bg-white/[0.06] transition"
               >
                 <img src="/assets/icons/page.png" />
-              </button>
+              </button> */}
               {/* Notification bell */}
-              <button
+              {/* <button
                 type="button"
-                className="relative w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 bg-slate-100 transition"
+                className="relative w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 bg-slate-100 dark:bg-white/[0.06] transition"
               >
                 <img src="/assets/icons/notification.png" />
-                {/* <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" /> */}
-              </button>
+              </button> */}
               {/* separator */}
-              <div className="w-px h-3 bg-slate-300" />
+              {/* <div className="w-px h-3 bg-slate-300 dark:bg-white/20" /> */}
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm">
                   {firstName?.charAt(0)?.toUpperCase() || "U"}
                 </div>
                 <div className="hidden lg:block">
-                  <p className="text-sm font-semibold text-slate-700 leading-tight">
+                  <p className="text-sm font-semibold text-slate-700 dark:text-white leading-tight">
                     ¡{user?.displayName || ""}!
                   </p>
-                  <p className="text-xs text-slate-400">{user?.email || ""}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">
+                    {user?.email || ""}
+                  </p>
                 </div>
               </div>
             </div>
@@ -503,7 +515,7 @@ function Dashboard() {
                 </div>
 
                 {/* Chart card */}
-                <div className="bg-[#F7F7F7] p-1.5 rounded-2xl">
+                <div className="bg-[#F7F7F7] dark:bg-white/[0.06] p-1.5 rounded-2xl">
                   <CardContainer title="Ocupación de camas – Próximos días">
                     <ChartLine
                       labels={chartData.labels}
@@ -529,10 +541,10 @@ function Dashboard() {
               {/* ---- RIGHT COLUMN: occupancy + badges + blocks ---- */}
               <div className="space-y-4">
                 {/* Occupancy panel */}
-                <div className="bg-[#F7F7F7] p-1.5 rounded-xl space-y-3">
+                <div className="bg-[#F7F7F7] dark:bg-white/[0.06] p-1.5 rounded-xl space-y-3">
                   {/* Title + progress bar + percentage */}
-                  <div className="rounded-2xl bg-white border border-gray-100 shadow-sm px-6 py-5">
-                    <h3 className="text-2xl font-semibold text-slate-800 mb-4">
+                  <div className="rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm px-6 py-5">
+                    <h3 className="text-2xl font-semibold text-slate-800 dark:text-white mb-4">
                       Ocupación de camas
                     </h3>
                     <ProgressBar
@@ -565,7 +577,7 @@ function Dashboard() {
                 {/* Block occupancy grid */}
                 {blockOccupancy.length > 0 && (
                   <div className="space-y-3">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 bg-[#F7F7F7] p-2 rounded-xl">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 bg-[#F7F7F7] dark:bg-white/[0.06] p-2 rounded-xl">
                       {blockOccupancy
                         .slice(0, isBlockExpanded ? blockOccupancy.length : 48)
                         .map((block) => (

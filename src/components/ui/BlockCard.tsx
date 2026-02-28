@@ -33,7 +33,7 @@ const BlockCard: React.FC<BlockCardProps> = ({
     <button
       type="button"
       onClick={onClick}
-      className="flex flex-col items-start rounded-xl border border-gray-100 bg-white overflow-hidden w-full cursor-pointer"
+      className="flex flex-col items-start rounded-xl border border-gray-100 dark:border-white/10 bg-white dark:bg-white/[0.06] overflow-hidden w-full cursor-pointer"
     >
       <div className="flex flex-col py-3 gap-3">
         <span
@@ -42,10 +42,10 @@ const BlockCard: React.FC<BlockCardProps> = ({
           {name}
         </span>
         <div className="flex flex-col gap-1">
-          <span className="pl-2 text-lg font-bold text-slate-800">
+          <span className="pl-2 text-lg font-bold text-slate-800 dark:text-white">
             {percentage.toFixed(2)}%
           </span>
-          <span className="text-[11px] text-slate-400">
+          <span className="text-[11px] text-slate-400 dark:text-slate-500">
             {occupied}/{total}
           </span>
         </div>

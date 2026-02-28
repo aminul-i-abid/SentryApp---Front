@@ -31,8 +31,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       {/* Label above bar, right-aligned */}
       {label && (
         <div className="flex justify-end mb-1 mr-24">
-          <span className="text-[11px] text-slate-500 flex items-center gap-1">
-            <span className="inline-block w-1 h-1 rounded-full bg-slate-800" />
+          <span className="text-[13px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span className="inline-block w-1 h-1 rounded-full bg-slate-800 dark:bg-slate-300" />
             {label}
           </span>
         </div>
@@ -40,7 +40,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       {/* Bar + separator + percentage in one row */}
       <div className="flex items-center gap-4">
         <div
-          className={`flex-1 ${heightClass} rounded-full overflow-hidden bg-gray-200`}
+          className={`flex-1 ${heightClass} rounded-full overflow-hidden bg-gray-200 dark:bg-white/10`}
         >
           <div
             className={`${heightClass} rounded-full transition-all duration-500`}
@@ -52,8 +52,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
           />
         </div>
         {/* Separator + percentage */}
-        <div className="w-px h-3 bg-gray-300 shrink-0" />
-        <span className="text-4xl font-bold text-slate-800 shrink-0">
+        <div className="w-px h-3 bg-gray-300 dark:bg-white/20 shrink-0" />
+        <span className="text-4xl font-bold text-slate-800 dark:text-white shrink-0">
           {pct}%
         </span>
       </div>

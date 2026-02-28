@@ -15,10 +15,10 @@ const CardContainer: React.FC<CardContainerProps> = ({
   title,
 }) => (
   <div
-    className={`rounded-2xl bg-white border border-gray-100 shadow-sm ${className}`}
+    className={`rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm ${className}`}
   >
     {title && (
-      <h3 className="text-2xl font-semibold text-slate-800 px-6 pt-5 pb-0">
+      <h3 className="text-2xl font-semibold text-slate-800 dark:text-white px-6 pt-5 pb-0">
         {title}
       </h3>
     )}
