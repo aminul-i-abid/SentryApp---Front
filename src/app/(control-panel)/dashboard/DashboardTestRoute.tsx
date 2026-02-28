@@ -1,15 +1,14 @@
-import i18next from 'i18next';
-import { lazy } from 'react';
-import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
-import { Routes } from 'src/utils/routesEnum';
+import { FuseRouteItemType } from "@fuse/utils/FuseUtils";
+import { lazy } from "react";
+import { Routes } from "src/utils/routesEnum";
 
-const Dashboard = lazy(() => import('./Dashboard.optimized'));
+const Dashboard = lazy(() => import("./Dashboard"));
 
 const DashboardRoute: FuseRouteItemType[] = [
-    {
-        path: Routes.DASHBOARD,
-        element: <Dashboard />
-    },
+  {
+    path: Routes.DASHBOARD,
+    element: <Dashboard />,
+  },
 ];
 
-export default DashboardRoute; 
+export default DashboardRoute;
