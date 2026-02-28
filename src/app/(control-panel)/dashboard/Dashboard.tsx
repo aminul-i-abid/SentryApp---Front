@@ -1,4 +1,4 @@
-import NavbarToggleButton from "@/components/theme-layouts/components/navbar/NavbarToggleButton";
+import TopbarHeader from "@/components/TopbarHeader";
 import {
   BlockCard,
   CardContainer,
@@ -371,16 +371,7 @@ function Dashboard() {
     return (
       <Root
         containerClassName="!max-w-full"
-        header={
-          <div className="p-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
-              <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
-                Panel de Control
-              </h2>
-            </div>
-          </div>
-        }
+        header={<TopbarHeader />}
         content={<DashboardSkeleton />}
       />
     );
@@ -400,63 +391,7 @@ function Dashboard() {
     <>
       <Root
         containerClassName="!max-w-full"
-        header={
-          <div className="px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-4">
-              {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
-              <div>
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
-                  ¡Bienvenido de nuevo, {firstName}!
-                </h2>
-                <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">
-                  Que tengas un buen dia. Consulte su Panel de Control.
-                </p>
-              </div>
-            </div>
-
-            {/* <div className="relative hidden md:block flex-1 max-w-md mx-auto">
-              <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-                <IconSearch />
-              </span>
-              <input
-                type="text"
-                placeholder="Buscar cualquier cosa..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.06] text-sm text-slate-600 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-              />
-            </div> */}
-
-            <div className="flex items-center gap-3">
-              {/* <button
-                type="button"
-                className="relative w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 bg-slate-100 dark:bg-white/[0.06] transition"
-              >
-                <img src="/assets/icons/page.png" />
-              </button> */}
-              {/* Notification bell */}
-              {/* <button
-                type="button"
-                className="relative w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 bg-slate-100 dark:bg-white/[0.06] transition"
-              >
-                <img src="/assets/icons/notification.png" />
-              </button> */}
-              {/* separator */}
-              {/* <div className="w-px h-3 bg-slate-300 dark:bg-white/20" /> */}
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm">
-                  {firstName?.charAt(0)?.toUpperCase() || "U"}
-                </div>
-                <div className="hidden lg:block">
-                  <p className="text-sm font-semibold text-slate-700 dark:text-white leading-tight">
-                    ¡{user?.displayName || ""}!
-                  </p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
-                    {user?.email || ""}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
+        header={<TopbarHeader />}
         content={
           <div className="p-6 space-y-6">
             {/* === 2-column layout: left stats+chart | right occupancy+blocks === */}
