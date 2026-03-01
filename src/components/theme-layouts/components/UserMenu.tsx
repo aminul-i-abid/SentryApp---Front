@@ -197,7 +197,7 @@ function UserMenu(props: UserMenuProps) {
         ) : (
           <div className="flex flex-col">
             {/* ── Mi Perfil ── */}
-            <button
+            {/* <button
               type="button"
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-colors cursor-pointer bg-transparent border-none w-full text-left"
               onClick={userMenuClose}
@@ -214,10 +214,10 @@ function UserMenu(props: UserMenuProps) {
               <span className="text-gray-400 dark:text-gray-500 text-[15px] font-semibold tracking-tight shrink-0">
                 &#xBB;&#x203A;
               </span>
-            </button>
+            </button> */}
 
             {/* ── ajuste (highlighted pill) ── */}
-            <div className="px-2 py-0.5">
+            {/* <div className="px-2 py-0.5">
               <button
                 type="button"
                 className={clsx(
@@ -238,10 +238,10 @@ function UserMenu(props: UserMenuProps) {
                   ajuste
                 </span>
               </button>
-            </div>
+            </div> */}
 
             {/* ── modo oscuro ── */}
-            <button
+            {/* <button
               type="button"
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/[0.05] transition-colors cursor-pointer bg-transparent border-none w-full text-left"
               onClick={handleDarkModeToggle}
@@ -256,9 +256,9 @@ function UserMenu(props: UserMenuProps) {
               </FuseSvgIcon>
               <span className="text-[13px] font-medium text-gray-700 dark:text-gray-200 flex-1">
                 modo oscuro
-              </span>
-              {/* Toggle switch */}
-              <div
+              </span> */}
+            {/* Toggle switch */}
+            {/* <div
                 role="switch"
                 aria-checked={isDarkMode}
                 className={clsx(
@@ -276,8 +276,8 @@ function UserMenu(props: UserMenuProps) {
                     isDarkMode ? "translate-x-[18px]" : "translate-x-[2px]",
                   )}
                 />
-              </div>
-            </button>
+              </div> */}
+            {/* </button> */}
 
             {/* ── Idioma ── */}
             <button
