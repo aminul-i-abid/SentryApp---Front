@@ -1,14 +1,13 @@
-import React from 'react';
-import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import tagRoleMap from '../../tag/enum/RoleTag';
-import { ContractorResponse } from '../../contractors/models/ContractorResponse';
+import Box from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import React from "react";
+import { ContractorResponse } from "../../contractors/models/ContractorResponse";
+import tagRoleMap from "../../tag/enum/RoleTag";
 
 interface AddRoomFormProps {
   roomCount: number;
@@ -49,90 +48,114 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
   onFloorNumberChange,
   onContractorChange,
 }) => {
+  const labelSx = {
+    fontWeight: 600,
+    fontSize: "13px",
+    mb: 0.5,
+    color: "#344054",
+  };
+  const inputSx = {
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: "#F5F7FA",
+      borderRadius: "8px",
+      "& fieldset": { border: "1px solid #E5E7EB" },
+      "&:hover fieldset": { borderColor: "#d0d5dd" },
+      "&.Mui-focused fieldset": {
+        borderColor: "#415EDE",
+        borderWidth: "1.5px",
+      },
+    },
+  };
+  const selectSx = {
+    backgroundColor: "#F5F7FA",
+    borderRadius: "8px",
+    "& fieldset": { border: "1px solid #E5E7EB" },
+    "&:hover fieldset": { borderColor: "#d0d5dd" },
+    "&.Mui-focused fieldset": { borderColor: "#415EDE", borderWidth: "1.5px" },
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, mt: 1 }}>
       <Grid container spacing={2}>
         {!isEdit && (
           <Grid item xs={6}>
+            <Typography sx={labelSx}>Cantidad de habitaciones</Typography>
             <TextField
-              label="Cantidad de habitaciones"
               value={roomCount}
               onChange={onRoomCountChange}
               fullWidth
               size="small"
               type="number"
-              required
+              placeholder="Ingrese la cantidad"
+              sx={inputSx}
             />
           </Grid>
         )}
         <Grid item xs={isEdit ? 12 : 6}>
+          <Typography sx={labelSx}>Camas por habitación</Typography>
           <TextField
-            label="Camas por habitación"
             value={bedsPerRoom}
             onChange={onBedsPerRoomChange}
             fullWidth
             size="small"
             type="number"
-            required
+            placeholder="Seleccione total de camas"
+            sx={inputSx}
           />
         </Grid>
       </Grid>
+
       {!isEdit && (
-        <>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                label="Número inicial"
-                value={startNumber}
-                onChange={onStartNumberChange}
-                fullWidth
-                size="small"
-                type="number"
-                required
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                label="Dígitos del número"
-                value={numberDigits}
-                onChange={onNumberDigitsChange}
-                fullWidth
-                size="small"
-                type="number"
-                required
-              />
-            </Grid>
-          </Grid>
-        </>
-      )}
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <FormControl fullWidth size="small">
-            <InputLabel>Estándar</InputLabel>
-            <Select
-              value={tag.toString()}
-              label="Etiqueta"
-              onChange={onTagChange}
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Typography sx={labelSx}>Número inicial</Typography>
+            <TextField
+              value={startNumber}
+              onChange={onStartNumberChange}
               fullWidth
-              required
-            >
+              size="small"
+              type="number"
+              placeholder="Ingrese número"
+              sx={inputSx}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Typography sx={labelSx}>Dígitos del número</Typography>
+            <TextField
+              value={numberDigits}
+              onChange={onNumberDigitsChange}
+              fullWidth
+              size="small"
+              type="number"
+              placeholder="Seleccione"
+              sx={inputSx}
+            />
+          </Grid>
+        </Grid>
+      )}
+
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <Typography sx={labelSx}>Estándar</Typography>
+          <FormControl fullWidth size="small">
+            <Select value={tag.toString()} onChange={onTagChange} sx={selectSx}>
               {Object.entries(tagRoleMap).map(([key, value]) => (
-                <MenuItem key={key} value={key}>{value}</MenuItem>
+                <MenuItem key={key} value={key}>
+                  {value}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={4}>
+          <Typography sx={labelSx}>Número de piso</Typography>
           <FormControl fullWidth size="small">
-            <InputLabel>Número de piso</InputLabel>
             <Select
               value={floorNumber.toString()}
-              label="Número de piso"
               onChange={onFloorNumberChange}
-              fullWidth
-              required
+              sx={selectSx}
             >
-              {[...Array((maxFloors || 1))].map((_, index) => (
+              {[...Array(maxFloors || 1)].map((_, index) => (
                 <MenuItem key={index + 1} value={(index + 1).toString()}>
                   {index + 1}
                 </MenuItem>
@@ -140,17 +163,13 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
             </Select>
           </FormControl>
         </Grid>
-      </Grid>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid item xs={4}>
+          <Typography sx={labelSx}>Contratista</Typography>
           <FormControl fullWidth size="small">
-            <InputLabel>Contratista</InputLabel>
             <Select
               value={contractorId.toString()}
-              label="Contratista"
               onChange={onContractorChange}
-              fullWidth
-              required
+              sx={selectSx}
             >
               {contractors.map((contractor) => (
                 <MenuItem key={contractor.id} value={contractor.id.toString()}>
@@ -161,8 +180,8 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
           </FormControl>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 
-export default AddRoomForm; 
+export default AddRoomForm;

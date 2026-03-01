@@ -41,8 +41,8 @@ const EditContractorModal: React.FC<EditContractorModalProps> = ({
     <ContractorFormDialog
       open={open}
       onClose={onClose}
-      title="Edit Contactor Info"
-      submitLabel="Submit Info"
+      title="Editar información del contratista"
+      submitLabel="Guardar"
       showState
       initialData={
         contractor

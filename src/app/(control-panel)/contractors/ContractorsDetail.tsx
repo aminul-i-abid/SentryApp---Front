@@ -292,7 +292,7 @@ function ContractorsDetail() {
           >
             {/* Page Title */}
             <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
-              Contractors Details Here:
+              Detalles del contratista:
             </Typography>
 
             <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
@@ -349,7 +349,7 @@ function ContractorsDetail() {
                         {contractor.name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Contractor
+                        Contratista
                       </Typography>
                     </Box>
                     <Box sx={{ display: "flex", gap: 0.5, flexShrink: 0 }}>
@@ -479,7 +479,7 @@ function ContractorsDetail() {
                   >
                     <HomeIcon fontSize="small" sx={{ color: "#6b7280" }} />
                     <Typography variant="body2" color="text.secondary">
-                      Address:
+                      Dirección:
                     </Typography>
                     <Typography variant="body2" fontWeight={500}>
                       {contractor.address || "—"}
@@ -495,7 +495,7 @@ function ContractorsDetail() {
                   >
                     <EmailIcon fontSize="small" sx={{ color: "#6b7280" }} />
                     <Typography variant="body2" color="text.secondary">
-                      Mail ID:
+                      Correo:
                     </Typography>
                     <Typography variant="body2" fontWeight={500}>
                       {contractor.email || "—"}
@@ -510,7 +510,7 @@ function ContractorsDetail() {
                   >
                     <PhoneIcon fontSize="small" sx={{ color: "#6b7280" }} />
                     <Typography variant="body2" color="text.secondary">
-                      Phone No:
+                      Teléfono:
                     </Typography>
                     <Typography variant="body2" fontWeight={500}>
                       {contractor.phone || "—"}
@@ -549,10 +549,10 @@ function ContractorsDetail() {
                       }}
                     >
                       <Typography variant="h6" fontWeight={700}>
-                        Contact Person
+                        Persona de contacto
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Total Room:{" "}
+                        Total habitaciones:{" "}
                         <strong>
                           {contractor.rooms ? contractor.rooms.length : 0}
                         </strong>
@@ -575,7 +575,7 @@ function ContractorsDetail() {
                         },
                       }}
                     >
-                      Add Person
+                      Agregar persona
                     </Button>
                   </Box>
 
@@ -640,7 +640,7 @@ function ContractorsDetail() {
                                 color="text.secondary"
                                 sx={{ minWidth: 48 }}
                               >
-                                Mail ID:
+                                Correo:
                               </Typography>
                               <Typography
                                 variant="body2"
@@ -666,7 +666,7 @@ function ContractorsDetail() {
                                 color="text.secondary"
                                 sx={{ minWidth: 48 }}
                               >
-                                Phone No:
+                                Teléfono:
                               </Typography>
                               <Typography variant="body2" fontWeight={500}>
                                 {cu.phoneNumber}

@@ -63,7 +63,7 @@ function NavbarStyle2Content(props: NavbarStyle2ContentProps) {
               <Logo />
             </div>
             <NavbarPinToggleButton
-              className="w-8 h-8 border border-gray-200 dark:border-white/20 bg-gray-100 dark:bg-white/[0.06] hover:bg-gray-200 dark:hover:bg-white/[0.12] shrink-0 p-0"
+              className="w-8 h-8 border border-gray-200 dark:border-white/20 bg-gray-100 dark:bg-gray-400 shrink-0 p-0"
               sx={{ borderRadius: "50% !important" }}
             >
               <img

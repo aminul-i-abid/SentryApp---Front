@@ -1,33 +1,47 @@
-import React, { useState } from 'react';
-import { Box, Typography, Grid, Card, CardContent, CardMedia, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { CampResponse } from '../models/CampResponse';
-import { ConfirmationModal } from '@/components/ConfirmationModal';
-import { deleteCamp } from '../campsService';
-import { useNavigate } from 'react-router-dom';
-import { buildRoute, Routes } from '@/utils/routesEnum';
-import AddCampModal from './AddCampModal';
-import { useSnackbar } from 'notistack';
-import authRoles from '@auth/authRoles';
-import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
+import { ConfirmationModal } from "@/components/ConfirmationModal";
+import { buildRoute, Routes } from "@/utils/routesEnum";
+import authRoles from "@auth/authRoles";
+import useAuth from "@fuse/core/FuseAuthProvider/useAuth";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import {
+  Box,
+  Card,
+  CardMedia,
+  Grid,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import { useSnackbar } from "notistack";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { deleteCamp } from "../campsService";
+import { CampResponse } from "../models/CampResponse";
+import AddCampModal from "./AddCampModal";
 
 interface DetailCampProps {
   camp: CampResponse;
   fetchData: () => void;
   sectorContractor?: boolean;
   contractorName?: string;
-  tagSummaryOrdered?: Array<{ tag: string; count: number }>;
+  tagSummaryOrdered?: { tag: string; count: number }[];
 }
 
-function DetailCamp({ camp, fetchData, sectorContractor, contractorName, tagSummaryOrdered }: DetailCampProps) {
+function DetailCamp({
+  camp,
+  fetchData,
+  sectorContractor,
+  contractorName,
+  tagSummaryOrdered,
+}: DetailCampProps) {
   const { authState } = useAuth();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  
+
   const handleDeleteClick = () => {
     setIsDeleteModalOpen(true);
   };
@@ -35,17 +49,23 @@ function DetailCamp({ camp, fetchData, sectorContractor, contractorName, tagSumm
   const handleDeleteConfirm = async () => {
     try {
       const response = await deleteCamp(camp.id);
+
       if (response.succeeded) {
-        enqueueSnackbar('Campamento eliminado exitosamente', { variant: 'success' });
+        enqueueSnackbar("Campamento eliminado exitosamente", {
+          variant: "success",
+        });
         navigate(buildRoute(Routes.CAMPS));
         setIsDeleteModalOpen(false);
       } else {
-        const errorMessage = response.errors?.[0] || response.message || 'Error al eliminar el campamento';
-        enqueueSnackbar(errorMessage, { variant: 'error' });
+        const errorMessage =
+          response.errors?.[0] ||
+          response.message ||
+          "Error al eliminar el campamento";
+        enqueueSnackbar(errorMessage, { variant: "error" });
         setIsDeleteModalOpen(false);
       }
     } catch (error) {
-      enqueueSnackbar('Error al eliminar el campamento', { variant: 'error' });
+      enqueueSnackbar("Error al eliminar el campamento", { variant: "error" });
       setIsDeleteModalOpen(false);
     }
   };
@@ -64,132 +84,246 @@ function DetailCamp({ camp, fetchData, sectorContractor, contractorName, tagSumm
 
   return (
     <>
-      <div className="flex justify-between mb-4 gap-2">
-      <IconButton
+      {/* Back button */}
+      <div className="flex justify-start mb-3">
+        <IconButton
           sx={{
-            bgcolor: '#e0e0e0',
-            width: 40,
-            height: 40,
-            '&:hover': {
-              bgcolor: '#bdbdbd',
-            }
+            bgcolor: "#f1f5f9",
+            width: 36,
+            height: 36,
+            "&:hover": { bgcolor: "#e2e8f0" },
           }}
           onClick={handleBackClick}
         >
-          <ArrowBackIcon sx={{ color: '#1976d2' }} />
+          <ArrowBackIcon sx={{ color: "#4f46e5", fontSize: 20 }} />
         </IconButton>
-        {(!sectorContractor && authState?.user?.role && authRoles.admin.includes(authState.user.role as string)) && (
-        <div className="flex gap-2">
-        <IconButton
-          sx={{
-            bgcolor: '#e0e0e0',
-            width: 40,
-            height: 40,
-            '&:hover': {
-              bgcolor: '#bdbdbd',
-            }
-          }}
-          onClick={handleEditClick}
-        >
-          <EditIcon sx={{ color: '#1976d2' }} />
-        </IconButton>
-        {/* <IconButton
-          sx={{
-            bgcolor: '#e0e0e0',
-            width: 40,
-            height: 40,
-            '&:hover': {
-              bgcolor: '#bdbdbd',
-            }
-          }}
-          onClick={handleDeleteClick}
-        >
-          <DeleteIcon sx={{ color: '#f44336' }} />
-        </IconButton> */}
-        </div>
-        )}
       </div>
-      <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
-          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <CardMedia
-              component="img"
-              height="120"
-              image={"https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"}
-              alt={camp.name}
-              sx={{ borderRadius: 3, height: 120, objectFit: 'cover', maxWidth: 150 }}
-            />
-          </Box>
-          <Box sx={{ flex: 1, pl: 2 }}>
-            <Typography variant="subtitle2" color="text.secondary">Nombre del campamento</Typography>
-            <Typography variant="h6" fontWeight={700}>{camp.name}</Typography>
-            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>Ubicación</Typography>
-            <Typography variant="body1" fontWeight={600}>{camp.location || 'Sin ubicación'}</Typography>
-          </Box>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 2, borderTop: '1px solid #e0e0e0' }}>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="body1" fontWeight={600}>
-              {/* fecha de hoy */}
-              {new Date().toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
+
+      {/* Camp info card */}
+      <Card
+        sx={{
+          borderRadius: 3,
+          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+          overflow: "hidden",
+          backgroundColor: "#fff",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", p: 2.5, gap: 2 }}>
+          <CardMedia
+            component="img"
+            image="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
+            alt={camp.name}
+            sx={{
+              borderRadius: 2,
+              width: 120,
+              height: 100,
+              objectFit: "cover",
+              flexShrink: 0,
+            }}
+          />
+          <Box>
+            <Typography variant="h6" fontWeight={700}>
+              {camp.name}
             </Typography>
-            {contractorName && (
-              <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                Contratista: {contractorName}
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}
+            >
+              <LocationOnIcon sx={{ fontSize: 16, color: "#ef4444" }} />
+              <Typography variant="body2" color="text.secondary">
+                {camp.location || "Sin ubicación"}
               </Typography>
-            )}
+            </Box>
           </Box>
         </Box>
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Box sx={{ bgcolor: '#eaf1ff', borderRadius: 2, p: 2, textAlign: 'center' }}>
-                <Typography variant="h5" fontWeight={700} color="primary.main">{camp.totalRooms}</Typography>
-                <Typography variant="body2">Habitaciones disponibles</Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Box sx={{ bgcolor: '#eaf1ff', borderRadius: 2, p: 2, textAlign: 'center' }}>
-                <Typography variant="h5" fontWeight={700} color="primary.main">{camp.totalBeds}</Typography>
-                <Typography variant="body2">Camas disponibles</Typography>
-              </Box>
-            </Grid>
-          </Grid>
-          {!sectorContractor && authState?.user?.role && authRoles.admin.includes(authState.user.role as string) && (
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={6}>
-              <Box sx={{ bgcolor: '#eaf1ff', borderRadius: 2, p: 2, textAlign: 'center' }}>
-                <Typography variant="h5" fontWeight={700} color="primary.main">{((camp.occupiedBeds*100)/camp.totalBeds).toFixed(2) == "NaN" ? "0.00" : ((camp.occupiedBeds*100)/camp.totalBeds).toFixed(2)}%</Typography>
-                <Typography variant="body2">% de camas en uso</Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Box sx={{ bgcolor: '#eaf1ff', borderRadius: 2, p: 2, textAlign: 'center' }}>
-                <Typography variant="h5" fontWeight={700} color="primary.main">{camp.occupiedBeds}</Typography>
-                <Typography variant="body2">Camas en uso</Typography>
-              </Box>
-            </Grid>
-          </Grid>
-          )}
-          {tagSummaryOrdered && tagSummaryOrdered.length > 0 && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="subtitle1" fontWeight={600} color="primary.main">Habitaciones por Estándar:</Typography>
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 1 }}>
-                {tagSummaryOrdered.map(({ tag, count }) => (
-                  <Box key={tag} sx={{ bgcolor: '#eaf1ff', borderRadius: 2, p: 2, minWidth: 120, textAlign: 'center', boxShadow: 1 }}>
-                    <Typography variant="h6" fontWeight={700} color="primary.main">{count}</Typography>
-                    <Typography variant="body2" fontWeight={500}>{tag}</Typography>
-                  </Box>
-                ))}
-              </Box>
+        {!sectorContractor &&
+          authState?.user?.role &&
+          authRoles.admin.includes(authState.user.role as string) && (
+            <Box sx={{ display: "flex", gap: 1.5, px: 2.5, pb: 2 }}>
+              <IconButton
+                onClick={handleEditClick}
+                sx={{
+                  bgcolor: "#f1f5f9",
+                  width: 36,
+                  height: 36,
+                  "&:hover": { bgcolor: "#e2e8f0" },
+                }}
+              >
+                <EditIcon sx={{ color: "#4f46e5", fontSize: 18 }} />
+              </IconButton>
+              <IconButton
+                onClick={handleDeleteClick}
+                sx={{
+                  bgcolor: "#fef2f2",
+                  width: 36,
+                  height: 36,
+                  "&:hover": { bgcolor: "#fee2e2" },
+                }}
+              >
+                <DeleteIcon sx={{ color: "#ef4444", fontSize: 18 }} />
+              </IconButton>
             </Box>
           )}
-        </CardContent>
       </Card>
+
+      {/* Date divider */}
+      <Box sx={{ display: "flex", alignItems: "center", my: 3 }}>
+        <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          fontWeight={500}
+          sx={{ mx: 2, whiteSpace: "nowrap" }}
+        >
+          {contractorName
+            ? `Contratista: ${contractorName}`
+            : new Date().toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+        </Typography>
+        <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+      </Box>
+
+      {/* Stats grid */}
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <Box
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 3,
+              p: 2,
+              textAlign: "center",
+              border: "1px solid #e2e8f0",
+            }}
+          >
+            <Typography variant="h4" fontWeight={700} sx={{ color: "#4f46e5" }}>
+              {camp.totalRooms}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Habitaciones disponibles
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={6}>
+          <Box
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 3,
+              p: 2,
+              textAlign: "center",
+              border: "1px solid #e2e8f0",
+            }}
+          >
+            <Typography variant="h4" fontWeight={700} sx={{ color: "#4f46e5" }}>
+              {camp.totalBeds}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Camas disponibles
+            </Typography>
+          </Box>
+        </Grid>
+        {!sectorContractor &&
+          authState?.user?.role &&
+          authRoles.admin.includes(authState.user.role as string) && (
+            <>
+              <Grid item xs={6}>
+                <Box
+                  sx={{
+                    bgcolor: "#fff",
+                    borderRadius: 3,
+                    p: 2,
+                    textAlign: "center",
+                    border: "1px solid #e2e8f0",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    fontWeight={700}
+                    sx={{ color: "#22c55e" }}
+                  >
+                    {((camp.occupiedBeds * 100) / camp.totalBeds).toFixed(2) ===
+                    "NaN"
+                      ? "0.00"
+                      : ((camp.occupiedBeds * 100) / camp.totalBeds).toFixed(
+                          2,
+                        )}{" "}
+                    %
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    % de camas en uso
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <Box
+                  sx={{
+                    bgcolor: "#fff",
+                    borderRadius: 3,
+                    p: 2,
+                    textAlign: "center",
+                    border: "1px solid #e2e8f0",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    fontWeight={700}
+                    sx={{ color: "#4f46e5" }}
+                  >
+                    {camp.occupiedBeds}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Camas en uso
+                  </Typography>
+                </Box>
+              </Grid>
+            </>
+          )}
+      </Grid>
+
+      {/* Rooms by Standard */}
+      {tagSummaryOrdered && tagSummaryOrdered.length > 0 && (
+        <>
+          <Box sx={{ display: "flex", alignItems: "center", my: 3 }}>
+            <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              fontWeight={500}
+              sx={{ mx: 2, whiteSpace: "nowrap" }}
+            >
+              Habitaciones por estándar
+            </Typography>
+            <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+          </Box>
+          <Grid container spacing={2}>
+            {tagSummaryOrdered.map(({ tag, count }) => (
+              <Grid item xs={4} key={tag}>
+                <Box
+                  sx={{
+                    bgcolor: "#fff",
+                    borderRadius: 3,
+                    p: 2,
+                    textAlign: "center",
+                    border: "1px solid #e2e8f0",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    fontWeight={700}
+                    sx={{ color: "#4f46e5" }}
+                  >
+                    {count}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {tag}
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </>
+      )}
 
       <ConfirmationModal
         isOpen={isDeleteModalOpen}

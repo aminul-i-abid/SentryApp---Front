@@ -120,7 +120,7 @@ function UserMenu(props: UserMenuProps) {
         </div>
 
         {/* Chevron icon */}
-        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 shrink-0 border border-gray-200 dark:bg-white/[0.06] dark:border-white/20">
+        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 shrink-0 border border-gray-200 dark:bg-gray-400 dark:border-white/20">
           <img
             src="/assets/icons/arrow-left-double.png"
             alt="menu"
@@ -223,7 +223,7 @@ function UserMenu(props: UserMenuProps) {
                 className={clsx(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer border-none w-full text-left transition-all duration-200",
                   "bg-[#f7f7f7] dark:bg-white/[0.12]",
-                  "hover:bg-gray-800 dark:hover:bg-white/[0.18]",
+                  "dark:hover:bg-white/[0.18]",
                   "active:scale-[0.98]",
                 )}
                 onClick={userMenuClose}

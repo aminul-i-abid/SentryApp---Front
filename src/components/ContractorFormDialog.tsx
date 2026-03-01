@@ -61,7 +61,7 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
   open,
   onClose,
   title,
-  submitLabel = "Submit Info",
+  submitLabel = "Guardar",
   initialData,
   showState = true,
   onSubmit,
@@ -209,10 +209,10 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
         <Box sx={{ display: "flex", gap: 2 }}>
           <Box sx={{ flex: 1 }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-              Company Name
+              Nombre de la empresa
             </Typography>
             <TextField
-              placeholder="Enter your company name"
+              placeholder="Ingrese el nombre de la empresa"
               value={formData.name}
               onChange={set("name")}
               fullWidth
@@ -222,10 +222,10 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
           </Box>
           <Box sx={{ flex: 1 }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-              Company Tax ID
+              RUT de la empresa
             </Typography>
             <TextField
-              placeholder="Enter your tax id"
+              placeholder="Ingrese su RUT"
               value={formData.rut}
               onChange={set("rut")}
               fullWidth
@@ -239,10 +239,10 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
         <Box sx={{ display: "flex", gap: 2 }}>
           <Box sx={{ flex: 1 }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-              Email ID
+              Correo
             </Typography>
             <TextField
-              placeholder="Enter your mail address"
+              placeholder="Ingrese su correo"
               value={formData.email}
               onChange={set("email")}
               fullWidth
@@ -253,7 +253,7 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
           </Box>
           <Box sx={{ flex: 1 }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-              Phone Number
+              Número de teléfono
             </Typography>
             <Box sx={{ display: "flex", gap: 1 }}>
               <FormControl size="small" sx={{ width: 110, flexShrink: 0 }}>
@@ -284,7 +284,7 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
                 </Select>
               </FormControl>
               <TextField
-                placeholder="Enter your phone"
+                placeholder="Ingrese su teléfono"
                 value={localPhone}
                 onChange={handleLocalPhone}
                 fullWidth
@@ -299,10 +299,10 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
         <Box sx={{ display: "flex", gap: 2 }}>
           <Box sx={{ flex: 1 }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-              Address
+              Dirección
             </Typography>
             <TextField
-              placeholder="Enter your address"
+              placeholder="Ingrese su dirección"
               value={formData.address}
               onChange={set("address")}
               fullWidth
@@ -312,10 +312,10 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
           </Box>
           <Box sx={{ flex: 1 }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-              Website
+              Sitio web
             </Typography>
             <TextField
-              placeholder="Enter your website URL"
+              placeholder="Ingrese la URL del sitio web"
               value={formData.website}
               onChange={set("website")}
               fullWidth
@@ -342,7 +342,7 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
                   sx={selectFieldSx}
                 >
                   <MenuItem value="" disabled>
-                    Select State
+                    Seleccione estado
                   </MenuItem>
                   <MenuItem value="true">Activo</MenuItem>
                   <MenuItem value="false">Inactivo</MenuItem>
@@ -375,7 +375,7 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
               "&:hover": { backgroundColor: "transparent" },
             }}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button
             onClick={handleSubmit}

@@ -10,7 +10,7 @@ export default function TopbarHeader() {
   const firstName = user?.displayName?.split(" ")[0] || "";
 
   return (
-    <div className="px-6 py-5 flex items-center justify-between gap-4 flex-wrap bg-white dark:bg-[#121212] border-b border-gray-100 dark:border-white/6">
+    <div className="px-6 py-4 flex items-center justify-between gap-4 flex-wrap bg-white dark:bg-[#121212] border-b border-gray-100 dark:border-white/6">
       <div className="flex items-center gap-4">
         {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
         <div>

@@ -1,54 +1,56 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Box, 
-  Typography,
-  IconButton,
-  TableSortLabel,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-  OutlinedInput,
-  SelectChangeEvent,
-  Checkbox,
-  Toolbar,
-  Tooltip,
-  Popover,
+import { ConfirmationModal } from "@/components/ConfirmationModal";
+import type { ActionMenuItem } from "@/components/ui/RowActionMenu";
+import RowActionMenu from "@/components/ui/RowActionMenu";
+import type { TableColumnDef } from "@/components/ui/StyledTable";
+import StyledTable from "@/components/ui/StyledTable";
+import useAuth from "@fuse/core/FuseAuthProvider/useAuth";
+import Battery20Icon from "@mui/icons-material/Battery20";
+import Battery60Icon from "@mui/icons-material/Battery60";
+import BatteryFullIcon from "@mui/icons-material/BatteryFull";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import HistoryIcon from "@mui/icons-material/History";
+import InfoIcon from "@mui/icons-material/Info";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import {
   alpha,
-  Modal,
+  Box,
   Button,
+  Chip,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Modal,
+  OutlinedInput,
+  Popover,
+  Select,
+  SelectChangeEvent,
   Stack,
   TextField,
-  TablePagination,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import BatteryFullIcon from '@mui/icons-material/BatteryFull';
-import Battery60Icon from '@mui/icons-material/Battery60';
-import Battery20Icon from '@mui/icons-material/Battery20';
-import { RoomResponse } from '../models/RoomResponse';
-import { ConfirmationModal } from '@/components/ConfirmationModal';
-import { deleteRoom, updateRoom, updateRoomDisabledStatus, createRoomPinUnique } from '../roomService';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
-import InfoIcon from '@mui/icons-material/Info';
-import DialpadIcon from '@mui/icons-material/Dialpad';
-import AddPinModal from './AddPinModal';
-import { ContractorResponse } from '../../contractors/models/ContractorResponse';
-import tagRoleMap from '../../tag/enum/RoleTag';
-import RoomDetailSidebar from './RoomDetailSidebar';
-import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { useSnackbar } from "notistack";
+import React, { useMemo, useState } from "react";
+import { ContractorResponse } from "../../contractors/models/ContractorResponse";
+import tagRoleMap from "../../tag/enum/RoleTag";
+import { RoomResponse } from "../models/RoomResponse";
+import {
+  createRoomPinUnique,
+  deleteRoom,
+  updateRoom,
+  updateRoomDisabledStatus,
+} from "../roomService";
+import AddPinModal from "./AddPinModal";
+import RoomDetailSidebar from "./RoomDetailSidebar";
 
 interface RoomCardsProps {
   rooms: RoomResponse[];
@@ -65,69 +67,82 @@ interface RoomCardsProps {
   // Filter props
   onCompanyFilter?: (companyIds: number[]) => void;
   onSearchFilter?: (search: string) => void;
+  // External filter anchor (from parent tune icon)
+  externalFilterAnchorEl?: HTMLElement | null;
+  onExternalFilterClose?: () => void;
 }
 
-type Order = 'asc' | 'desc';
-type OrderBy = 'roomNumber' | 'companyName';
+type Order = "asc" | "desc";
+type OrderBy = "roomNumber" | "companyName";
 
-function RoomCards({ 
-  rooms, 
-  onRoomClick, 
-  onDeleteClick, 
-  contractors, 
+function RoomCards({
+  rooms,
+  onRoomClick,
+  onDeleteClick,
+  contractors,
   loading = false,
   page,
   rowsPerPage,
   totalCount,
   onPageChange,
-  onRowsPerPageChange,
+  onRowsPerPageChange: _onRowsPerPageChange,
   onCompanyFilter,
-  onSearchFilter
+  onSearchFilter,
+  externalFilterAnchorEl = null,
+  onExternalFilterClose,
 }: RoomCardsProps) {
   const [selectedRoom, setSelectedRoom] = useState<RoomResponse | null>(null);
-  const [selectedTag, setSelectedTag] = useState<number | ''>('');
+  const [selectedTag, setSelectedTag] = useState<number | "">("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
   const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [disableComments, setDisableComments] = useState<string>('');
-  const [pendingDisabledState, setPendingDisabledState] = useState<boolean>(false);
+  const [disableComments, setDisableComments] = useState<string>("");
+  const [pendingDisabledState, setPendingDisabledState] =
+    useState<boolean>(false);
   // Add PIN modal state
   const [isAddPinOpen, setIsAddPinOpen] = useState(false);
   const [roomForPin, setRoomForPin] = useState<RoomResponse | null>(null);
   const [addingPin, setAddingPin] = useState(false);
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<OrderBy>('roomNumber');
+  const [order, setOrder] = useState<Order>("asc");
+  const [orderBy, setOrderBy] = useState<OrderBy>("roomNumber");
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
-  const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(null);
-  const [searchText, setSearchText] = useState<string>('');
-  
+  const [searchText, setSearchText] = useState<string>("");
+
   // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedRoomForSidebar, setSelectedRoomForSidebar] = useState<RoomResponse | null>(null);
-  
+  const [selectedRoomForSidebar, setSelectedRoomForSidebar] =
+    useState<RoomResponse | null>(null);
+
   // Bulk edit form state
   const [bulkEditTag, setBulkEditTag] = useState<string>("");
   const [bulkEditBeds, setBulkEditBeds] = useState<string>("");
   const [bulkEditContractor, setBulkEditContractor] = useState<string>("");
-  
+
   const { enqueueSnackbar } = useSnackbar();
   const { authState } = useAuth();
-  const isSentryAdmin = authState.user?.role === 'Sentry_Admin';
+  const isSentryAdmin = authState.user?.role === "Sentry_Admin";
 
   // Battery level functions
   const getBatteryColor = (batteryLevel: number | undefined | null) => {
-    if (batteryLevel === undefined || batteryLevel === null) return '#94A3B8'; // Gris para desconocido
-    if (batteryLevel < 35) return '#EF4444'; // Rojo para bajo
-    if (batteryLevel <= 65) return '#F59E0B'; // Amarillo para medio
-    return '#10B981'; // Verde para bueno
+    if (batteryLevel === undefined || batteryLevel === null) return "#94A3B8"; // Gris para desconocido
+
+    if (batteryLevel < 35) return "#EF4444"; // Rojo para bajo
+
+    if (batteryLevel <= 65) return "#F59E0B"; // Amarillo para medio
+
+    return "#10B981"; // Verde para bueno
   };
 
   const getBatteryIcon = (batteryLevel: number | undefined | null) => {
-    if (batteryLevel === undefined || batteryLevel === null) return Battery60Icon;
+    if (batteryLevel === undefined || batteryLevel === null)
+      return Battery60Icon;
+
     if (batteryLevel < 35) return Battery20Icon;
+
     if (batteryLevel <= 65) return Battery60Icon;
+
     return BatteryFullIcon;
   };
 
@@ -151,16 +166,12 @@ function RoomCards({
     }
   };
 
-  const handleFilterClick = (event: React.MouseEvent<HTMLElement>) => {
-    setFilterAnchorEl(event.currentTarget);
-  };
-
   const handleFilterClose = () => {
-    setFilterAnchorEl(null);
+    onExternalFilterClose?.();
   };
 
-  const filterOpen = Boolean(filterAnchorEl);
-  const filterId = filterOpen ? 'filter-popover' : undefined;
+  const filterOpen = Boolean(externalFilterAnchorEl);
+  const filterId = filterOpen ? "filter-popover" : undefined;
 
   const handleRoomClick = (room: RoomResponse) => {
     if (onRoomClick) {
@@ -175,28 +186,34 @@ function RoomCards({
     if (selectedRoom) {
       try {
         await deleteRoom(selectedRoom.id);
-        enqueueSnackbar('Habitación eliminada exitosamente', { variant: 'success' });
+        enqueueSnackbar("Habitación eliminada exitosamente", {
+          variant: "success",
+        });
+
         if (onDeleteClick) {
           onDeleteClick(selectedRoom);
         }
       } catch (error) {
-        console.error('Error deleting room:', error);
-        enqueueSnackbar('Error al eliminar la habitación', { variant: 'error' });
+        console.error("Error deleting room:", error);
+        enqueueSnackbar("Error al eliminar la habitación", {
+          variant: "error",
+        });
       }
     }
+
     setIsDeleteModalOpen(false);
   };
 
   const handleRequestSort = (property: OrderBy) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
   // Get all unique companies from rooms
   const companies = useMemo(() => {
     const uniqueCompanies = new Set<string>();
-    rooms.forEach(room => {
+    rooms.forEach((room) => {
       if (room.companyName) {
         uniqueCompanies.add(room.companyName);
       }
@@ -207,12 +224,14 @@ function RoomCards({
   // Handle company filter change
   const handleCompanyFilterChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value;
-    const companies = typeof value === 'string' ? value.split(',') : value;
+    const companies = typeof value === "string" ? value.split(",") : value;
     setSelectedCompanies(companies);
   };
 
   // Handle search text change
-  const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchTextChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const searchValue = event.target.value;
     setSearchText(searchValue);
   };
@@ -222,18 +241,20 @@ function RoomCards({
     // If parent component provides filter callbacks, use them
     if (onCompanyFilter) {
       // Convert company names to company IDs
-      const companyIds = selectedCompanies.map(companyName => {
-        const contractor = contractors.find(c => c.name === companyName);
-        return contractor ? contractor.id : null;
-      }).filter(id => id !== null) as number[];
-      
+      const companyIds = selectedCompanies
+        .map((companyName) => {
+          const contractor = contractors.find((c) => c.name === companyName);
+          return contractor ? contractor.id : null;
+        })
+        .filter((id) => id !== null) as number[];
+
       onCompanyFilter(companyIds);
     }
-    
+
     if (onSearchFilter) {
       onSearchFilter(searchText);
     }
-    
+
     // Close the filter popover
     handleFilterClose();
   };
@@ -241,17 +262,17 @@ function RoomCards({
   // Handle clear filters button click
   const handleClearFilters = () => {
     setSelectedCompanies([]);
-    setSearchText('');
-    
+    setSearchText("");
+
     // If parent component provides filter callbacks, clear them
     if (onCompanyFilter) {
       onCompanyFilter([]);
     }
-    
+
     if (onSearchFilter) {
-      onSearchFilter('');
+      onSearchFilter("");
     }
-    
+
     // Close the filter popover
     handleFilterClose();
   };
@@ -264,49 +285,53 @@ function RoomCards({
       return [...rooms].sort((a, b) => {
         let valueA: string | number;
         let valueB: string | number;
-        
+
         switch (orderBy) {
-          case 'roomNumber':
+          case "roomNumber":
             valueA = a.id;
             valueB = b.id;
             break;
-          case 'companyName':
-            valueA = a.companyName || '';
-            valueB = b.companyName || '';
+          case "companyName":
+            valueA = a.companyName || "";
+            valueB = b.companyName || "";
             break;
           default:
             valueA = a.id;
             valueB = b.id;
         }
-        
-        if (typeof valueA === 'string' && typeof valueB === 'string') {
-          return order === 'asc' 
+
+        if (typeof valueA === "string" && typeof valueB === "string") {
+          return order === "asc"
             ? valueA.localeCompare(valueB)
             : valueB.localeCompare(valueA);
         } else {
           // Handle numeric comparison by converting to numbers first
           const numA = Number(valueA);
           const numB = Number(valueB);
-          return order === 'asc'
-            ? numA - numB
-            : numB - numA;
+          return order === "asc" ? numA - numB : numB - numA;
         }
       });
     }
 
     // Local filtering (when no parent callbacks) - apply both filtering and sorting
     // First filter by selected companies
-    let filtered = selectedCompanies.length > 0
-      ? rooms.filter(room => room.companyName && selectedCompanies.includes(room.companyName))
-      : rooms;
+    let filtered =
+      selectedCompanies.length > 0
+        ? rooms.filter(
+            (room) =>
+              room.companyName && selectedCompanies.includes(room.companyName),
+          )
+        : rooms;
 
     // Then filter by search text
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase().trim();
-      filtered = filtered.filter(room => 
-        room.roomNumber.toLowerCase().includes(searchLower) ||
-        (room.companyName && room.companyName.toLowerCase().includes(searchLower)) ||
-        room.floorNumber.toString().includes(searchLower)
+      filtered = filtered.filter(
+        (room) =>
+          room.roomNumber.toLowerCase().includes(searchLower) ||
+          (room.companyName &&
+            room.companyName.toLowerCase().includes(searchLower)) ||
+          room.floorNumber.toString().includes(searchLower),
       );
     }
 
@@ -314,35 +339,41 @@ function RoomCards({
     return [...filtered].sort((a, b) => {
       let valueA: string | number;
       let valueB: string | number;
-      
+
       switch (orderBy) {
-        case 'roomNumber':
+        case "roomNumber":
           valueA = a.id;
           valueB = b.id;
           break;
-        case 'companyName':
-          valueA = a.companyName || '';
-          valueB = b.companyName || '';
+        case "companyName":
+          valueA = a.companyName || "";
+          valueB = b.companyName || "";
           break;
         default:
           valueA = a.id;
           valueB = b.id;
       }
-      
-      if (typeof valueA === 'string' && typeof valueB === 'string') {
-        return order === 'asc' 
+
+      if (typeof valueA === "string" && typeof valueB === "string") {
+        return order === "asc"
           ? valueA.localeCompare(valueB)
           : valueB.localeCompare(valueA);
       } else {
         // Handle numeric comparison by converting to numbers first
         const numA = Number(valueA);
         const numB = Number(valueB);
-        return order === 'asc'
-          ? numA - numB
-          : numB - numA;
+        return order === "asc" ? numA - numB : numB - numA;
       }
     });
-  }, [rooms, selectedCompanies, searchText, order, orderBy, onCompanyFilter, onSearchFilter]);
+  }, [
+    rooms,
+    selectedCompanies,
+    searchText,
+    order,
+    orderBy,
+    onCompanyFilter,
+    onSearchFilter,
+  ]);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -350,6 +381,7 @@ function RoomCards({
       setSelected(newSelected);
       return;
     }
+
     setSelected([]);
   };
 
@@ -369,10 +401,11 @@ function RoomCards({
         selected.slice(selectedIndex + 1),
       );
     }
+
     setSelected(newSelected);
   };
 
-  const isSelected = (id: string) => selected.indexOf(id) !== -1;
+  const _isSelected = (id: string) => selected.indexOf(id) !== -1;
 
   const handleBulkEditOpen = () => {
     setIsBulkEditModalOpen(true);
@@ -391,36 +424,48 @@ function RoomCards({
           beds: bulkEditBeds ? parseInt(bulkEditBeds) : room.beds,
           isStorage: room.isStorage,
           blockId: room.blockId,
-          companyId: bulkEditContractor ? parseInt(bulkEditContractor) : room.companyId,
+          companyId: bulkEditContractor
+            ? parseInt(bulkEditContractor)
+            : room.companyId,
           tag: bulkEditTag ? parseInt(bulkEditTag) : room.tag,
           floorNumber: room.floorNumber,
-          disabled: room.disabled
+          disabled: room.disabled,
         };
-        
+
         await updateRoom(room.id.toString(), updatedRoom);
       }
-      
+
       // Show success message
-      enqueueSnackbar(`Se actualizaron ${selectedRooms.length} habitaciones correctamente`, { variant: 'success' });
-      
+      enqueueSnackbar(
+        `Se actualizaron ${selectedRooms.length} habitaciones correctamente`,
+        {
+          variant: "success",
+        },
+      );
+
       // Close modal and refresh
       setIsBulkEditModalOpen(false);
       setSelected([]);
       setBulkEditTag("");
       setBulkEditBeds("");
       setBulkEditContractor("");
-      
+
       // If onDeleteClick exists, use it as a way to trigger refresh from parent
       if (onDeleteClick && selectedRooms.length > 0) {
         onDeleteClick(selectedRooms[0]);
       }
     } catch (error) {
-      console.error('Error updating rooms:', error);
-      enqueueSnackbar("Error al actualizar las habitaciones", { variant: 'error' });
+      console.error("Error updating rooms:", error);
+      enqueueSnackbar("Error al actualizar las habitaciones", {
+        variant: "error",
+      });
     }
   };
 
-  const handleDisabledChange = (room: RoomResponse, newDisabledState: boolean) => {
+  const handleDisabledChange = (
+    room: RoomResponse,
+    newDisabledState: boolean,
+  ) => {
     setSelectedRoom(room);
     setPendingDisabledState(newDisabledState);
     setIsDisableModalOpen(true);
@@ -432,46 +477,55 @@ function RoomCards({
     try {
       // action: 1 para deshabilitar, 0 para habilitar
       const action = pendingDisabledState ? 1 : 0;
-      
+
       // Si se está habilitando y no hay comentario, usar uno por defecto
-      const comments = disableComments.trim() || (pendingDisabledState ? '' : 'Se habilitó la habitación');
-      
+      const comments =
+        disableComments.trim() ||
+        (pendingDisabledState ? "" : "Se habilitó la habitación");
+
       const result = await updateRoomDisabledStatus(
         selectedRoom.id,
         action,
-        comments
+        comments,
       );
 
       if (result.succeeded) {
         enqueueSnackbar(
-          `Habitación ${pendingDisabledState ? 'deshabilitada' : 'habilitada'} correctamente`,
-          { variant: 'success' }
+          `Habitación ${pendingDisabledState ? "deshabilitada" : "habilitada"} correctamente`,
+          {
+            variant: "success",
+          },
         );
-        
+
         // Trigger refresh from parent
         if (onDeleteClick) {
           onDeleteClick(selectedRoom);
         }
       } else {
         enqueueSnackbar(
-          result.errors?.[0] || 'Error al actualizar el estado de la habitación',
-          { variant: 'error' }
+          result.errors?.[0] ||
+            "Error al actualizar el estado de la habitación",
+          {
+            variant: "error",
+          },
         );
       }
     } catch (error) {
-      console.error('Error updating room status:', error);
-      enqueueSnackbar('Error al actualizar el estado de la habitación', { variant: 'error' });
+      console.error("Error updating room status:", error);
+      enqueueSnackbar("Error al actualizar el estado de la habitación", {
+        variant: "error",
+      });
     }
 
     // Reset modal state
     setIsDisableModalOpen(false);
-    setDisableComments('');
+    setDisableComments("");
     setSelectedRoom(null);
   };
 
   const handleDisableCancel = () => {
     setIsDisableModalOpen(false);
-    setDisableComments('');
+    setDisableComments("");
     setSelectedRoom(null);
   };
 
@@ -496,23 +550,29 @@ function RoomCards({
     setRoomForPin(null);
   };
 
-  const handleSaveAddPin = async (data: { name: string; phoneNumber: string; roomId: number }) => {
+  const handleSaveAddPin = async (data: {
+    name: string;
+    phoneNumber: string;
+    roomId: number;
+  }) => {
     setAddingPin(true);
     try {
       const result = await createRoomPinUnique({
         name: data.name,
         phoneNumber: data.phoneNumber,
-        roomId: data.roomId
+        roomId: data.roomId,
       });
 
       if (result.succeeded) {
-        enqueueSnackbar('PIN creado correctamente', { variant: 'success' });
+        enqueueSnackbar("PIN creado correctamente", { variant: "success" });
         handleCloseAddPin();
       } else {
-        enqueueSnackbar(result.errors?.[0] || 'Error al crear el PIN', { variant: 'error' });
+        enqueueSnackbar(result.errors?.[0] || "Error al crear el PIN", {
+          variant: "error",
+        });
       }
     } catch (e) {
-      enqueueSnackbar('Error al crear el PIN', { variant: 'error' });
+      enqueueSnackbar("Error al crear el PIN", { variant: "error" });
     } finally {
       setAddingPin(false);
     }
@@ -520,313 +580,282 @@ function RoomCards({
 
   // Get the selected room objects based on their IDs
   const selectedRooms = useMemo(() => {
-    return rooms.filter(room => selected.includes(room.id.toString()));
+    return rooms.filter((room) => selected.includes(room.id.toString()));
   }, [rooms, selected]);
 
   // Check if any filters are active
-  const hasActiveFilters = selectedCompanies.length > 0 || searchText.trim() !== '';
+  const hasActiveFilters =
+    selectedCompanies.length > 0 || searchText.trim() !== "";
+
+  // Column definitions for StyledTable
+  const columns: TableColumnDef<RoomResponse>[] = useMemo(
+    () => [
+      {
+        id: "roomNumber",
+        label: "Habitación",
+        sortable: true,
+        render: (room: RoomResponse) => (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Typography variant="body2" fontWeight={600}>
+              {room.roomNumber}
+            </Typography>
+            {room.hasDoorLock && (
+              <MeetingRoomIcon sx={{ fontSize: 16, color: "primary.main" }} />
+            )}
+          </Box>
+        ),
+      },
+      {
+        id: "floorNumber",
+        label: "Piso",
+        render: (room: RoomResponse) => room.floorNumber,
+      },
+      {
+        id: "beds",
+        label: "Camas",
+        render: (room: RoomResponse) => room.beds,
+      },
+      {
+        id: "tag",
+        label: "Estándar",
+        render: (room: RoomResponse) => tagRoleMap[room.tag] || room.tag,
+      },
+      {
+        id: "companyName",
+        label: "Contratista",
+        sortable: true,
+        render: (room: RoomResponse) => room.companyName || "Sin contratista",
+      },
+      {
+        id: "enabled",
+        label: "Habilitada",
+        render: (room: RoomResponse) => (
+          <Box
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDisabledChange(room, !room.disabled);
+            }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+              cursor: "pointer",
+              "&:hover": { opacity: 0.7 },
+            }}
+          >
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              sx={{
+                color: room.disabled ? "#ef4444" : "#22c55e",
+              }}
+            >
+              {room.disabled ? "Off" : "On"}
+            </Typography>
+            <FiberManualRecordIcon
+              sx={{
+                fontSize: 14,
+                color: room.disabled ? "#ef4444" : "#22c55e",
+              }}
+            />
+          </Box>
+        ),
+      },
+    ],
+    [],
+  );
+
+  // Render actions column for each row
+  const renderActions = (room: RoomResponse) => (
+    <RowActionMenu
+      onView={() => handleRowClick(room)}
+      menuItems={
+        [
+          {
+            key: "active",
+            label: "Información activa",
+            icon: <InfoOutlinedIcon fontSize="small" />,
+            toggle: true,
+            checked: !room.disabled,
+            onClick: () => handleDisabledChange(room, !room.disabled),
+          },
+          {
+            key: "edit",
+            label: "Editar información",
+            icon: <EditIcon fontSize="small" />,
+            onClick: () => handleRoomClick(room),
+          },
+          {
+            key: "history",
+            label: "Historia",
+            icon: <HistoryIcon fontSize="small" />,
+            onClick: () => handleHistoryClick(room),
+          },
+          {
+            key: "pin",
+            label: "Generar pin de habitación",
+            icon: (
+              <AddCircleOutlineIcon
+                fontSize="small"
+                sx={{ color: "#22c55e" }}
+              />
+            ),
+            onClick: () => handleOpenAddPin(room),
+            hidden: !isSentryAdmin,
+          },
+          {
+            key: "delete",
+            label: "Eliminar",
+            icon: <DeleteOutlineIcon fontSize="small" />,
+            color: "error.main",
+            dividerAbove: true,
+            onClick: () => {
+              setSelectedRoom(room);
+              setIsDeleteModalOpen(true);
+            },
+          },
+        ] as ActionMenuItem[]
+      }
+    />
+  );
+
+  // Bulk selection toolbar
+  const bulkToolbarContent =
+    selected.length > 0 ? (
+      <Toolbar
+        sx={{
+          pl: { sm: 2 },
+          pr: { xs: 1, sm: 1 },
+          minHeight: "48px !important",
+          mb: 1,
+          borderRadius: 2,
+          bgcolor: (theme) =>
+            alpha(
+              theme.palette.primary.main,
+              theme.palette.action.activatedOpacity,
+            ),
+        }}
+      >
+        <Typography
+          sx={{ flex: "1 1 100%" }}
+          color="inherit"
+          variant="subtitle1"
+          component="div"
+        >
+          {selected.length} selected
+        </Typography>
+        <Tooltip title="Edit selected">
+          <IconButton onClick={handleBulkEditOpen}>
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+      </Toolbar>
+    ) : null;
 
   return (
     <>
-      <Paper sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.05)', mb: 2 }}>
-        <Toolbar
-          sx={{
-            pl: { sm: 2 },
-            pr: { xs: 1, sm: 1 },
-            ...(selected.length > 0 && {
-              bgcolor: (theme) =>
-                alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-            }),
-          }}
-        >
-          {selected.length > 0 ? (
-            <>
-              <Typography
-                sx={{ flex: '1 1 100%' }}
-                color="inherit"
-                variant="subtitle1"
-                component="div"
-              >
-                {selected.length} seleccionado(s)
-              </Typography>
-              <Tooltip title="Editar seleccionados">
-                <IconButton onClick={handleBulkEditOpen}>
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-            </>
-          ) : (
-            <Typography
-              sx={{ flex: '1 1 100%' }}
-              variant="h6"
-              id="tableTitle"
-              component="div"
-            >
-              Habitaciones
-            </Typography>
-          )}
-
-          <Tooltip title="Filtrar por contratista">
-            <IconButton 
-              onClick={handleFilterClick}
-              sx={{
-                ...(hasActiveFilters && {
-                  bgcolor: 'primary.main',
-                  color: 'white',
-                  '&:hover': {
-                    bgcolor: 'primary.dark',
-                  }
-                })
-              }}
-            >
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Popover
-            id={filterId}
-            open={filterOpen}
-            anchorEl={filterAnchorEl}
-            onClose={handleFilterClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            <Box sx={{ p: 2, width: 300 }}>
-              <TextField
-                fullWidth
-                label="Buscar habitación"
-                placeholder="Buscar por habitación, contratista o piso..."
-                value={searchText}
-                onChange={handleSearchTextChange}
-                sx={{ mb: 2 }}
-                variant="outlined"
-              />
-              
-              <FormControl sx={{ width: '100%' }}>
-                <InputLabel id="company-filter-label">Filtrar por Contratista</InputLabel>
-                <Select
-                  labelId="company-filter-label"
-                  id="company-filter"
-                  multiple
-                  value={selectedCompanies}
-                  onChange={handleCompanyFilterChange}
-                  input={<OutlinedInput id="select-multiple-companies" label="Filtrar por Contratista" />}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value} />
-                      ))}
-                    </Box>
-                  )}
-                >
-                  {companies.map((company) => (
-                    <MenuItem key={company} value={company}>
-                      {company}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <Stack direction="row" spacing={2} sx={{ mt: 2, justifyContent: 'flex-end' }}>
-                <Button onClick={handleClearFilters} variant="outlined">
-                  Limpiar
-                </Button>
-                <Button onClick={handleApplyFilters} variant="contained" color="primary">
-                  Buscar
-                </Button>
-              </Stack>
-            </Box>
-          </Popover>
-        </Toolbar>
-
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: '#f5f5f5' }}>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    color="primary"
-                    indeterminate={selected.length > 0 && selected.length < filteredAndSortedRooms.length}
-                    checked={filteredAndSortedRooms.length > 0 && selected.length === filteredAndSortedRooms.length}
-                    onChange={handleSelectAllClick}
-                    inputProps={{
-                      'aria-label': 'seleccionar todas las habitaciones',
-                    }}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'roomNumber'}
-                    direction={orderBy === 'roomNumber' ? order : 'asc'}
-                    onClick={() => handleRequestSort('roomNumber')}
-                  >
-                    Habitación
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>Piso</TableCell>
-                <TableCell>Camas</TableCell>
-                <TableCell>Estándar</TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'companyName'}
-                    direction={orderBy === 'companyName' ? order : 'asc'}
-                    onClick={() => handleRequestSort('companyName')}
-                  >
-                    Contratista
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>Habilitada</TableCell>
-                <TableCell>Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={8}>
-                    <Box sx={{ py: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Typography variant="subtitle1" color="text.secondary">Cargando habitaciones...</Typography>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ) : filteredAndSortedRooms.length > 0 ? (
-                filteredAndSortedRooms.map((room) => {
-                  const isItemSelected = isSelected(room.id.toString());
-                  
-                  return (
-                    <TableRow 
-                      key={room.id}
-                      hover
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      selected={isItemSelected}
-                      onClick={() => handleRowClick(room)}
-                      sx={{ 
-                        cursor: 'pointer',
-                        '&:hover': {
-                          bgcolor: '#f8f9fa'
-                        }
-                      }}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleClick(event, room.id.toString());
-                          }}
-                          inputProps={{
-                            'aria-labelledby': `enhanced-table-checkbox-${room.id}`,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell 
-                        id={`enhanced-table-checkbox-${room.id}`}
-                      >
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <Typography variant="body2" fontWeight={600}>
-                              {room.roomNumber}
-                            </Typography>
-                            {room.hasDoorLock && (
-                              <MeetingRoomIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                            )}
-                          </Box>
-                      </TableCell>
-                      <TableCell>{room.floorNumber}</TableCell>
-                      <TableCell>{room.beds}</TableCell>
-                      <TableCell>{tagRoleMap[room.tag] || room.tag}</TableCell>
-                      <TableCell>{room.companyName || 'Sin contratista'}</TableCell>
-                      <TableCell>
-                        <IconButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDisabledChange(room, !room.disabled);
-                          }}
-                          size="small"
-                          sx={{
-                            color: room.disabled ? 'error.main' : 'success.main',
-                            '&:hover': {
-                              bgcolor: room.disabled ? 'error' : 'success',
-                              opacity: 0.4
-                            }
-                          }}
-                        >
-                          {room.disabled ? <CloseIcon sx={{ color: 'error.main' }} /> : <CheckIcon sx={{ color: 'success.main' }} />}
-                        </IconButton>
-                      </TableCell>
-                      <TableCell>
-                        <IconButton onClick={(e) => {
-                          e.stopPropagation();
-                          handleRoomClick(room);
-                        }}>
-                          <EditIcon />
-                        </IconButton>
-                        {isSentryAdmin && (
-                          <IconButton 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenAddPin(room);
-                            }}
-                            sx={{ color: 'primary.main' }}
-                          >
-                            <DialpadIcon />
-                          </IconButton>
-                        )}
-                        <IconButton 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleHistoryClick(room);
-                          }}
-                          sx={{ color: 'info.main' }}
-                        >
-                          <InfoIcon />
-                        </IconButton>
-                        {/* <IconButton 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedRoom(room);
-                            setIsDeleteModalOpen(true);
-                          }}
-                        >
-                          <DeleteIcon color="error" />
-                        </IconButton> */}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8}>
-                    <Box sx={{ py: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Typography variant="subtitle1" color="text.secondary">No se encontraron habitaciones</Typography>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: 8 }}>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={totalCount}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={onPageChange}
-            onRowsPerPageChange={onRowsPerPageChange}
-            labelRowsPerPage="Filas por página:"
-            labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
+      {/* Filter Popover - anchored to external tune icon */}
+      <Popover
+        id={filterId}
+        open={filterOpen}
+        anchorEl={externalFilterAnchorEl}
+        onClose={handleFilterClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <Box sx={{ p: 2, width: 300 }}>
+          <TextField
+            fullWidth
+            label="Search room"
+            placeholder="Search by room, contractor or floor..."
+            value={searchText}
+            onChange={handleSearchTextChange}
+            sx={{ mb: 2 }}
+            variant="outlined"
           />
-        </div>
-      </Paper>
+
+          <FormControl sx={{ width: "100%" }}>
+            <InputLabel id="company-filter-label">
+              Filter by Contractor
+            </InputLabel>
+            <Select
+              labelId="company-filter-label"
+              id="company-filter"
+              multiple
+              value={selectedCompanies}
+              onChange={handleCompanyFilterChange}
+              input={
+                <OutlinedInput
+                  id="select-multiple-companies"
+                  label="Filter by Contractor"
+                />
+              }
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} />
+                  ))}
+                </Box>
+              )}
+            >
+              {companies.map((company) => (
+                <MenuItem key={company} value={company}>
+                  {company}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{ mt: 2, justifyContent: "flex-end" }}
+          >
+            <Button onClick={handleClearFilters} variant="outlined">
+              Clear
+            </Button>
+            <Button
+              onClick={handleApplyFilters}
+              variant="contained"
+              color="primary"
+            >
+              Search
+            </Button>
+          </Stack>
+        </Box>
+      </Popover>
+
+      <StyledTable<RoomResponse>
+        columns={columns}
+        data={filteredAndSortedRooms}
+        getRowId={(room) => room.id.toString()}
+        loading={loading}
+        loadingMessage="Cargando habitaciones..."
+        emptyMessage="No se encontraron habitaciones"
+        selectable
+        selected={selected}
+        onSelectAll={handleSelectAllClick}
+        onSelectRow={handleClick}
+        order={order}
+        orderBy={orderBy}
+        onSort={(columnId) => handleRequestSort(columnId as OrderBy)}
+        onRowClick={handleRowClick}
+        renderActions={renderActions}
+        actionsLabel="Acciones"
+        pagination={{
+          count: totalCount,
+          page,
+          rowsPerPage,
+          onPageChange,
+        }}
+        bulkToolbar={bulkToolbarContent}
+      />
 
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
@@ -838,37 +867,36 @@ function RoomCards({
       />
 
       {/* Bulk Edit Modal */}
-      <Modal
-        open={isBulkEditModalOpen}
-        onClose={handleBulkEditClose}
-      >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 400,
-          bgcolor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4
-        }}>
+      <Modal open={isBulkEditModalOpen} onClose={handleBulkEditClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
           <Typography variant="h6" component="h2" mb={2}>
             Editar habitaciones seleccionadas
           </Typography>
-          
+
           <Typography variant="body2" mb={3}>
             Estás editando {selected.length} habitación(es):
-            {selectedRooms.map(room => (
-              <Chip 
-                key={room.id} 
-                label={room.roomNumber} 
-                size="small" 
-                sx={{ ml: 0.5, mb: 0.5 }} 
+            {selectedRooms.map((room) => (
+              <Chip
+                key={room.id}
+                label={room.roomNumber}
+                size="small"
+                sx={{ ml: 0.5, mb: 0.5 }}
               />
             ))}
           </Typography>
-          
+
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel id="company-edit-label">Contratista</InputLabel>
             <Select
@@ -922,19 +950,21 @@ function RoomCards({
                 <em>No cambiar</em>
               </MenuItem>
               {Object.entries(tagRoleMap).map(([key, value]) => (
-                <MenuItem key={key} value={key}>{value}</MenuItem>
+                <MenuItem key={key} value={key}>
+                  {value}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          <Stack direction="row" spacing={2} sx={{ '& > *': { flex: 1 } }}>
+          <Stack direction="row" spacing={2} sx={{ "& > *": { flex: 1 } }}>
             <Button onClick={handleBulkEditClose} variant="outlined" fullWidth>
               Cancelar
             </Button>
-            <Button 
-              onClick={handleBulkEditSave} 
-              variant="contained" 
-              color="primary" 
+            <Button
+              onClick={handleBulkEditSave}
+              variant="contained"
+              color="primary"
               fullWidth
               disabled={!bulkEditContractor && !bulkEditBeds && !bulkEditTag}
             >
@@ -945,34 +975,36 @@ function RoomCards({
       </Modal>
 
       {/* Disable/Enable Room Modal */}
-      <Modal
-        open={isDisableModalOpen}
-        onClose={handleDisableCancel}
-      >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 400,
-          bgcolor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4
-        }}>
+      <Modal open={isDisableModalOpen} onClose={handleDisableCancel}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
           <Typography variant="h6" component="h2" mb={2}>
-            {pendingDisabledState ? 'Deshabilitar' : 'Habilitar'} Habitación
+            {pendingDisabledState ? "Deshabilitar" : "Habilitar"} Habitación
           </Typography>
-          
+
           <Typography variant="body2" mb={3}>
-            ¿Estás seguro que deseas {pendingDisabledState ? 'deshabilitar' : 'habilitar'} la habitación{' '}
+            ¿Estás seguro que deseas{" "}
+            {pendingDisabledState ? "deshabilitar" : "habilitar"} la habitación{" "}
             <strong>{selectedRoom?.roomNumber}</strong>?
           </Typography>
-          
+
           <TextField
             fullWidth
-            label={pendingDisabledState ? "Motivo (requerido)" : "Motivo (opcional)"}
-            placeholder={`Ingresa el motivo para ${pendingDisabledState ? 'deshabilitar' : 'habilitar'} la habitación...`}
+            label={
+              pendingDisabledState ? "Motivo (requerido)" : "Motivo (opcional)"
+            }
+            placeholder={`Ingresa el motivo para ${pendingDisabledState ? "deshabilitar" : "habilitar"} la habitación...`}
             value={disableComments}
             onChange={(e) => setDisableComments(e.target.value)}
             multiline
@@ -981,122 +1013,163 @@ function RoomCards({
             required={pendingDisabledState}
           />
 
-          <Stack direction="row" spacing={2} sx={{ '& > *': { flex: 1 } }}>
+          <Stack direction="row" spacing={2} sx={{ "& > *": { flex: 1 } }}>
             <Button onClick={handleDisableCancel} variant="outlined" fullWidth>
               Cancelar
             </Button>
-            <Button 
-              onClick={handleDisableConfirm} 
-              variant="contained" 
-              color={pendingDisabledState ? 'error' : 'success'}
+            <Button
+              onClick={handleDisableConfirm}
+              variant="contained"
+              color={pendingDisabledState ? "error" : "success"}
               fullWidth
               disabled={pendingDisabledState && !disableComments.trim()}
             >
-              {pendingDisabledState ? 'Deshabilitar' : 'Habilitar'}
+              {pendingDisabledState ? "Deshabilitar" : "Habilitar"}
             </Button>
           </Stack>
         </Box>
       </Modal>
 
       {/* Room History Modal */}
-      <Modal
-        open={isHistoryModalOpen}
-        onClose={handleHistoryClose}
-      >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 600,
-          maxHeight: '80vh',
-          bgcolor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-          overflow: 'auto'
-        }}>
-          <Typography variant="h6" component="h2" mb={3} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Modal open={isHistoryModalOpen} onClose={handleHistoryClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 600,
+            maxHeight: "80vh",
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            overflow: "auto",
+          }}
+        >
+          <Typography
+            variant="h6"
+            component="h2"
+            mb={3}
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
             <InfoIcon color="primary" />
             Historial de la Habitación {selectedRoom?.roomNumber}
           </Typography>
-          
-          {selectedRoom?.disabledHistory && selectedRoom.disabledHistory.length > 0 ? (
+
+          {selectedRoom?.disabledHistory &&
+          selectedRoom.disabledHistory.length > 0 ? (
             <Box>
               {selectedRoom.disabledHistory
-                .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
+                .sort(
+                  (a, b) =>
+                    new Date(b.created).getTime() -
+                    new Date(a.created).getTime(),
+                )
                 .map((history, index) => (
-                <Box 
-                  key={index}
-                  sx={{
-                    mb: 3,
-                    p: 2,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 2,
-                    bgcolor: history.action ? 'error.50' : 'success.50',
-                    borderLeftWidth: 4,
-                    borderLeftColor: history.action ? 'error.main' : 'success.main'
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    {history.action ? (
-                      <CloseIcon sx={{ color: 'error.main', fontSize: 20 }} />
-                    ) : (
-                      <CheckIcon sx={{ color: 'success.main', fontSize: 20 }} />
-                    )}
-                    <Typography 
-                      variant="subtitle1" 
-                      fontWeight={600}
-                      sx={{ color: history.action ? 'error.main' : 'success.main' }}
+                  <Box
+                    key={index}
+                    sx={{
+                      mb: 3,
+                      p: 2,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      borderRadius: 2,
+                      bgcolor: history.action ? "error.50" : "success.50",
+                      borderLeftWidth: 4,
+                      borderLeftColor: history.action
+                        ? "error.main"
+                        : "success.main",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mb: 1,
+                      }}
                     >
-                      {history.action ? 'Habitación Deshabilitada' : 'Habitación Habilitada'}
+                      {history.action ? (
+                        <CloseIcon sx={{ color: "error.main", fontSize: 20 }} />
+                      ) : (
+                        <CheckIcon
+                          sx={{ color: "success.main", fontSize: 20 }}
+                        />
+                      )}
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight={600}
+                        sx={{
+                          color: history.action ? "error.main" : "success.main",
+                        }}
+                      >
+                        {history.action
+                          ? "Habitación Deshabilitada"
+                          : "Habitación Habilitada"}
+                      </Typography>
+                    </Box>
+
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
+                      {new Date(history.created).toLocaleString("es-ES", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </Typography>
+
+                    {history.comments && (
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          bgcolor: "background.paper",
+                          p: 1.5,
+                          borderRadius: 1,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          fontStyle:
+                            history.comments.trim() === ""
+                              ? "italic"
+                              : "normal",
+                        }}
+                      >
+                        {history.comments.trim() || "Sin comentarios"}
+                      </Typography>
+                    )}
                   </Box>
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    {new Date(history.created).toLocaleString('es-ES', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </Typography>
-                  
-                  {history.comments && (
-                    <Typography variant="body1" sx={{ 
-                      bgcolor: 'background.paper',
-                      p: 1.5,
-                      borderRadius: 1,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      fontStyle: history.comments.trim() === '' ? 'italic' : 'normal'
-                    }}>
-                      {history.comments.trim() || 'Sin comentarios'}
-                    </Typography>
-                  )}
-                </Box>
-              ))}
+                ))}
             </Box>
           ) : (
-            <Box sx={{ 
-              textAlign: 'center', 
-              py: 6,
-              color: 'text.secondary'
-            }}>
-              <InfoIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+            <Box
+              sx={{
+                textAlign: "center",
+                py: 6,
+                color: "text.secondary",
+              }}
+            >
+              <InfoIcon sx={{ fontSize: 48, color: "text.disabled", mb: 2 }} />
               <Typography variant="h6" color="text.secondary" gutterBottom>
                 Sin historial disponible
               </Typography>
               <Typography variant="body2" color="text.disabled">
-                Esta habitación no tiene registros de habilitación/deshabilitación
+                Esta habitación no tiene registros de
+                habilitación/deshabilitación
               </Typography>
             </Box>
           )}
 
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-            <Button onClick={handleHistoryClose} variant="contained" color="primary">
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+            <Button
+              onClick={handleHistoryClose}
+              variant="contained"
+              color="primary"
+            >
               Cerrar
             </Button>
           </Box>
@@ -1118,7 +1191,7 @@ function RoomCards({
         onSave={handleSaveAddPin}
         roomNumber={roomForPin?.roomNumber}
         roomId={roomForPin?.id || null}
-  loading={addingPin}
+        loading={addingPin}
       />
     </>
   );

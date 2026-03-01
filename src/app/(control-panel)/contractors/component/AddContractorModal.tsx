@@ -231,8 +231,8 @@ const AddContractorModal: React.FC<AddContractorModalProps> = ({
     <ContractorFormDialog
       open={open}
       onClose={onClose}
-      title="Add New Contractor"
-      submitLabel="Add Contractor"
+      title="Agregar nuevo contratista"
+      submitLabel="Agregar contratista"
       showState={false}
       onSubmit={handleSubmit}
       isSubmitDisabled={() => !contactFieldsValid}
@@ -245,13 +245,13 @@ const AddContractorModal: React.FC<AddContractorModalProps> = ({
         })}
       />
       <Typography variant="subtitle1" fontWeight={700} sx={{ mt: 0.5 }}>
-        Contact Person
+        Persona de contacto
       </Typography>
 
       {/* Row: Contact RUT (autocomplete) */}
       <Box>
         <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-          Contact Person Tax ID (RUT)
+          RUT de la persona de contacto
         </Typography>
         <Autocomplete
           freeSolo
@@ -283,7 +283,7 @@ const AddContractorModal: React.FC<AddContractorModalProps> = ({
           renderInput={(params) => (
             <TextField
               {...params}
-              placeholder="Search by RUT"
+              placeholder="Buscar por RUT"
               error={!!rutError}
               helperText={rutError}
               size="small"
@@ -292,8 +292,8 @@ const AddContractorModal: React.FC<AddContractorModalProps> = ({
             />
           )}
           loading={isSearchingRut}
-          loadingText="Searching..."
-          noOptionsText="No results found"
+          loadingText="Buscando..."
+          noOptionsText="No se encontraron resultados"
         />
       </Box>
 
@@ -301,10 +301,10 @@ const AddContractorModal: React.FC<AddContractorModalProps> = ({
       <Box sx={{ display: "flex", gap: 2 }}>
         <Box sx={{ flex: 1 }}>
           <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-            First Name
+            Nombre
           </Typography>
           <TextField
-            placeholder="Enter first name"
+            placeholder="Ingrese el nombre"
             value={contactFirstName}
             onChange={(e) => setContactFirstName(e.target.value)}
             fullWidth
@@ -314,10 +314,10 @@ const AddContractorModal: React.FC<AddContractorModalProps> = ({
         </Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-            Last Name
+            Apellido
           </Typography>
           <TextField
-            placeholder="Enter last name"
+            placeholder="Ingrese el apellido"
             value={contactLastName}
             onChange={(e) => setContactLastName(e.target.value)}
             fullWidth
@@ -331,10 +331,10 @@ const AddContractorModal: React.FC<AddContractorModalProps> = ({
       <Box sx={{ display: "flex", gap: 2 }}>
         <Box sx={{ flex: 1 }}>
           <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-            Contact Email
+            Correo de contacto
           </Typography>
           <TextField
-            placeholder="Enter contact email"
+            placeholder="Ingrese el correo de contacto"
             value={contactEmail}
             onChange={(e) => {
               setContactEmail(e.target.value);
@@ -350,7 +350,7 @@ const AddContractorModal: React.FC<AddContractorModalProps> = ({
         </Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
-            Contact Phone
+            Teléfono de contacto
           </Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
             <FormControl size="small" sx={{ width: 110, flexShrink: 0 }}>
@@ -377,7 +377,7 @@ const AddContractorModal: React.FC<AddContractorModalProps> = ({
               </Select>
             </FormControl>
             <TextField
-              placeholder="Enter phone"
+              placeholder="Ingrese teléfono"
               value={localContactPhone}
               onChange={handleContactPhoneChange}
               error={!!contactPhoneError}

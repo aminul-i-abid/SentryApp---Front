@@ -57,7 +57,7 @@ function NavbarStyle1Content(props: NavbarStyle1ContentProps) {
           <div className="flex-1 min-w-0">
             <Logo />
           </div>
-          <NavbarToggleButton className="w-8 h-8 rounded-full border-none bg-gray-100 hover:bg-gray-200 dark:hover:bg-white/[0.06] shrink-0">
+          <NavbarToggleButton className="w-8 h-8 rounded-full border-none bg-gray-100 dark:bg-gray-400 shrink-0">
             <img
               src="/assets/icons/arrow-left-double.png"
               alt="collapse"
