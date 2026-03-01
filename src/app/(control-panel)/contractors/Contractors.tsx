@@ -49,7 +49,12 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
     borderStyle: "solid",
     borderColor: theme.palette.divider,
   },
-  "& .FusePageSimple-content": {},
+  "& .FusePageSimple-content": {
+    backgroundImage: "url(/assets/dashbg1.png), url(/assets/dashbg2.png)",
+    backgroundPosition: "top left, bottom right",
+    backgroundRepeat: "no-repeat, no-repeat",
+    backgroundSize: "30% auto, 70% auto",
+  },
   "& .FusePageSimple-content > .container": {
     maxWidth: "100% !important",
     padding: "0 !important",
@@ -265,11 +270,55 @@ function Contractors() {
             <TableContainer
               component={Paper}
               elevation={0}
-              sx={{ border: "none", boxShadow: "none" }}
+              sx={{
+                border: "none",
+                boxShadow: "none",
+                backgroundColor: "transparent",
+                overflow: "visible",
+              }}
             >
-              <Table>
-                <TableHead className="bg-white border border-[#E5E7EB]">
-                  <TableRow>
+              <Table
+                sx={{
+                  borderCollapse: "separate",
+                  borderSpacing: "0 8px",
+                  tableLayout: "fixed",
+                  width: "100%",
+                }}
+              >
+                <colgroup>
+                  <col style={{ width: "14%" }} />
+                  <col style={{ width: "10%" }} />
+                  <col style={{ width: "16%" }} />
+                  <col style={{ width: "18%" }} />
+                  <col style={{ width: "16%" }} />
+                  <col style={{ width: "8%" }} />
+                  <col style={{ width: "8%" }} />
+                  <col style={{ width: "10%" }} />
+                </colgroup>
+                <TableHead>
+                  <TableRow
+                    sx={(t) => {
+                      const isDark = t.palette.mode === "dark";
+                      const borderColor = isDark ? "#444" : "#ebebeb";
+                      return {
+                        "& th": {
+                          backgroundColor: isDark ? "#1e1e1e" : "#fff",
+                          borderTop: `1px solid ${borderColor}`,
+                          borderBottom: `1px solid ${borderColor}`,
+                          "&:first-of-type": {
+                            borderLeft: `1px solid ${borderColor}`,
+                            borderTopLeftRadius: "12px",
+                            borderBottomLeftRadius: "12px",
+                          },
+                          "&:last-of-type": {
+                            borderRight: `1px solid ${borderColor}`,
+                            borderTopRightRadius: "12px",
+                            borderBottomRightRadius: "12px",
+                          },
+                        },
+                      };
+                    }}
+                  >
                     <TableCell sx={{ color: "#415EDE", fontWeight: 600 }}>
                       Nombre
                     </TableCell>
@@ -299,71 +348,139 @@ function Contractors() {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
-                  {contractors.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} align="center">
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            padding: "40px 0",
-                          }}
-                        >
-                          <span style={{ color: "#888" }}>
-                            No se encontraron datos
-                          </span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    contractors
-                      .slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage,
-                      )
-                      .map((contractor) => (
-                        <TableRow key={contractor.id} hover>
-                          <TableCell>{contractor.name}</TableCell>
-                          <TableCell>{contractor.rut}</TableCell>
-                          <TableCell>{contractor.contactPerson}</TableCell>
-                          <TableCell>{contractor.contactEmail}</TableCell>
-                          <TableCell>{contractor.contactPhone}</TableCell>
-                          <TableCell>
-                            {String(contractor.rooms?.length ?? 0).padStart(
-                              2,
-                              "0",
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <span style={{ color: "#000000" }}>
-                              {contractor.state ? "Activos" : "Inactivos"}
-                            </span>
-                          </TableCell>
-                          <TableCell align="center">
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                handleContractorClick(contractor.id)
-                              }
-                              sx={{ color: "#6b7280" }}
-                            >
-                              <VisibilityIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              onClick={(e) => handleMenuOpen(e, contractor)}
-                              sx={{ color: "#6b7280" }}
-                            >
-                              <MoreVertIcon fontSize="small" />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                  )}
-                </TableBody>
               </Table>
+              <div
+                style={{
+                  backgroundColor:
+                    theme.palette.mode === "dark" ? "#1e1e1e" : "#fff",
+                  border: `1px solid ${theme.palette.mode === "dark" ? "#444" : "#ebebeb"}`,
+                  borderRadius: "12px",
+                  padding: "6px 6px",
+                  overflow: "hidden",
+                }}
+              >
+                <Table
+                  sx={{
+                    borderCollapse: "separate",
+                    borderSpacing: "0 4px",
+                    tableLayout: "fixed",
+                    width: "100%",
+                  }}
+                >
+                  <colgroup>
+                    <col style={{ width: "14%" }} />
+                    <col style={{ width: "10%" }} />
+                    <col style={{ width: "16%" }} />
+                    <col style={{ width: "18%" }} />
+                    <col style={{ width: "16%" }} />
+                    <col style={{ width: "8%" }} />
+                    <col style={{ width: "8%" }} />
+                    <col style={{ width: "10%" }} />
+                  </colgroup>
+                  <TableBody>
+                    {contractors.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={8} align="center">
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              padding: "40px 0",
+                            }}
+                          >
+                            <span style={{ color: "#888" }}>
+                              No se encontraron datos
+                            </span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      contractors
+                        .slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage,
+                        )
+                        .map((contractor) => (
+                          <TableRow
+                            key={contractor.id}
+                            hover
+                            sx={(t) => ({
+                              "& td": {
+                                backgroundColor:
+                                  t.palette.mode === "dark"
+                                    ? "#2a2a2a"
+                                    : "#F3F4F6",
+                                borderBottom: "none",
+                                py: "11px",
+                                "&:first-of-type": {
+                                  borderTopLeftRadius: "12px",
+                                  borderBottomLeftRadius: "12px",
+                                },
+                                "&:last-of-type": {
+                                  borderTopRightRadius: "12px",
+                                  borderBottomRightRadius: "12px",
+                                },
+                              },
+                            })}
+                          >
+                            <TableCell>{contractor.name}</TableCell>
+                            <TableCell>{contractor.rut}</TableCell>
+                            <TableCell>{contractor.contactPerson}</TableCell>
+                            <TableCell>{contractor.contactEmail}</TableCell>
+                            <TableCell>{contractor.contactPhone}</TableCell>
+                            <TableCell>
+                              {String(contractor.rooms?.length ?? 0).padStart(
+                                2,
+                                "0",
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <span
+                                style={{
+                                  color:
+                                    theme.palette.mode === "dark"
+                                      ? "#e0e0e0"
+                                      : "#000000",
+                                }}
+                              >
+                                {contractor.state ? "Activos" : "Inactivos"}
+                              </span>
+                            </TableCell>
+                            <TableCell align="center">
+                              <IconButton
+                                size="small"
+                                onClick={() =>
+                                  handleContractorClick(contractor.id)
+                                }
+                                sx={(t) => ({
+                                  color:
+                                    t.palette.mode === "dark"
+                                      ? "#9ca3af"
+                                      : "#6b7280",
+                                })}
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => handleMenuOpen(e, contractor)}
+                                sx={(t) => ({
+                                  color:
+                                    t.palette.mode === "dark"
+                                      ? "#9ca3af"
+                                      : "#6b7280",
+                                })}
+                              >
+                                <MoreVertIcon fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
               <div
                 style={{
                   display: "flex",
@@ -403,28 +520,58 @@ function Contractors() {
               }}
               slotProps={{
                 paper: {
-                  sx: {
-                    borderRadius: "12px",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
-                    minWidth: 220,
-                    py: 0.5,
+                  sx: (t) => {
+                    const isDark = t.palette.mode === "dark";
+                    return {
+                      borderRadius: "16px",
+                      boxShadow: isDark
+                        ? "0 8px 32px rgba(0,0,0,0.45)"
+                        : "0 8px 32px rgba(0,0,0,0.12)",
+                      minWidth: 240,
+                      p: 0,
+                      backgroundColor: isDark ? "#2a2a2a" : "#F3F4F6",
+                      border: `1px solid ${isDark ? "#444" : "#E5E7EB"}`,
+                      overflow: "hidden",
+                    };
                   },
                 },
               }}
             >
-              <List disablePadding>
+              <List
+                disablePadding
+                sx={(t) => {
+                  const isDark = t.palette.mode === "dark";
+                  return {
+                    m: "6px",
+                    backgroundColor: isDark ? "#1e1e1e" : "#fff",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                  };
+                }}
+              >
                 <ListItemButton
                   onClick={() => {
                     if (menuContractor) {
                       handleToggleActive(menuContractor);
                     }
                   }}
-                  sx={{ px: 2, py: 1 }}
+                  sx={(t) => ({
+                    px: 2,
+                    py: 1.2,
+                    borderBottom: `1px solid ${t.palette.mode === "dark" ? "#333" : "#F0F0F0"}`,
+                    "&:hover": {
+                      backgroundColor:
+                        t.palette.mode === "dark" ? "#333" : "#F9FAFB",
+                    },
+                  })}
                 >
                   <ListItemIcon sx={{ minWidth: 32 }}>
                     <InfoOutlinedIcon
                       fontSize="small"
-                      sx={{ color: "#6b7280" }}
+                      sx={(t) => ({
+                        color:
+                          t.palette.mode === "dark" ? "#9ca3af" : "#6b7280",
+                      })}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -446,10 +593,24 @@ function Contractors() {
                   onClick={() =>
                     menuContractor && handleEditClick(menuContractor)
                   }
-                  sx={{ px: 2, py: 1 }}
+                  sx={(t) => ({
+                    px: 2,
+                    py: 1.2,
+                    borderBottom: `1px solid ${t.palette.mode === "dark" ? "#333" : "#F0F0F0"}`,
+                    "&:hover": {
+                      backgroundColor:
+                        t.palette.mode === "dark" ? "#333" : "#F9FAFB",
+                    },
+                  })}
                 >
                   <ListItemIcon sx={{ minWidth: 32 }}>
-                    <EditIcon fontSize="small" sx={{ color: "#6b7280" }} />
+                    <EditIcon
+                      fontSize="small"
+                      sx={(t) => ({
+                        color:
+                          t.palette.mode === "dark" ? "#9ca3af" : "#6b7280",
+                      })}
+                    />
                   </ListItemIcon>
                   <ListItemText
                     primary="Editar información"
@@ -460,7 +621,14 @@ function Contractors() {
                   onClick={() =>
                     menuContractor && handleDeleteClick(menuContractor)
                   }
-                  sx={{ px: 2, py: 1 }}
+                  sx={(t) => ({
+                    px: 2,
+                    py: 1.2,
+                    "&:hover": {
+                      backgroundColor:
+                        t.palette.mode === "dark" ? "#333" : "#F9FAFB",
+                    },
+                  })}
                 >
                   <ListItemIcon sx={{ minWidth: 32 }}>
                     <DeleteIcon fontSize="small" sx={{ color: "#ef4444" }} />
