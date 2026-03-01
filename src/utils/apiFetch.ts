@@ -17,7 +17,23 @@ const getBaseUrl = () => {
       return `${url.protocol}//${tenant}.api.sentryapp.io`;
     }
 
-    // Fallback for other domains (keep original behavior)
+    // Fallback: use VITE_API_BASE_URL env variable for non-sentryapp.io domains (e.g. Vercel)
+    const envBaseUrl = (import.meta.env.VITE_API_BASE_URL || "") as string;
+    const envHost = envBaseUrl.replace(/^https?:\/\//, "");
+    const envMatch = envHost.match(sentryAppPattern);
+
+    if (envMatch) {
+      const tenant = envMatch[1];
+      return `https://${tenant}.api.sentryapp.io`;
+    }
+
+    if (envBaseUrl) {
+      return envBaseUrl.startsWith("http")
+        ? envBaseUrl
+        : `https://${envBaseUrl}`;
+    }
+
+    // Last fallback (keep original behavior)
     return `${url.protocol}//${url.host}`;
   }
 };
@@ -28,7 +44,9 @@ const PORT = 7152;
 const devApiBaseUrl = `${apiUrl.protocol}//${devApiBaseHost}:${PORT}`;
 
 // In dev: relative path so Vite proxy handles it (no CORS). In prod: use dynamic base URL.
-export const API_BASE_URL = import.meta.env.DEV ? '/api' : `${getBaseUrl()}/api`;
+export const API_BASE_URL = import.meta.env.DEV
+  ? "/api"
+  : `${getBaseUrl()}/api`;
 
 // Define the types for options and configuration
 type FetchOptions = RequestInit;
