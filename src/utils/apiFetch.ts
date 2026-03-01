@@ -43,10 +43,18 @@ const devApiBaseHost = apiUrl.hostname;
 const PORT = 7152;
 const devApiBaseUrl = `${apiUrl.protocol}//${devApiBaseHost}:${PORT}`;
 
-// In dev: relative path so Vite proxy handles it (no CORS). In prod: use dynamic base URL.
-export const API_BASE_URL = import.meta.env.DEV
-  ? "/api"
-  : `${getBaseUrl()}/api`;
+// Determine if we're on a non-sentryapp.io domain (e.g. Vercel) where we use a proxy rewrite
+const isProxiedHost = () => {
+  if (typeof window === "undefined") return false;
+
+  const hostname = window.location.hostname;
+  return !hostname.includes("localhost") && !hostname.endsWith(".sentryapp.io");
+};
+
+// In dev or on proxied hosts (Vercel): relative path so proxy handles it (no CORS).
+// On sentryapp.io domains: use dynamic base URL directly.
+export const API_BASE_URL =
+  import.meta.env.DEV || isProxiedHost() ? "/api" : `${getBaseUrl()}/api`;
 
 // Define the types for options and configuration
 type FetchOptions = RequestInit;

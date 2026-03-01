@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://suris.api.sentryapp.io/api/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
