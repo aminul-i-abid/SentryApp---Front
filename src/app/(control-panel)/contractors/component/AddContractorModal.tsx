@@ -1,11 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import AddContractorForm from './AddContractorForm';
+import { searchByRut } from "@/app/(control-panel)/reserve/reserveService";
+import ContractorFormDialog, {
+  ContractorFormData,
+} from "@/components/ContractorFormDialog";
+import {
+  countryCodes,
+  fieldSx,
+  selectFieldSx,
+} from "@/components/contractorFormHelpers";
+import {
+  Autocomplete,
+  Box,
+  Divider,
+  FormControl,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
 
 interface AddContractorModalProps {
   open: boolean;
@@ -26,146 +39,358 @@ interface AddContractorModalProps {
   }) => void;
 }
 
-const AddContractorModal: React.FC<AddContractorModalProps> = ({ open, onClose, onAdd }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    rut: '',
-    address: '',
-    phone: '',
-    email: '',
-    website: '',
-    contract: '',
-    contactFirstName: '',
-    contactLastName: '',
-    contactRut: '',
-    contactPhone: '',
-    contactEmail: '',
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [resetForm, setResetForm] = useState(false);
+/* ------------------------------------------------------------------ */
+/*  Validation helpers                                                 */
+/* ------------------------------------------------------------------ */
+const validateRut = (rut: string) => {
+  const rutRegex = /^\d{8}-[0-9kK]$/;
+  if (!rut) return "El RUT es requerido";
+  if (!rutRegex.test(rut))
+    return "El RUT debe tener el formato: 12345678-9 o 12345678-K";
+  const [num, dv] = rut.split("-");
+  let suma = 0;
+  let multiplicador = 2;
+  for (let i = num.length - 1; i >= 0; i--) {
+    suma += parseInt(num[i], 10) * multiplicador;
+    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+  }
+  const resto = suma % 11;
+  let dvEsperado: string;
+  if (11 - resto === 11) dvEsperado = "0";
+  else if (11 - resto === 10) dvEsperado = "K";
+  else dvEsperado = String(11 - resto);
+  if (dvEsperado !== dv.toUpperCase()) return "El RUT no es válido";
+  return "";
+};
 
-  // Reset form data when modal opens
+const validateEmail = (email: string) => {
+  if (!email) return "";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) ? "" : "Ingrese un correo electrónico válido";
+};
+
+const validatePhone = (phone: string, countryCode: string) => {
+  if (!phone) return "El número de teléfono es requerido";
+  const digitsOnly = phone.replace(/\D/g, "");
+  if (countryCode === "+56" && digitsOnly.length !== 9)
+    return "Debe tener 9 dígitos";
+  if (countryCode === "+549" && digitsOnly.length !== 10)
+    return "Debe tener 10 dígitos";
+  return "";
+};
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
+const AddContractorModal: React.FC<AddContractorModalProps> = ({
+  open,
+  onClose,
+  onAdd,
+}) => {
+  /* Contact person local state */
+  const [contactFirstName, setContactFirstName] = useState("");
+  const [contactLastName, setContactLastName] = useState("");
+  const [contactRut, setContactRut] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactCountryCode, setContactCountryCode] = useState("+56");
+  const [localContactPhone, setLocalContactPhone] = useState("");
+
+  /* RUT autocomplete */
+  const [rutSearchResults, setRutSearchResults] = useState<any[]>([]);
+  const [isSearchingRut, setIsSearchingRut] = useState(false);
+  const [selectedRut, setSelectedRut] = useState<any>(null);
+
+  /* Validation */
+  const [rutError, setRutError] = useState("");
+  const [contactEmailError, setContactEmailError] = useState("");
+  const [contactPhoneError, setContactPhoneError] = useState("");
+
+  /* Reset everything when modal opens */
   useEffect(() => {
     if (open) {
-      setFormData({
-        name: '',
-        rut: '',
-        address: '',
-        phone: '',
-        email: '',
-        website: '',
-        contract: '0',
-        contactFirstName: '',
-        contactLastName: '',
-        contactRut: '',
-        contactPhone: '',
-        contactEmail: '',
-      });
-      setResetForm(true);
-      // Reset the resetForm flag after a short delay
-      setTimeout(() => setResetForm(false), 100);
+      setContactFirstName("");
+      setContactLastName("");
+      setContactRut("");
+      setContactPhone("");
+      setContactEmail("");
+      setContactCountryCode("+56");
+      setLocalContactPhone("");
+      setRutSearchResults([]);
+      setSelectedRut(null);
+      setRutError("");
+      setContactEmailError("");
+      setContactPhoneError("");
     }
   }, [open]);
 
-  const handleSubmit = async () => {
-    try {
-      setIsLoading(true);
-      const { contract, ...rest } = formData;
-      await onAdd({ ...rest, contract: contract });
-      // Reset form data after successful creation
-      setFormData({
-        name: '',
-        rut: '',
-        address: '',
-        phone: '',
-        email: '',
-        website: '',
-        contract: '0',
-        contactFirstName: '',
-        contactLastName: '',
-        contactRut: '',
-        contactPhone: '',
-        contactEmail: '',
-      });
-      // Trigger form reset
-      setResetForm(true);
-      setTimeout(() => setResetForm(false), 100);
-      onClose();
-    } catch (error) {
-      console.error('Error adding contractor:', error);
-    } finally {
-      setIsLoading(false);
+  /* ---- RUT search ---- */
+  const handleRutSearch = async (input: string) => {
+    if (input.length >= 3) {
+      setIsSearchingRut(true);
+      try {
+        const res = await searchByRut(input);
+        if (res.succeeded && res.data) {
+          setRutSearchResults(Array.isArray(res.data) ? res.data : [res.data]);
+        } else {
+          setRutSearchResults([]);
+        }
+      } catch {
+        setRutSearchResults([]);
+      } finally {
+        setIsSearchingRut(false);
+      }
+    } else {
+      setRutSearchResults([]);
     }
   };
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: e.target.value
-    }));
+  const handleRutChange = (_: React.SyntheticEvent, newValue: string | any) => {
+    if (typeof newValue === "object" && newValue !== null) {
+      setSelectedRut(newValue);
+      setContactRut(newValue.dni || "");
+      setContactFirstName(newValue.firstName?.toString() || "");
+      setContactLastName(newValue.lastName?.toString() || "");
+      const phone = newValue.phoneNumber || "";
+      setContactPhone(phone);
+      // Try to extract country code
+      for (const cc of countryCodes) {
+        if (phone.startsWith(cc.code)) {
+          setContactCountryCode(cc.code);
+          setLocalContactPhone(phone.slice(cc.code.length));
+          break;
+        }
+      }
+      setContactEmail(newValue.email?.toString() || "");
+      setRutError("");
+      setContactEmailError("");
+      setContactPhoneError("");
+    } else {
+      setSelectedRut(null);
+      const val = newValue || "";
+      setContactRut(val);
+      if (!val) {
+        setContactFirstName("");
+        setContactLastName("");
+        setContactPhone("");
+        setLocalContactPhone("");
+        setContactEmail("");
+        setRutError("");
+        setContactEmailError("");
+        setContactPhoneError("");
+      } else {
+        setRutError(validateRut(val));
+      }
+    }
   };
 
+  const handleContactPhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const lp = e.target.value;
+    setLocalContactPhone(lp);
+    const full = contactCountryCode + lp;
+    setContactPhone(full);
+    setContactPhoneError(validatePhone(lp, contactCountryCode));
+  };
+
+  const handleContactCountryCode = (e: SelectChangeEvent) => {
+    const cc = e.target.value;
+    setContactCountryCode(cc);
+    const full = cc + localContactPhone;
+    setContactPhone(full);
+    if (localContactPhone)
+      setContactPhoneError(validatePhone(localContactPhone, cc));
+  };
+
+  /* ---- Submit handler ---- */
+  const handleSubmit = async (companyData: ContractorFormData) => {
+    await onAdd({
+      name: companyData.name,
+      rut: companyData.rut,
+      address: companyData.address,
+      phone: companyData.phone,
+      email: companyData.email,
+      website: companyData.website,
+      contract: "0",
+      contactFirstName,
+      contactLastName,
+      contactRut,
+      contactPhone,
+      contactEmail,
+    });
+    onClose();
+  };
+
+  const contactFieldsValid =
+    !!contactFirstName &&
+    !!contactLastName &&
+    !!contactRut &&
+    !!contactPhone &&
+    !!contactEmail;
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle sx={{ fontWeight: 700, fontSize: '1.1rem', pb: 0 }}>Agregar Nuevo Contratista</DialogTitle>
-      <DialogContent sx={{ pt: 2 }}>
-        <AddContractorForm
-          name={formData.name}
-          rut={formData.rut}
-          address={formData.address}
-          phone={formData.phone}
-          email={formData.email}
-          website={formData.website}
-          contract={formData.contract}
-          contactFirstName={formData.contactFirstName}
-          contactLastName={formData.contactLastName}
-          contactRut={formData.contactRut}
-          contactPhone={formData.contactPhone}
-          contactEmail={formData.contactEmail}
-          resetForm={resetForm}
-          onNameChange={handleChange('name')}
-          onRutChange={handleChange('rut')}
-          onAddressChange={handleChange('address')}
-          onPhoneChange={handleChange('phone')}
-          onEmailChange={handleChange('email')}
-          onWebsiteChange={handleChange('website')}
-          onContractChange={handleChange('contract')}
-          onContactFirstNameChange={handleChange('contactFirstName')}
-          onContactLastNameChange={handleChange('contactLastName')}
-          onContactRutChange={handleChange('contactRut')}
-          onContactPhoneChange={handleChange('contactPhone')}
-          onContactEmailChange={handleChange('contactEmail')}
-        />
-      </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2, pt: 0 }}>
-        <Button onClick={onClose} variant="outlined" color="inherit" sx={{ flex: 1, mr: 2, bgcolor: '#F5F7FA' }}>
-          Cancelar
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          color="primary"
-          sx={{ flex: 1 }}
-          disabled={
-            isLoading ||
-            !formData.name ||
-            !formData.rut ||
-            !formData.contactFirstName ||
-            !formData.contactLastName ||
-            !formData.contactRut ||
-            !formData.contactPhone ||
-            !formData.contactEmail
-          }
-        >
-          {isLoading ? (
-            <CircularProgress size={24} color="inherit" />
-          ) : (
-            'Agregar'
+    <ContractorFormDialog
+      open={open}
+      onClose={onClose}
+      title="Add New Contractor"
+      submitLabel="Add Contractor"
+      showState={false}
+      onSubmit={handleSubmit}
+      isSubmitDisabled={() => !contactFieldsValid}
+    >
+      {/* ---- Contact Person Section ---- */}
+      <Divider
+        sx={(t) => ({
+          borderColor: t.palette.mode === "dark" ? "#333" : "#E5E7EB",
+          my: 0.5,
+        })}
+      />
+      <Typography variant="subtitle1" fontWeight={700} sx={{ mt: 0.5 }}>
+        Contact Person
+      </Typography>
+
+      {/* Row: Contact RUT (autocomplete) */}
+      <Box>
+        <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
+          Contact Person Tax ID (RUT)
+        </Typography>
+        <Autocomplete
+          freeSolo
+          options={rutSearchResults}
+          getOptionLabel={(option) => {
+            if (typeof option === "string") return option;
+            return `${option.dni} / ${option.firstName} ${option.lastName}`;
+          }}
+          value={selectedRut}
+          onChange={handleRutChange}
+          onInputChange={(_, newInput) => {
+            handleRutSearch(newInput);
+            if (!selectedRut && newInput) {
+              setContactRut(newInput);
+              setRutError(validateRut(newInput));
+            } else if (!newInput) {
+              setSelectedRut(null);
+              setContactRut("");
+              setContactFirstName("");
+              setContactLastName("");
+              setContactPhone("");
+              setLocalContactPhone("");
+              setContactEmail("");
+              setRutError("");
+              setContactEmailError("");
+              setContactPhoneError("");
+            }
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder="Search by RUT"
+              error={!!rutError}
+              helperText={rutError}
+              size="small"
+              fullWidth
+              sx={fieldSx}
+            />
           )}
-        </Button>
-      </DialogActions>
-    </Dialog>
+          loading={isSearchingRut}
+          loadingText="Searching..."
+          noOptionsText="No results found"
+        />
+      </Box>
+
+      {/* Row: First Name | Last Name */}
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
+            First Name
+          </Typography>
+          <TextField
+            placeholder="Enter first name"
+            value={contactFirstName}
+            onChange={(e) => setContactFirstName(e.target.value)}
+            fullWidth
+            size="small"
+            sx={fieldSx}
+          />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
+            Last Name
+          </Typography>
+          <TextField
+            placeholder="Enter last name"
+            value={contactLastName}
+            onChange={(e) => setContactLastName(e.target.value)}
+            fullWidth
+            size="small"
+            sx={fieldSx}
+          />
+        </Box>
+      </Box>
+
+      {/* Row: Email | Phone */}
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
+            Contact Email
+          </Typography>
+          <TextField
+            placeholder="Enter contact email"
+            value={contactEmail}
+            onChange={(e) => {
+              setContactEmail(e.target.value);
+              setContactEmailError(validateEmail(e.target.value));
+            }}
+            error={!!contactEmailError}
+            helperText={contactEmailError}
+            fullWidth
+            size="small"
+            type="email"
+            sx={fieldSx}
+          />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
+            Contact Phone
+          </Typography>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <FormControl size="small" sx={{ width: 110, flexShrink: 0 }}>
+              <Select
+                value={contactCountryCode}
+                onChange={handleContactCountryCode}
+                size="small"
+                sx={selectFieldSx}
+              >
+                {countryCodes.map((cc) => (
+                  <MenuItem key={cc.code} value={cc.code}>
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.75 }}
+                    >
+                      <img
+                        src={cc.flag}
+                        alt={cc.label}
+                        style={{ width: 20, height: 15 }}
+                      />
+                      {cc.code}
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              placeholder="Enter phone"
+              value={localContactPhone}
+              onChange={handleContactPhoneChange}
+              error={!!contactPhoneError}
+              helperText={contactPhoneError}
+              fullWidth
+              size="small"
+              sx={fieldSx}
+            />
+          </Box>
+        </Box>
+      </Box>
+    </ContractorFormDialog>
   );
 };
 
-export default AddContractorModal; 
+export default AddContractorModal;

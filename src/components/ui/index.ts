@@ -15,3 +15,5 @@ export type { ChartLineProps, ChartLineSeries } from "./ChartLine";
 
 export { default as CardContainer } from "./CardContainer";
 export type { CardContainerProps } from "./CardContainer";
+
+export { default as CirclePagination } from "./CirclePagination";

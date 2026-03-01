@@ -23,7 +23,6 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   useMediaQuery,
 } from "@mui/material";
@@ -35,6 +34,7 @@ import AddContractorModal from "./component/AddContractorModal";
 import EditContractorModal from "./component/EditContractorModal";
 
 import TopbarHeader from "@/components/TopbarHeader";
+import CirclePagination from "@/components/ui/CirclePagination";
 import {
   createContractor,
   deleteContractor,
@@ -274,7 +274,7 @@ function Contractors() {
                 border: "none",
                 boxShadow: "none",
                 backgroundColor: "transparent",
-                overflow: "visible",
+                overflowX: "auto",
               }}
             >
               <Table
@@ -282,6 +282,7 @@ function Contractors() {
                   borderCollapse: "separate",
                   borderSpacing: "0 8px",
                   tableLayout: "fixed",
+                  minWidth: 1200,
                   width: "100%",
                 }}
               >
@@ -299,7 +300,7 @@ function Contractors() {
                   <TableRow
                     sx={(t) => {
                       const isDark = t.palette.mode === "dark";
-                      const borderColor = isDark ? "#444" : "#ebebeb";
+                      const borderColor = isDark ? "#444" : "#e6e3e3";
                       return {
                         "& th": {
                           backgroundColor: isDark ? "#1e1e1e" : "#fff",
@@ -353,10 +354,10 @@ function Contractors() {
                 style={{
                   backgroundColor:
                     theme.palette.mode === "dark" ? "#1e1e1e" : "#fff",
-                  border: `1px solid ${theme.palette.mode === "dark" ? "#444" : "#ebebeb"}`,
+                  border: `1px solid ${theme.palette.mode === "dark" ? "#444" : "#e6e3e3"}`,
                   borderRadius: "12px",
                   padding: "6px 6px",
-                  overflow: "hidden",
+                  minWidth: 1200,
                 }}
               >
                 <Table
@@ -364,6 +365,7 @@ function Contractors() {
                     borderCollapse: "separate",
                     borderSpacing: "0 4px",
                     tableLayout: "fixed",
+                    minWidth: 1200,
                     width: "100%",
                   }}
                 >
@@ -413,6 +415,9 @@ function Contractors() {
                                     : "#F3F4F6",
                                 borderBottom: "none",
                                 py: "11px",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
                                 "&:first-of-type": {
                                   borderTopLeftRadius: "12px",
                                   borderBottomLeftRadius: "12px",
@@ -481,28 +486,12 @@ function Contractors() {
                   </TableBody>
                 </Table>
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  width: "100%",
-                  marginTop: 8,
-                }}
-              >
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  component="div"
-                  count={contractors.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  labelRowsPerPage="Filas por página:"
-                  labelDisplayedRows={({ from, to, count }) =>
-                    `${from}-${to} de ${count}`
-                  }
-                />
-              </div>
+              <CirclePagination
+                count={contractors.length}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={handleChangePage}
+              />
             </TableContainer>
 
             {/* Action menu popover */}
