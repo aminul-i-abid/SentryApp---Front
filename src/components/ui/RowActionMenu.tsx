@@ -40,6 +40,8 @@ export interface ActionMenuItem {
 export interface RowActionMenuProps {
   /** Called when the eye/view icon is clicked */
   onView?: () => void;
+  /** Custom icon to replace the default eye/view icon */
+  viewIcon?: React.ReactNode;
   /** Menu items for the three-dot popup */
   menuItems: ActionMenuItem[];
 }
@@ -47,7 +49,11 @@ export interface RowActionMenuProps {
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
-const RowActionMenu: React.FC<RowActionMenuProps> = ({ onView, menuItems }) => {
+const RowActionMenu: React.FC<RowActionMenuProps> = ({
+  onView,
+  viewIcon,
+  menuItems,
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
 
@@ -94,30 +100,32 @@ const RowActionMenu: React.FC<RowActionMenuProps> = ({ onView, menuItems }) => {
             },
           }}
         >
-          <VisibilityOutlinedIcon sx={{ fontSize: 18 }} />
+          {viewIcon || <VisibilityOutlinedIcon sx={{ fontSize: 18 }} />}
         </IconButton>
       )}
 
       {/* Three-dot menu icon */}
-      <IconButton
-        size="small"
-        onClick={handleMenuOpen}
-        sx={{
-          color: "#94A3B8",
-          bgcolor: "#fff",
-          border: "1.5px solid #E5E7EB",
-          width: 34,
-          height: 34,
-          borderRadius: "10px",
-          "&:hover": {
-            color: "#415EDE",
+      {visibleItems.length > 0 && (
+        <IconButton
+          size="small"
+          onClick={handleMenuOpen}
+          sx={{
+            color: "#94A3B8",
             bgcolor: "#fff",
-            borderColor: "#415EDE",
-          },
-        }}
-      >
-        <MoreVertIcon sx={{ fontSize: 18 }} />
-      </IconButton>
+            border: "1.5px solid #E5E7EB",
+            width: 34,
+            height: 34,
+            borderRadius: "10px",
+            "&:hover": {
+              color: "#415EDE",
+              bgcolor: "#fff",
+              borderColor: "#415EDE",
+            },
+          }}
+        >
+          <MoreVertIcon sx={{ fontSize: 18 }} />
+        </IconButton>
+      )}
 
       {/* Popup menu */}
       <Menu
