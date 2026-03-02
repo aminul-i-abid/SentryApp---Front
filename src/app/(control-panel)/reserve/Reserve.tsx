@@ -1,4 +1,6 @@
 import TopbarHeader from "@/components/TopbarHeader";
+import RowActionMenu from "@/components/ui/RowActionMenu";
+import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
 import { Routes, buildRoute } from "@/utils/routesEnum";
 import useUser from "@auth/useUser";
 import FusePageSimple from "@fuse/core/FusePageSimple";
@@ -6,10 +8,9 @@ import AddIcon from "@mui/icons-material/Add";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import {
   Badge,
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -27,17 +28,14 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
-  TableSortLabel,
-  Toolbar,
   Tooltip,
   Typography,
   useMediaQuery,
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import { useSnackbar } from "notistack";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { getContractors } from "../contractors/contractorsService";
@@ -103,10 +101,8 @@ function Reserve() {
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
   const { data: user } = useUser();
   const [openModal, setOpenModal] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [selectedRow, setSelectedRow] = React.useState<number | null>(null);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage] = React.useState(10);
   const [reserves, setReserves] = useState<BulkReserve[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
@@ -125,7 +121,7 @@ function Reserve() {
   } | null>(null);
   const [reservationStatusFilter, setReservationStatusFilter] = useState<
     number | undefined
-  >(0); // Default to 'Activas' (status 0)
+  >(0);
   const [openSearchModal, setOpenSearchModal] = useState(false);
   const [openRutSidebar, setOpenRutSidebar] = useState(false);
 
@@ -240,53 +236,28 @@ function Reserve() {
     setOpenModal(false);
   };
 
-  const handleInfoClick = (id) => {
-    navigate(buildRoute(Routes.RESERVE_BULK, { id: id }));
+  const handleInfoClick = (reserveId: number) => {
+    navigate(buildRoute(Routes.RESERVE_BULK, { id: String(reserveId) }));
   };
 
-  const handleMenuClick = (
-    event: React.MouseEvent<HTMLElement>,
-    rowId: number,
-  ) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedRow(rowId);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedRow(null);
-  };
-
-  const handleAction = (action: string) => {
-    if (selectedRow) {
-      // TODO: Implement the actual actions
-    }
-    handleMenuClose();
-  };
-
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
   };
 
   const handleCloseUnassignedModal = () => {
     setOpenUnassignedModal(false);
   };
 
-  const handleRequestSort = (property: OrderBy) => {
+  const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
+    setOrderBy(property as OrderBy);
   };
 
   // Handle company filter change
   const handleCompanyFilterChange = (event: SelectChangeEvent<string>) => {
     setSelectedCompanyId(event.target.value);
-    setPage(0); // Reset to first page when filter changes
+    setPage(0);
   };
 
   // Filtro de estado de reserva
@@ -295,11 +266,10 @@ function Reserve() {
   ) => {
     const value = event.target.value;
     setReservationStatusFilter(value === "" ? undefined : parseInt(value));
-    setPage(0); // Reset to first page when filter changes
+    setPage(0);
   };
 
-  // Como ahora los filtros se manejan en el servidor, no necesitamos filtrar del lado del cliente
-  // Solo aplicamos el ordenamiento a los datos que vienen del servidor
+  // Ordenamiento
   const sortedReserves = React.useMemo(() => {
     return [...reserves].sort((a, b) => {
       let valueA: Date;
@@ -331,279 +301,242 @@ function Reserve() {
     });
   }, [reserves, order, orderBy]);
 
+  /* ---------- Filter bar shown above table ---------- */
+  const [showFilters, setShowFilters] = useState(false);
+
+  const filterBar = (
+    <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+      <Typography variant="h6" fontWeight={700}>
+        Reservas
+      </Typography>
+      <div className="flex items-center gap-3 flex-wrap">
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleOpenModal}
+          sx={{
+            backgroundColor: "#415EDE",
+            color: "#fff",
+            borderRadius: "24px",
+            textTransform: "none",
+            fontWeight: 600,
+            px: 3,
+            py: 1,
+            "&:hover": { backgroundColor: "#3449B5" },
+          }}
+        >
+          Nueva Reserva
+        </Button>
+        <Button
+          variant="outlined"
+          startIcon={<CancelIcon />}
+          onClick={() => setOpenRutSidebar(true)}
+          sx={{
+            borderRadius: "24px",
+            textTransform: "none",
+            fontWeight: 600,
+            px: 3,
+            py: 1,
+          }}
+        >
+          Cancelación por RUT
+        </Button>
+        <IconButton onClick={() => setShowFilters((v) => !v)}>
+          <FilterListIcon />
+        </IconButton>
+      </div>
+    </div>
+  );
+
+  const filtersRow = showFilters ? (
+    <div className="flex items-center gap-3 mb-4 flex-wrap">
+      {isAdmin && contractors.length > 0 && (
+        <FormControl sx={{ minWidth: 200 }} size="small">
+          <InputLabel id="company-filter-label">
+            Filtrar por Contratista
+          </InputLabel>
+          <Select
+            labelId="company-filter-label"
+            id="company-filter"
+            value={selectedCompanyId}
+            onChange={handleCompanyFilterChange}
+            label="Filtrar por Contratista"
+          >
+            <MenuItem value="">
+              <em>Todos los contratistas</em>
+            </MenuItem>
+            {contractors.map((contractor) => (
+              <MenuItem key={contractor.id} value={contractor.id.toString()}>
+                {contractor.name || contractor.companyName || contractor.title}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+      <FormControl sx={{ minWidth: 180 }} size="small">
+        <InputLabel id="reservation-status-filter-label">
+          Estado de Reserva
+        </InputLabel>
+        <Select
+          labelId="reservation-status-filter-label"
+          id="reservation-status-filter"
+          value={reservationStatusFilter?.toString() || ""}
+          label="Estado de Reserva"
+          onChange={handleReservationStatusFilterChange}
+        >
+          <MenuItem value="">Todas</MenuItem>
+          <MenuItem value="0">Activas</MenuItem>
+          <MenuItem value="1">Canceladas</MenuItem>
+          <MenuItem value="3">Vencidas</MenuItem>
+        </Select>
+      </FormControl>
+    </div>
+  ) : null;
+
+  /* ---------- Column definitions ---------- */
+  const columns: TableColumnDef<BulkReserve>[] = useMemo(
+    () => [
+      {
+        id: "guid",
+        label: "Reserva",
+        sortable: false,
+        align: "center" as const,
+        render: (row: BulkReserve) => row.guid,
+      },
+      {
+        id: "guestCount",
+        label: "Huéspedes",
+        sortable: false,
+        align: "center" as const,
+        render: (row: BulkReserve) => row.guestCount,
+      },
+      {
+        id: "companyName",
+        label: "Contratista",
+        sortable: false,
+        align: "center" as const,
+        render: (row: BulkReserve) => row.companyName ?? "-",
+      },
+      {
+        id: "solicitante",
+        label: "Solicitante",
+        sortable: false,
+        align: "center" as const,
+        render: (row: BulkReserve) => row.solicitante ?? "-",
+      },
+      {
+        id: "numberOfReservations",
+        label: "Cant. Reservas",
+        sortable: false,
+        align: "center" as const,
+        render: (row: BulkReserve) =>
+          `${row.numberOfReservations} (${row.activeReservations}/${row.cancelledReservations})`,
+      },
+      {
+        id: "created",
+        label: "Fecha de Creación",
+        sortable: true,
+        align: "center" as const,
+        render: (row: BulkReserve) =>
+          row.created && !isNaN(new Date(row.created).getTime())
+            ? formatDate(new Date(row.created))
+            : "-",
+      },
+      {
+        id: "status",
+        label: "Estado",
+        sortable: false,
+        align: "center" as const,
+        render: (row: BulkReserve) => {
+          if (row.status === 0)
+            return (
+              <Tooltip title="Reservas creadas exitosamente">
+                <CheckCircleIcon sx={{ color: "#4caf50" }} />
+              </Tooltip>
+            );
+          if (row.status === 1)
+            return (
+              <Tooltip title="Procesando reservas">
+                <AutorenewIcon
+                  sx={{
+                    color: "#1976d2",
+                    animation: "spin 1s linear infinite",
+                    "@keyframes spin": {
+                      "0%": { transform: "rotate(0deg)" },
+                      "100%": { transform: "rotate(360deg)" },
+                    },
+                  }}
+                />
+              </Tooltip>
+            );
+          if (row.status === 2)
+            return (
+              <Tooltip title="Algunas reservas presentan problemas con la chapa">
+                <Badge
+                  badgeContent="!"
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      backgroundColor: "#ffa726",
+                      color: "white",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      minWidth: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                    },
+                  }}
+                >
+                  <span></span>
+                </Badge>
+              </Tooltip>
+            );
+          return `${row.status}`;
+        },
+      },
+    ],
+    [],
+  );
+
+  const totalPages = Math.ceil(totalCount / rowsPerPage);
+
   return (
     <Root
       header={<TopbarHeader />}
       content={
-        <div className="p-6">
-          <div className="flex justify-end mb-4" style={{ gap: 12 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={handleOpenModal}
-            >
-              Nueva Reserva
-            </Button>
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<CancelIcon />}
-              onClick={() => setOpenRutSidebar(true)}
-            >
-              Cancelacion por RUT
-            </Button>
-            {/* <Button
-                            variant="outlined"
-                            color="primary"
-                            startIcon={<SearchIcon />}
-                            onClick={() => setOpenSearchModal(true)}
-                        >
-                            Búsqueda de huéspedes
-                        </Button> */}
-          </div>
-          <TableContainer component={Paper}>
-            <Toolbar
-              sx={{
-                pl: { sm: 2 },
-                pr: { xs: 1, sm: 1 },
-              }}
-            >
-              <Typography
-                sx={{ flex: "1 1 100%" }}
-                variant="h6"
-                id="tableTitle"
-                component="div"
-              >
-                Reservas
-              </Typography>
+        <div className="p-6 w-full">
+          {filterBar}
+          {filtersRow}
 
-              {isAdmin && contractors.length > 0 && (
-                <FormControl sx={{ minWidth: 200, mr: 2 }} size="small">
-                  <InputLabel id="company-filter-label">
-                    Filtrar por Contratista
-                  </InputLabel>
-                  <Select
-                    labelId="company-filter-label"
-                    id="company-filter"
-                    value={selectedCompanyId}
-                    onChange={handleCompanyFilterChange}
-                    label="Filtrar por Contratista"
-                  >
-                    <MenuItem value="">
-                      <em>Todos los contratistas</em>
-                    </MenuItem>
-                    {contractors.map((contractor) => (
-                      <MenuItem
-                        key={contractor.id}
-                        value={contractor.id.toString()}
-                      >
-                        {contractor.name ||
-                          contractor.companyName ||
-                          contractor.title}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-
-              <FormControl sx={{ minWidth: 180 }} size="small">
-                <InputLabel id="reservation-status-filter-label">
-                  Estado de Reserva
-                </InputLabel>
-                <Select
-                  labelId="reservation-status-filter-label"
-                  id="reservation-status-filter"
-                  value={reservationStatusFilter?.toString() || ""}
-                  label="Estado de Reserva"
-                  onChange={handleReservationStatusFilterChange}
-                >
-                  <MenuItem value="">Todas</MenuItem>
-                  <MenuItem value="0">Activas</MenuItem>
-                  <MenuItem value="1">Canceladas</MenuItem>
-                  <MenuItem value="3">Vencidas</MenuItem>
-                </Select>
-              </FormControl>
-            </Toolbar>
-            {/* Tabla con los datos de reservas */}
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontSize: "0.8rem" }}>Reserva</TableCell>
-                  <TableCell sx={{ fontSize: "0.8rem" }}>Huéspedes</TableCell>
-                  <TableCell sx={{ fontSize: "0.8rem" }}>Contratista</TableCell>
-                  <TableCell sx={{ fontSize: "0.8rem" }}>Solicitante</TableCell>
-                  <TableCell sx={{ fontSize: "0.8rem" }}>
-                    Cantidad de Reservas
-                    <Tooltip title="Cantidad total de reservas (activas/canceladas)">
-                      <InfoOutlinedIcon
-                        fontSize="small"
-                        sx={{
-                          ml: 0.5,
-                          verticalAlign: "middle",
-                          color: "action.active",
-                        }}
-                      />
-                    </Tooltip>
-                  </TableCell>
-                  <TableCell sx={{ fontSize: "0.8rem" }}>
-                    <TableSortLabel
-                      active={orderBy === "created"}
-                      direction={orderBy === "created" ? order : "asc"}
-                      onClick={() => handleRequestSort("created")}
-                    >
-                      Fecha de creación
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sx={{ fontSize: "0.8rem" }} align="center">
-                    Estado
-                  </TableCell>
-                  <TableCell sx={{ fontSize: "0.8rem" }} align="center">
-                    Acción
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={11} align="center">
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          padding: "40px 0",
-                        }}
-                      >
-                        <span style={{ color: "#888" }}>Cargando datos...</span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : sortedReserves.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={11} align="center">
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          padding: "40px 0",
-                        }}
-                      >
-                        <span style={{ color: "#888" }}>
-                          No se encontraron datos
-                        </span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  sortedReserves.map((reserve) => (
-                    <TableRow key={reserve.id}>
-                      <TableCell
-                        sx={{ fontSize: "0.8rem" }}
-                        align="center"
-                      >{`${reserve.guid}`}</TableCell>
-                      <TableCell
-                        sx={{ fontSize: "0.8rem" }}
-                        align="center"
-                      >{`${reserve.guestCount}`}</TableCell>
-                      <TableCell
-                        sx={{ fontSize: "0.8rem" }}
-                        align="center"
-                      >{`${reserve.companyName}`}</TableCell>
-                      <TableCell sx={{ fontSize: "0.8rem" }} align="center">
-                        {reserve.solicitante}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: "0.8rem" }} align="center">
-                        {reserve.numberOfReservations} (
-                        {reserve.activeReservations}/
-                        {reserve.cancelledReservations})
-                      </TableCell>
-                      <TableCell sx={{ fontSize: "0.8rem" }} align="center">
-                        {reserve.created &&
-                        !isNaN(new Date(reserve.created).getTime())
-                          ? formatDate(new Date(reserve.created))
-                          : "-"}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: "0.8rem" }} align="center">
-                        {reserve.status === 0 ? (
-                          <Tooltip title="Reservas creadas exitosamente">
-                            <CheckCircleIcon sx={{ color: "#4caf50" }} />
-                          </Tooltip>
-                        ) : reserve.status === 1 ? (
-                          <Tooltip title="Procesando reservas">
-                            <AutorenewIcon
-                              sx={{
-                                color: "#1976d2",
-                                animation: "spin 1s linear infinite",
-                                "@keyframes spin": {
-                                  "0%": { transform: "rotate(0deg)" },
-                                  "100%": { transform: "rotate(360deg)" },
-                                },
-                              }}
-                            />
-                          </Tooltip>
-                        ) : reserve.status === 2 ? (
-                          <Tooltip title="Algunas reservas presentan problemas con la chapa">
-                            <Badge
-                              badgeContent="!"
-                              sx={{
-                                "& .MuiBadge-badge": {
-                                  backgroundColor: "#ffa726",
-                                  color: "white",
-                                  fontSize: "12px",
-                                  fontWeight: "bold",
-                                  minWidth: "20px",
-                                  height: "20px",
-                                  borderRadius: "50%",
-                                },
-                              }}
-                            >
-                              <span></span>
-                            </Badge>
-                          </Tooltip>
-                        ) : (
-                          `${reserve.status}`
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: "0.8rem" }} align="center">
-                        <Box display="flex" justifyContent="center">
-                          <IconButton
-                            color="info"
-                            size="small"
-                            onClick={() => handleInfoClick(reserve.id)}
-                          >
-                            <InfoOutlinedIcon />
-                          </IconButton>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              width="100%"
-              mt={1}
-            >
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={totalCount}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                labelRowsPerPage="Filas por página:"
-                labelDisplayedRows={({ from, to, count }) =>
-                  `${from}-${to} de ${count}`
-                }
+          <StyledTable<BulkReserve>
+            columns={columns}
+            data={sortedReserves}
+            getRowId={(row) => String(row.id)}
+            loading={loading}
+            loadingMessage="Cargando datos..."
+            emptyMessage="No se encontraron datos"
+            order={order}
+            orderBy={orderBy}
+            onSort={handleRequestSort}
+            onRowClick={(row) => handleInfoClick(row.id)}
+            renderActions={(row) => (
+              <RowActionMenu
+                onView={() => handleInfoClick(row.id)}
+                menuItems={[]}
               />
-            </Box>
-          </TableContainer>
+            )}
+            actionsLabel="Acciones"
+            pagination={
+              totalPages > 1
+                ? {
+                    count: totalCount,
+                    page,
+                    rowsPerPage,
+                    onPageChange: handleChangePage,
+                  }
+                : undefined
+            }
+          />
+
           <AddReservationModal
             open={openModal}
             onClose={handleCloseModal}
@@ -663,41 +596,6 @@ function Reserve() {
                 >
                   Volver
                 </Button>
-                {/*<Button 
-                                    onClick={async () => {
-                                        if (!validationData) {
-                                            enqueueSnackbar('Error: No hay datos de validación disponibles', { variant: 'error' });
-                                            return;
-                                        }
-
-                                        try {
-                                            const response = await createBulkReservation(
-                                                validationData.file,
-                                                validationData.companyId,
-                                                validationData.comments,
-                                                assignableGuests,
-                                                unassignedGuests
-                                            );
-
-                                            if (response.succeeded) {
-                                                enqueueSnackbar('Reservas creadas exitosamente', { variant: 'success' });
-                                                handleCloseUnassignedModal();
-                                                fetchReserves();
-                                                setValidationData(null);
-                                            } else {
-                                                enqueueSnackbar(`Error al crear las reservas: ${response.message}`, { variant: 'error' });
-                                            }
-                                        } catch (error) {
-                                            console.error('Error creating reservations:', error);
-                                            enqueueSnackbar('Error al crear las reservas', { variant: 'error' });
-                                        }
-                                    }} 
-                                    variant="contained" 
-                                    color="primary" 
-                                    sx={{ flex: 1 }}
-                                >
-                                    Reservar
-                                </Button>*/}
               </div>
             </DialogActions>
           </Dialog>
