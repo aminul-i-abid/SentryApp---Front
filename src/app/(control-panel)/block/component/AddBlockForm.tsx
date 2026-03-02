@@ -62,7 +62,14 @@ const AddBlockForm: React.FC<AddBlockFormProps> = ({ formData, onChange }) => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, mt: 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2.5,
+        mt: 1,
+      }}
+    >
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Typography sx={labelSx}>Nombre</Typography>

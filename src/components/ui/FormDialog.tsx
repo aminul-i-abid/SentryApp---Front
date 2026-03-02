@@ -97,71 +97,71 @@ const DialogInner: React.FC<{
     {/* ---- Content ---- */}
     <Box
       sx={{
-        px: 3,
+        px: 2,
         pt: 2,
-        pb: hideActions ? 3 : 1,
+        pb: hideActions ? 3 : 2,
         // In drawer variant we don't want the content to flex-grow and push
         // actions to the bottom of the drawer. Instead limit height and
         // allow internal scrolling so actions appear right after fields.
         flex: variant === "drawer" ? "0 0 auto" : 1,
         overflowY: variant === "drawer" ? "auto" : "auto",
         maxHeight: variant === "drawer" ? "calc(100vh - 220px)" : undefined,
+        backgroundColor: "#F7F7F7",
+        m: 2,
+        borderRadius: 2,
       }}
     >
       {children}
-    </Box>
-
-    {/* ---- Actions ---- */}
-    {!hideActions && (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: 1,
-          px: 3,
-          pb: 3,
-          pt: 1,
-        }}
-      >
-        <Button
-          onClick={onClose}
+      {/* ---- Actions ---- */}
+      {!hideActions && (
+        <Box
           sx={{
-            textTransform: "none",
-            fontWeight: 600,
-            color: "text.primary",
-            px: 3,
-            "&:hover": { backgroundColor: "transparent" },
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 1,
+            mt: 3,
           }}
         >
-          {cancelLabel}
-        </Button>
-        <Button
-          onClick={onSubmit}
-          variant="contained"
-          disabled={loading || submitDisabled}
-          sx={{
-            textTransform: "none",
-            fontWeight: 600,
-            borderRadius: "12px",
-            backgroundColor: "#415EDE",
-            px: 3,
-            py: 1,
-            color: "#fff",
-            "&:hover": { backgroundColor: "#3347b8" },
-            "&.Mui-disabled": {
-              backgroundColor: "#a0b0f0",
+          <Button
+            onClick={onClose}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              color: "text.primary",
+              px: 3,
+              "&:hover": { backgroundColor: "transparent" },
+            }}
+          >
+            {cancelLabel}
+          </Button>
+          <Button
+            onClick={onSubmit}
+            variant="contained"
+            disabled={loading || submitDisabled}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              borderRadius: "12px",
+              backgroundColor: "#415EDE",
+              px: 3,
+              py: 1,
               color: "#fff",
-            },
-          }}
-        >
-          {loading ? (
-            <CircularProgress size={22} color="inherit" />
-          ) : (
-            submitLabel
-          )}
-        </Button>
-      </Box>
-    )}
+              "&:hover": { backgroundColor: "#3347b8" },
+              "&.Mui-disabled": {
+                backgroundColor: "#a0b0f0",
+                color: "#fff",
+              },
+            }}
+          >
+            {loading ? (
+              <CircularProgress size={22} color="inherit" />
+            ) : (
+              submitLabel
+            )}
+          </Button>
+        </Box>
+      )}
+    </Box>
   </>
 );
 

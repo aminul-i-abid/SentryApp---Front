@@ -1,4 +1,26 @@
-import React, { useMemo } from "react";
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip,
+  type ChartData,
+  type ChartOptions,
+} from "chart.js";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { Line } from "react-chartjs-2";
+
+/* Register Chart.js modules once */
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Filler,
+);
 
 export interface ChartLineSeries {
   label: string;
@@ -14,116 +36,174 @@ export interface ChartLineProps {
 }
 
 /**
- * Pure SVG line chart built with Tailwind + inline styles. No external chart lib.
- * Supports multiple series with a built-in legend and smooth Catmull-Rom curves.
+ * Smooth line chart using Chart.js + react-chartjs-2.
+ * Matches the "Bed Occupancy – Coming Days" design: thick smooth curves,
+ * no visible data-point dots, subtle dashed grid, toggle-style legend.
  */
 const ChartLine: React.FC<ChartLineProps> = ({
   labels,
   series,
-  height = 280,
+  height = 340,
   yLabel = "",
 }) => {
-  const padding = { top: 20, right: 20, bottom: 40, left: 60 };
-  const chartW = 800;
-  const chartH = height;
-  const innerW = chartW - padding.left - padding.right;
-  const innerH = chartH - padding.top - padding.bottom;
+  /* --- visibility toggles (one per series) --- */
+  const [visible, setVisible] = useState<boolean[]>(() =>
+    series.map(() => true),
+  );
+  const chartRef = useRef<ChartJS<"line"> | null>(null);
 
-  // Compute global min/max across all series
-  const { minVal, maxVal, yTicks } = useMemo(() => {
-    let mn = Infinity;
-    let mx = -Infinity;
-    series.forEach((s) =>
-      s.data.forEach((v) => {
-        if (v < mn) mn = v;
-        if (v > mx) mx = v;
-      }),
-    );
+  const toggleSeries = useCallback((idx: number) => {
+    setVisible((prev) => {
+      const next = [...prev];
+      next[idx] = !next[idx];
+      return next;
+    });
+    const chart = chartRef.current;
 
-    if (!isFinite(mn)) mn = 0;
-    if (!isFinite(mx)) mx = 100;
-
-    // Round max up
-    const range = mx - mn || 1;
-    const step = Math.pow(10, Math.floor(Math.log10(range))) || 1;
-    const adjMax = Math.ceil(mx / step) * step;
-    const adjMin = Math.floor(mn / step) * step;
-
-    const ticks: number[] = [];
-    const tickStep = (adjMax - adjMin) / 5 || 1;
-    for (let v = adjMin; v <= adjMax; v += tickStep) {
-      ticks.push(Math.round(v));
+    if (chart) {
+      const meta = chart.getDatasetMeta(idx);
+      meta.hidden = !meta.hidden;
+      chart.update();
     }
-    return { minVal: adjMin, maxVal: adjMax, yTicks: ticks };
-  }, [series]);
+  }, []);
 
-  const xStep = labels.length > 1 ? innerW / (labels.length - 1) : innerW;
+  /* --- Chart.js data --- */
+  const chartData: ChartData<"line"> = useMemo(
+    () => ({
+      labels,
+      datasets: series.map((s, idx) => ({
+        label: s.label,
+        data: s.data,
+        borderColor: s.color,
+        backgroundColor: s.color + "14", // ~8 % opacity fill
+        borderWidth: 2.5,
+        tension: 0.15, // slight smoothing – keeps spiky peaks
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: s.color,
+        pointHoverBorderWidth: 2.5,
+        hidden: !visible[idx],
+      })),
+    }),
+    [labels, series, visible],
+  );
 
-  const toX = (i: number) => padding.left + i * xStep;
-  const toY = (v: number) => {
-    const ratio = maxVal !== minVal ? (v - minVal) / (maxVal - minVal) : 0;
-    return padding.top + innerH - ratio * innerH;
-  };
-
-  /** Catmull-Rom smooth path */
-  const buildSmoothPath = (data: number[]) => {
-    if (data.length === 0) return "";
-    const pts = data.map((v, i) => ({ x: toX(i), y: toY(v) }));
-    if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
-    if (pts.length === 2)
-      return `M ${pts[0].x} ${pts[0].y} L ${pts[1].x} ${pts[1].y}`;
-
-    let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = pts[i - 1] || pts[i];
-      const p1 = pts[i];
-      const p2 = pts[i + 1];
-      const p3 = pts[i + 2] || p2;
-      const cp1x = p1.x + (p2.x - p0.x) / 6;
-      const cp1y = p1.y + (p2.y - p0.y) / 6;
-      const cp2x = p2.x - (p3.x - p1.x) / 6;
-      const cp2y = p2.y - (p3.y - p1.y) / 6;
-      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
-    }
-    return d;
-  };
-
-  const buildSmoothArea = (data: number[]) => {
-    const linePath = buildSmoothPath(data);
-    if (!linePath) return "";
-    const lastX = toX(data.length - 1).toFixed(1);
-    const firstX = toX(0).toFixed(1);
-    const baseY = (padding.top + innerH).toFixed(1);
-    return `${linePath} L ${lastX} ${baseY} L ${firstX} ${baseY} Z`;
-  };
+  /* --- Chart.js options --- */
+  const options: ChartOptions<"line"> = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: "index" as const,
+        intersect: false,
+      },
+      plugins: {
+        legend: { display: false }, // we render our own legend
+        tooltip: {
+          backgroundColor: "#fff",
+          titleColor: "#334155",
+          bodyColor: "#64748b",
+          borderColor: "#e2e8f0",
+          borderWidth: 1,
+          padding: 10,
+          cornerRadius: 8,
+          displayColors: true,
+          boxPadding: 4,
+          callbacks: {
+            label: (ctx) =>
+              ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            color: "#94A3B8",
+            font: { size: 11 },
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 14,
+          },
+        },
+        y: {
+          beginAtZero: true,
+          border: { display: false },
+          grid: {
+            color: "#E2E8F0",
+          },
+          title: {
+            display: !!yLabel,
+            text: yLabel,
+            color: "#94A3B8",
+            font: { size: 11 },
+          },
+          ticks: {
+            color: "#94A3B8",
+            font: { size: 11 },
+            callback: (value) =>
+              typeof value === "number" ? value.toLocaleString() : value,
+          },
+        },
+      },
+    }),
+    [yLabel],
+  );
 
   const hasData = labels.length > 0 && series.some((s) => s.data.length > 0);
 
   return (
     <div className="w-full">
-      {/* Legend with toggle-style indicators */}
+      {/* ---- Custom legend with toggle switches ---- */}
       <div className="flex items-center justify-end gap-5 mb-4 flex-wrap">
-        {series.map((s) => (
-          <div key={s.label} className="flex items-center gap-2">
+        {series.map((s, idx) => (
+          <button
+            key={s.label}
+            type="button"
+            onClick={() => toggleSeries(idx)}
+            className="flex items-center gap-2 cursor-pointer select-none"
+          >
+            {/* Colored dot */}
             <span
-              className="inline-block w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: s.color }}
+              className="inline-block w-2.5 h-2.5 rounded-full transition-opacity"
+              style={{
+                backgroundColor: s.color,
+                opacity: visible[idx] ? 1 : 0.35,
+              }}
             />
-            <span className="text-xs text-slate-500 font-medium">{s.label}</span>
-            {/* Toggle indicator (decorative, always on) */}
+            {/* Label */}
             <span
-              className="relative inline-flex items-center w-7 h-4 rounded-full"
-              style={{ backgroundColor: s.color + "30" }}
+              className="text-xs font-medium transition-opacity"
+              style={{
+                color: visible[idx] ? "#64748b" : "#cbd5e1",
+              }}
+            >
+              {s.label}
+            </span>
+            {/* Toggle pill */}
+            <span
+              className="relative inline-flex items-center w-7 h-4 rounded-full transition-colors"
+              style={{
+                backgroundColor: visible[idx] ? s.color + "30" : "#e2e8f0",
+              }}
             >
               <span
-                className="absolute right-0.5 w-3 h-3 rounded-full"
-                style={{ backgroundColor: s.color }}
+                className="absolute w-3 h-3 rounded-full transition-all"
+                style={{
+                  backgroundColor: visible[idx] ? s.color : "#cbd5e1",
+                  right: visible[idx] ? "2px" : undefined,
+                  left: visible[idx] ? undefined : "2px",
+                }}
               />
             </span>
-          </div>
+          </button>
         ))}
       </div>
 
+      {/* ---- Chart ---- */}
       {!hasData ? (
         <div
           className="flex items-center justify-center text-slate-400 text-sm"
@@ -132,92 +212,9 @@ const ChartLine: React.FC<ChartLineProps> = ({
           No hay datos disponibles
         </div>
       ) : (
-        <svg
-          viewBox={`0 0 ${chartW} ${chartH}`}
-          className="w-full"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          {/* Y grid + tick labels */}
-          {yTicks.map((tick) => (
-            <g key={tick}>
-              <line
-                x1={padding.left}
-                x2={chartW - padding.right}
-                y1={toY(tick)}
-                y2={toY(tick)}
-                stroke="#E2E8F0"
-                strokeDasharray="4 4"
-                strokeWidth={1}
-              />
-              <text
-                x={padding.left - 10}
-                y={toY(tick) + 4}
-                textAnchor="end"
-                fontSize={11}
-                fill="#94A3B8"
-              >
-                {tick.toLocaleString()}
-              </text>
-            </g>
-          ))}
-
-          {/* Y axis label */}
-          {yLabel && (
-            <text
-              x={14}
-              y={padding.top + innerH / 2}
-              textAnchor="middle"
-              transform={`rotate(-90 14 ${padding.top + innerH / 2})`}
-              fontSize={11}
-              fill="#94A3B8"
-            >
-              {yLabel}
-            </text>
-          )}
-
-          {/* X tick labels */}
-          {labels.map((lbl, i) => (
-            <text
-              key={`${lbl}-${i}`}
-              x={toX(i)}
-              y={chartH - 8}
-              textAnchor="middle"
-              fontSize={11}
-              fill="#94A3B8"
-            >
-              {lbl}
-            </text>
-          ))}
-
-          {/* Series areas + smooth lines */}
-          {series.map((s) =>
-            s.data.length > 0 ? (
-              <g key={s.label}>
-                <path d={buildSmoothArea(s.data)} fill={s.color} opacity={0.08} />
-                <path
-                  d={buildSmoothPath(s.data)}
-                  fill="none"
-                  stroke={s.color}
-                  strokeWidth={2.5}
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                />
-                {/* Data points */}
-                {s.data.map((v, i) => (
-                  <circle
-                    key={i}
-                    cx={toX(i)}
-                    cy={toY(v)}
-                    r={3.5}
-                    fill="white"
-                    stroke={s.color}
-                    strokeWidth={2}
-                  />
-                ))}
-              </g>
-            ) : null,
-          )}
-        </svg>
+        <div style={{ height: `${height}px`, width: "100%" }}>
+          <Line ref={chartRef} data={chartData} options={options} />
+        </div>
       )}
     </div>
   );

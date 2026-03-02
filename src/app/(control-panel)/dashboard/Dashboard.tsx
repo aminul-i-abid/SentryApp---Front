@@ -11,7 +11,7 @@ import useUser from "@auth/useUser";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getContractors } from "../contractors/contractorsService";
 import tagRoleMap from "../tag/enum/RoleTag";
 import BlockOccupancyDetailSidebar from "./components/BlockOccupancyDetailSidebar";
@@ -192,7 +192,8 @@ function Dashboard() {
   const [contractors, setContractors] = useState<any[]>([]);
   const [selectedContractor, setSelectedContractor] = useState("");
   const [contractorDropdownOpen, setContractorDropdownOpen] = useState(false);
-  const selectedTimeFilter = 7;
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const selectedTimeFilter = 0; // 0 = show all available days
 
   // Block expansion
   const [isBlockExpanded, setIsBlockExpanded] = useState(false);
@@ -243,6 +244,27 @@ function Dashboard() {
       }
     })();
   }, []);
+
+  /* -- Close contractor dropdown on outside click -- */
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setContractorDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedContractorName = useMemo(() => {
+    if (!selectedContractor) return "Seleccionar tipo contratista";
+
+    const found = contractors.find((c) => String(c.id) === selectedContractor);
+    return found ? found.name : "Seleccionar tipo contratista";
+  }, [selectedContractor, contractors]);
 
   /* ======== Computed data (matches optimized logic) ======== */
 
@@ -337,14 +359,13 @@ function Dashboard() {
         occupiedSeries: [] as number[],
       };
 
-    const sliced = daily.slice(0, selectedTimeFilter);
+    const sliced =
+      selectedTimeFilter > 0 ? daily.slice(0, selectedTimeFilter) : daily;
     return {
-      labels: sliced.map((d) =>
-        new Date(d.date).toLocaleDateString("es-ES", {
-          day: "2-digit",
-          month: "2-digit",
-        }),
-      ),
+      labels: sliced.map((d) => {
+        const dt = new Date(d.date);
+        return `${dt.getDate()}/${dt.getMonth() + 1}`;
+      }),
       totalSeries: sliced.map((d) => d.totalBeds),
       occupiedSeries: sliced.map((d) => d.occupiedBeds),
     };
@@ -389,6 +410,76 @@ function Dashboard() {
         header={<TopbarHeader />}
         content={
           <div className="p-6 space-y-6">
+            {/* === Title + Contractor filter row === */}
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <h2 className="text-3xl font-bold text-slate-800 dark:text-white">
+                Resumen del panel de control
+              </h2>
+              {isAdmin && (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setContractorDropdownOpen(!contractorDropdownOpen)
+                    }
+                    className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 transition cursor-pointer"
+                  >
+                    {selectedContractorName}
+                    <svg
+                      className={`w-4 h-4 text-slate-400 transition-transform ${
+                        contractorDropdownOpen ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  {contractorDropdownOpen && (
+                    <div className="absolute right-0 z-50 mt-1 w-64 max-h-80 overflow-y-auto overflow-x-hidden rounded-xl bg-white dark:bg-slate-800 border-4 border-[#F6F6F6] dark:border-white/10 shadow-lg">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedContractor("");
+                          setContractorDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2.5 m-2 text-sm rounded-[8px] transition cursor-pointer ${
+                          selectedContractor === ""
+                            ? "bg-gray-100 text-black font-medium"
+                            : "bg-white text-gray-600"
+                        }`}
+                      >
+                        Todos los contratistas
+                      </button>
+                      {contractors.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedContractor(String(c.id));
+                            setContractorDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 m-2 text-sm rounded-[8px] transition cursor-pointer hover:bg-gray-100 hover:text-black hover:font-medium ${
+                            selectedContractor === String(c.id)
+                              ? "bg-gray-100 text-black font-medium"
+                              : "bg-white text-gray-600"
+                          }`}
+                        >
+                          {c.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* === 2-column layout: left stats+chart | right occupancy+blocks === */}
             <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
               {/* ---- LEFT COLUMN: stat cards + chart ---- */}
