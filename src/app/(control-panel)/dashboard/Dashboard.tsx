@@ -409,7 +409,7 @@ function Dashboard() {
         containerClassName="!max-w-full"
         header={<TopbarHeader />}
         content={
-          <div className="p-6 space-y-6">
+          <div className="px-6 py-4 space-y-6">
             {/* === Title + Contractor filter row === */}
             <div className="flex items-center justify-between flex-wrap gap-4">
               <h2 className="text-3xl font-bold text-slate-800 dark:text-white">
