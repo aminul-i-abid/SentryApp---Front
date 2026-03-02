@@ -38,12 +38,7 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
     borderStyle: "solid",
     borderColor: theme.palette.divider,
   },
-  "& .FusePageSimple-content": {
-    backgroundImage: "url(/assets/dashbg1.png), url(/assets/dashbg2.png)",
-    backgroundPosition: "top left, bottom right",
-    backgroundRepeat: "no-repeat, no-repeat",
-    backgroundSize: "30% auto, 70% auto",
-  },
+  "& .FusePageSimple-content": {},
   "& .FusePageSimple-content > .container": {
     maxWidth: "100% !important",
     padding: "0 !important",
@@ -230,23 +225,62 @@ function Activities() {
       content={
         <div className="p-6">
           {/* Filters and Search */}
-          <Box className="mb-4 flex flex-col md:flex-row gap-4">
+          <Box
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 3,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+              p: 2,
+              mb: 2,
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              gap: 2,
+              alignItems: { xs: "stretch", md: "center" },
+            }}
+          >
             <TextField
               placeholder={t("search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               size="small"
-              className="flex-1"
+              sx={{
+                flex: 1,
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#F5F7FA",
+                  borderRadius: "10px",
+                  "& fieldset": { border: "1px solid #E5E7EB" },
+                  "&:hover fieldset": { borderColor: "#d0d5dd" },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#415EDE",
+                    borderWidth: "1.5px",
+                  },
+                },
+              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon />
+                    <SearchIcon sx={{ color: "#9CA3AF" }} />
                   </InputAdornment>
                 ),
               }}
             />
 
-            <FormControl size="small" className="w-full md:w-48">
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: { xs: "100%", md: 200 },
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#F5F7FA",
+                  borderRadius: "10px",
+                  "& fieldset": { border: "1px solid #E5E7EB" },
+                  "&:hover fieldset": { borderColor: "#d0d5dd" },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#415EDE",
+                    borderWidth: "1.5px",
+                  },
+                },
+              }}
+            >
               <InputLabel>{t("filter.all")}</InputLabel>
               <Select
                 value={statusFilter}
@@ -265,7 +299,15 @@ function Activities() {
                 color="primary"
                 startIcon={<AddIcon />}
                 onClick={handleCreateNew}
-                className="whitespace-nowrap"
+                sx={{
+                  borderRadius: "10px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  px: 3,
+                  whiteSpace: "nowrap",
+                  boxShadow: "none",
+                  "&:hover": { boxShadow: "0 2px 8px rgba(65,94,222,0.3)" },
+                }}
               >
                 {t("addNew")}
               </Button>

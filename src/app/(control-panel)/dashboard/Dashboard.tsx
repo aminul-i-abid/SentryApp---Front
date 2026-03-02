@@ -30,12 +30,7 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
       backgroundColor: theme.palette.background.paper,
     }),
   },
-  "& .FusePageSimple-content": {
-    backgroundImage: "url(/assets/dashbg1.png), url(/assets/dashbg2.png)",
-    backgroundPosition: "top left, bottom right",
-    backgroundRepeat: "no-repeat, no-repeat",
-    backgroundSize: "30% auto, 70% auto",
-  },
+  "& .FusePageSimple-content": {},
   "& .FusePageSimple-content > .container": {
     maxWidth: "100% !important",
     padding: "0 !important",

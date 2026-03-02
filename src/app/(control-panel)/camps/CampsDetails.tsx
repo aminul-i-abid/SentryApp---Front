@@ -4,7 +4,7 @@ import authRoles from "@auth/authRoles";
 import useAuth from "@fuse/core/FuseAuthProvider/useAuth";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -25,12 +25,7 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
     borderStyle: "solid",
     borderColor: theme.palette.divider,
   },
-  "& .FusePageSimple-content": {
-    backgroundImage: "url(/assets/dashbg1.png), url(/assets/dashbg2.png)",
-    backgroundPosition: "top left, bottom right",
-    backgroundRepeat: "no-repeat, no-repeat",
-    backgroundSize: "30% auto, 70% auto",
-  },
+  "& .FusePageSimple-content": {},
   "& .container": {
     maxWidth: "100% !important",
     padding: "0 !important",
@@ -255,7 +250,28 @@ function CampDetail() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+          minHeight: 300,
+          py: 6,
+          gap: 2,
+        }}
+      >
+        <CircularProgress size={56} thickness={4} />
+        <Typography variant="h6" sx={{ mt: 1, fontWeight: 600 }}>
+          Loading...
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Por favor espere...
+        </Typography>
+      </Box>
+    );
   }
 
   if (!camp) {

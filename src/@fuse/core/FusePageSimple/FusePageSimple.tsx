@@ -50,7 +50,7 @@ const Root = styled("div")<FusePageSimpleProps>(({ theme, ...props }) => ({
   flex: "1 1 auto",
   width: "100%",
   height: "auto",
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: "transparent",
 
   "&.FusePageSimple-scroll-content": {
     height: "100%",
@@ -63,7 +63,7 @@ const Root = styled("div")<FusePageSimpleProps>(({ theme, ...props }) => ({
     zIndex: 2,
     minWidth: 0,
     height: "100%",
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: "transparent",
 
     ...(props.scroll === "content" && {
       position: "absolute",

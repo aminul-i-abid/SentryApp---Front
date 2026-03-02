@@ -21,7 +21,7 @@ function BlockCards({ blocks, onBlockClick }: BlockCardsProps) {
     <Grid container spacing={2}>
       {blocks.length > 0 ? (
         blocks.map((block) => (
-          <Grid item xs={12} sm={6} md={4} key={block.id}>
+          <Grid item xs={12} sm={6} md={6} key={block.id}>
             <Card
               onClick={() => onBlockClick(block.id)}
               sx={{
@@ -35,6 +35,9 @@ function BlockCards({ blocks, onBlockClick }: BlockCardsProps) {
                   transform: "translateY(-2px)",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                 },
+                minWidth: 220,
+                display: "flex",
+                alignItems: "stretch",
               }}
             >
               <Box

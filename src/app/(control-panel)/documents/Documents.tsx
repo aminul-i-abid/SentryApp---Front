@@ -3,7 +3,6 @@ import RowActionMenu from "@/components/ui/RowActionMenu";
 import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
 import useUser from "@auth/useUser";
 import FusePageSimple from "@fuse/core/FusePageSimple";
-import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import CloseIcon from "@mui/icons-material/Close";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -39,12 +38,7 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
     borderStyle: "solid",
     borderColor: theme.palette.divider,
   },
-  "& .FusePageSimple-content": {
-    backgroundImage: "url(/assets/dashbg1.png), url(/assets/dashbg2.png)",
-    backgroundPosition: "top left, bottom right",
-    backgroundRepeat: "no-repeat, no-repeat",
-    backgroundSize: "30% auto, 70% auto",
-  },
+  "& .FusePageSimple-content": {},
   "& .FusePageSimple-content > .container": {
     maxWidth: "100% !important",
     padding: "0 !important",
@@ -317,11 +311,6 @@ function Documents() {
                     {
                       key: "delete",
                       label: "Eliminar",
-                      icon: (
-                        <FuseSvgIcon size={20}>
-                          heroicons-outline:trash
-                        </FuseSvgIcon>
-                      ),
                       color: "error.main",
                       onClick: () => handleDeleteDocument(row.fileName),
                     },

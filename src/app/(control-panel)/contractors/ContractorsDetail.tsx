@@ -19,6 +19,7 @@ import {
   CardContent,
   CardMedia,
   Chip,
+  CircularProgress,
   Grid,
   IconButton,
   Paper,
@@ -50,10 +51,6 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   },
   "& .FusePageSimple-content": {
     backgroundColor: theme.palette.background.default,
-    backgroundImage: "url(/assets/dashbg1.png), url(/assets/dashbg2.png)",
-    backgroundPosition: "top left, bottom right",
-    backgroundRepeat: "no-repeat, no-repeat",
-    backgroundSize: "30% auto, 70% auto",
   },
   "& .FusePageSimple-content > .container": {
     maxWidth: "100% !important",
@@ -269,7 +266,28 @@ function ContractorsDetail() {
   };
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+          minHeight: 300,
+          py: 6,
+          gap: 2,
+        }}
+      >
+        <CircularProgress size={56} thickness={4} />
+        <Typography variant="h6" sx={{ mt: 1, fontWeight: 600 }}>
+          Loading...
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Por favor espere...
+        </Typography>
+      </Box>
+    );
   }
 
   if (!contractor) {

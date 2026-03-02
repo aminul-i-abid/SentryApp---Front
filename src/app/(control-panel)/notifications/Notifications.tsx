@@ -6,7 +6,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   Button,
-  IconButton,
+  InputAdornment,
   TextField,
   Typography,
   useMediaQuery,
@@ -34,12 +34,7 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
     borderStyle: "solid",
     borderColor: theme.palette.divider,
   },
-  "& .FusePageSimple-content": {
-    backgroundImage: "url(/assets/dashbg1.png), url(/assets/dashbg2.png)",
-    backgroundPosition: "top left, bottom right",
-    backgroundRepeat: "no-repeat, no-repeat",
-    backgroundSize: "30% auto, 70% auto",
-  },
+  "& .FusePageSimple-content": {},
   "& .FusePageSimple-content > .container": {
     maxWidth: "100% !important",
     padding: "0 !important",
@@ -176,11 +171,6 @@ function Notifications() {
       setPage(0);
       fetchNotifications();
     }
-  };
-
-  const handleSearchClick = () => {
-    setPage(0);
-    fetchNotifications();
   };
 
   const handleChangePage = (_: unknown, newPage: number) => {
@@ -429,32 +419,46 @@ function Notifications() {
 
             {/* Filters */}
             <Box
-              display="flex"
-              flexDirection={{ xs: "column", md: "row" }}
-              gap={2}
-              mb={3}
-              alignItems={{ xs: "stretch", md: "center" }}
+              sx={{
+                bgcolor: "#fff",
+                borderRadius: 3,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                p: 2,
+                mb: 2,
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: 2,
+                alignItems: { xs: "stretch", md: "center" },
+              }}
             >
-              <Box display="flex" flex={1} gap={1} alignItems="center">
-                <TextField
-                  fullWidth
-                  placeholder="Buscar por título o descripción"
-                  value={searchTerm}
-                  onChange={(event) => setSearchTerm(event.target.value)}
-                  onKeyDown={handleSearchKeyDown}
-                  size="small"
-                />
-                <IconButton
-                  color="primary"
-                  onClick={handleSearchClick}
-                  sx={{
-                    border: `1px solid ${theme.palette.primary.main}`,
-                  }}
-                  aria-label="Buscar"
-                >
-                  <SearchIcon />
-                </IconButton>
-              </Box>
+              <TextField
+                fullWidth
+                placeholder="Buscar por título o descripción"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                onKeyDown={handleSearchKeyDown}
+                size="small"
+                sx={{
+                  flex: 1,
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "#F5F7FA",
+                    borderRadius: "10px",
+                    "& fieldset": { border: "1px solid #E5E7EB" },
+                    "&:hover fieldset": { borderColor: "#d0d5dd" },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#415EDE",
+                      borderWidth: "1.5px",
+                    },
+                  },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: "#9CA3AF" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
               <TextField
                 select
                 label="Audiencia"
@@ -465,7 +469,19 @@ function Notifications() {
                   select: { native: true },
                   inputLabel: { shrink: true },
                 }}
-                sx={{ minWidth: { xs: "100%", md: 160 } }}
+                sx={{
+                  minWidth: { xs: "100%", md: 180 },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "#F5F7FA",
+                    borderRadius: "10px",
+                    "& fieldset": { border: "1px solid #E5E7EB" },
+                    "&:hover fieldset": { borderColor: "#d0d5dd" },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#415EDE",
+                      borderWidth: "1.5px",
+                    },
+                  },
+                }}
               >
                 {AUDIENCE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -483,7 +499,19 @@ function Notifications() {
                   select: { native: true },
                   inputLabel: { shrink: true },
                 }}
-                sx={{ minWidth: { xs: "100%", md: 160 } }}
+                sx={{
+                  minWidth: { xs: "100%", md: 180 },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "#F5F7FA",
+                    borderRadius: "10px",
+                    "& fieldset": { border: "1px solid #E5E7EB" },
+                    "&:hover fieldset": { borderColor: "#d0d5dd" },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#415EDE",
+                      borderWidth: "1.5px",
+                    },
+                  },
+                }}
               >
                 <option value="">Todas</option>
                 {contractors.map((contractor) => (
@@ -501,6 +529,14 @@ function Notifications() {
                     setCompanyFilter("");
                     setPage(0);
                     fetchNotifications();
+                  }}
+                  sx={{
+                    borderRadius: "10px",
+                    textTransform: "none",
+                    fontWeight: 500,
+                    px: 2,
+                    color: "#415EDE",
+                    "&:hover": { backgroundColor: "rgba(65,94,222,0.08)" },
                   }}
                 >
                   Limpiar filtros
@@ -548,6 +584,19 @@ function Notifications() {
             required
             disabled={creating}
             placeholder="Ingrese el título de la notificación"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F5F7FA",
+                borderRadius: "10px",
+                "& fieldset": { border: "1px solid #E5E7EB" },
+                "&:hover fieldset": { borderColor: "#d0d5dd" },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#415EDE",
+                  borderWidth: "1.5px",
+                },
+              },
+              "& .MuiInputLabel-root": { fontWeight: 500 },
+            }}
           />
 
           <TextField
@@ -560,6 +609,19 @@ function Notifications() {
             minRows={3}
             disabled={creating}
             placeholder="Ingrese la descripción de la notificación"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F5F7FA",
+                borderRadius: "10px",
+                "& fieldset": { border: "1px solid #E5E7EB" },
+                "&:hover fieldset": { borderColor: "#d0d5dd" },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#415EDE",
+                  borderWidth: "1.5px",
+                },
+              },
+              "& .MuiInputLabel-root": { fontWeight: 500 },
+            }}
           />
 
           <TextField
@@ -573,6 +635,19 @@ function Notifications() {
             slotProps={{
               select: { native: true },
               inputLabel: { shrink: true },
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F5F7FA",
+                borderRadius: "10px",
+                "& fieldset": { border: "1px solid #E5E7EB" },
+                "&:hover fieldset": { borderColor: "#d0d5dd" },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#415EDE",
+                  borderWidth: "1.5px",
+                },
+              },
+              "& .MuiInputLabel-root": { fontWeight: 500 },
             }}
           >
             <option value={-1}>Seleccione una audiencia</option>
@@ -603,6 +678,19 @@ function Notifications() {
                 select: { native: true },
                 inputLabel: { shrink: true },
               }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#F5F7FA",
+                  borderRadius: "10px",
+                  "& fieldset": { border: "1px solid #E5E7EB" },
+                  "&:hover fieldset": { borderColor: "#d0d5dd" },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#415EDE",
+                    borderWidth: "1.5px",
+                  },
+                },
+                "& .MuiInputLabel-root": { fontWeight: 500 },
+              }}
             >
               <option value="">Seleccione una empresa</option>
               {contractors.map((contractor) => (
@@ -625,6 +713,19 @@ function Notifications() {
               slotProps={{
                 select: { native: true },
                 inputLabel: { shrink: true },
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#F5F7FA",
+                  borderRadius: "10px",
+                  "& fieldset": { border: "1px solid #E5E7EB" },
+                  "&:hover fieldset": { borderColor: "#d0d5dd" },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#415EDE",
+                    borderWidth: "1.5px",
+                  },
+                },
+                "& .MuiInputLabel-root": { fontWeight: 500 },
               }}
             >
               <option value="">Seleccione un pabellón</option>
