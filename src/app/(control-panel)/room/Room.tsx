@@ -1,66 +1,72 @@
-import FusePageSimple from '@fuse/core/FusePageSimple';
-import { useTranslation } from 'react-i18next';
-import { styled, useTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { getContractors } from '../contractors/contractorsService';
-import { ContractorResponse } from '../contractors/models/ContractorResponse';
-import AllRoomsTable from './components/AllRoomsTable';
-import NavbarToggleButton from '@/components/theme-layouts/components/navbar/NavbarToggleButton';
+import TopbarHeader from "@/components/TopbarHeader";
+import FusePageSimple from "@fuse/core/FusePageSimple";
+import { useMediaQuery } from "@mui/material";
+import { styled, useTheme } from "@mui/material/styles";
+import { useEffect, useState } from "react";
+import { getContractors } from "../contractors/contractorsService";
+import { ContractorResponse } from "../contractors/models/ContractorResponse";
+import AllRoomsTable from "./components/AllRoomsTable";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
-    '& .FusePageSimple-header': {
-        backgroundColor: theme.palette.background.paper,
-        borderBottomWidth: 1,
-        borderStyle: 'solid',
-        borderColor: theme.palette.divider
-    },
-    '& .FusePageSimple-content': {},
-    '& .FusePageSimple-sidebarHeader': {},
-    '& .FusePageSimple-sidebarContent': {}
+  "& .FusePageSimple-header": {
+    backgroundColor: theme.palette.background.paper,
+    borderBottomWidth: 1,
+    borderStyle: "solid",
+    borderColor: theme.palette.divider,
+  },
+  "& .FusePageSimple-content": {
+    backgroundImage: "url(/assets/dashbg1.png), url(/assets/dashbg2.png)",
+    backgroundPosition: "top left, bottom right",
+    backgroundRepeat: "no-repeat, no-repeat",
+    backgroundSize: "30% auto, 70% auto",
+  },
+  "& .FusePageSimple-content > .container": {
+    maxWidth: "100% !important",
+    padding: "0 !important",
+    width: "100%",
+  },
+  "& .FusePageSimple-header > .container": {
+    maxWidth: "100% !important",
+    padding: "0 !important",
+    width: "100%",
+  },
+  "& .FusePageSimple-sidebarHeader": {},
+  "& .FusePageSimple-sidebarContent": {},
 }));
 
-
 function Room() {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
-    const [contractors, setContractors] = useState<ContractorResponse[]>([]);
-    const [loading, setLoading] = useState(true);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
+  const [contractors, setContractors] = useState<ContractorResponse[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchContractors();
-    }, []);
+  useEffect(() => {
+    fetchContractors();
+  }, []);
 
-    const fetchContractors = async () => {
-        try {
-            const response = await getContractors();
-            if (response.succeeded) {
-                setContractors(response.data);
-            }
-        } catch (error) {
-            console.error('Error fetching contractors:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchContractors = async () => {
+    try {
+      const response = await getContractors();
+      if (response.succeeded) {
+        setContractors(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching contractors:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <Root
-            header={
-                <div className="p-6 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
-                        <h2 className="text-2xl font-bold text-slate-800">Todas las Habitaciones</h2>
-                    </div>
-                </div>
-            }
-            content={
-                <div className="p-6">
-                    {!loading && <AllRoomsTable contractors={contractors} />}
-                </div>
-            }
-        />
-    );
+  return (
+    <Root
+      header={<TopbarHeader />}
+      content={
+        <div className="p-6 w-full">
+          {!loading && <AllRoomsTable contractors={contractors} />}
+        </div>
+      }
+    />
+  );
 }
 
 export default Room;
