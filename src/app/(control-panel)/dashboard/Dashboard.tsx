@@ -481,11 +481,11 @@ function Dashboard() {
             </div>
 
             {/* === 2-column layout: left stats+chart | right occupancy+blocks === */}
-            <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
               {/* ---- LEFT COLUMN: stat cards + chart ---- */}
               <div className="space-y-6">
                 {/* Stat cards row */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
                   <StatCard
                     icon="/assets/icons/Frame.png"
                     value={String(dashboardData?.totalCamps || 0).padStart(

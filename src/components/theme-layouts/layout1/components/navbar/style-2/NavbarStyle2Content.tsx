@@ -54,16 +54,16 @@ function NavbarStyle2Content(props: NavbarStyle2ContentProps) {
         className,
       )}
     >
-      {/* Top section: Logo + collapse button + search wrapped in bordered card */}
-      <div className="shrink-0 px-3 pt-3 pb-6">
-        <div className="rounded-xl border border-gray-200 dark:border-white/10 p-2">
+      {/* Top section: Logo + collapse button wrapped in bordered card */}
+      <div className="logo-section shrink-0 px-3 pt-3 pb-6 transition-all duration-200">
+        <div className="logo-card rounded-xl border border-gray-200 dark:border-white/10 p-2 transition-all duration-200">
           {/* Logo row */}
-          <div className="flex items-center gap-1.5 my-2">
-            <div className="flex-1 min-w-0">
+          <div className="logo-row flex items-center gap-1.5 my-2 transition-all duration-200">
+            <div className="logo-wrapper flex-1 min-w-0 transition-all duration-200">
               <Logo />
             </div>
             <NavbarPinToggleButton
-              className="w-8 h-8 border border-gray-200 dark:border-white/20 bg-gray-100 dark:bg-gray-400 shrink-0 p-0"
+              className="pin-toggle-btn w-8 h-8 border border-gray-200 dark:border-white/20 bg-gray-100 dark:bg-gray-400 shrink-0 p-0 transition-all duration-200"
               sx={{ borderRadius: "50% !important" }}
             >
               <img
@@ -108,8 +108,8 @@ function NavbarStyle2Content(props: NavbarStyle2ContentProps) {
         <Navigation layout="vertical" />
       </StyledContent>
 
-      <div className="px-3 pb-3 pt-1 w-full">
-        <div className="rounded-xl border border-gray-200 dark:border-white/10 p-1.5">
+      <div className="user-section px-3 pb-3 pt-1 w-full transition-all duration-200">
+        <div className="user-card rounded-xl border border-gray-200 dark:border-white/10 p-1.5 transition-all duration-200">
           <UserMenu className="w-full" />
         </div>
       </div>

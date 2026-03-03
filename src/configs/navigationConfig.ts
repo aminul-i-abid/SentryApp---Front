@@ -21,7 +21,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "resumen",
     translate: "DASHBOARD",
     type: "item",
-    icon: "heroicons-outline:squares-2x2",
+    icon: "/assets/icons/nav/dash.png",
     url: Routes.DASHBOARD,
     auth: authRoles.company, // Solo visible para Sentry_Admin y Company_Admin
   },
@@ -47,7 +47,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "Contratistas",
     translate: "CONTRATISTAS",
     type: "item",
-    icon: "heroicons-outline:building-library",
+    icon: "/assets/icons/nav/contractor.png",
     url: Routes.CONTRACTORS,
     auth: authRoles.admin, // Solo visible para Sentry_Admin y Company_Admin
   },
@@ -56,7 +56,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "Campamentos",
     translate: "CAMPAMENTOS",
     type: "item",
-    icon: "heroicons-outline:building-office-2",
+    icon: "/assets/icons/nav/camp.png",
     url: Routes.CAMPS,
     auth: authRoles.company, // Solo visible para Sentry_Admin y Company_Admin
   },
@@ -65,7 +65,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "Habitaciones",
     translate: "HABITACIONES",
     type: "item",
-    icon: "heroicons-outline:home-modern",
+    icon: "/assets/icons/nav/rooms.png",
     url: Routes.ROOM,
     auth: authRoles.admin, // Solo visible para Sentry_Admin
   },
@@ -74,7 +74,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "Reservas",
     translate: "RESERVAS",
     type: "item",
-    icon: "heroicons-outline:globe-alt",
+    icon: "/assets/icons/nav/reservations.png",
     url: Routes.RESERVE,
     auth: authRoles.company, // Solo visible para Sentry_Admin y Company_Admin
   },
@@ -83,7 +83,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "invitado",
     translate: "HUÉSPEDES",
     type: "item",
-    icon: "heroicons-outline:user-group",
+    icon: "/assets/icons/nav/guests.png",
     url: Routes.GUESTS,
     auth: authRoles.company, // Solo visible para Sentry_Admin y Company_Admin
   },
@@ -92,7 +92,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "Calendario",
     translate: "CALENDARIO",
     type: "item",
-    icon: "heroicons-outline:calendar",
+    icon: "/assets/icons/nav/calendar.png",
     url: Routes.CALENDAR,
     auth: authRoles.company, // Solo visible para Sentry_Admin y Company_Admin
   },
@@ -101,7 +101,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "informes",
     translate: "REPORTES",
     type: "item",
-    icon: "heroicons-outline:clipboard-document-list",
+    icon: "/assets/icons/nav/reports.png",
     url: Routes.REPORTS,
     auth: authRoles.company, // Solo visible para Sentry_Admin y Company_Admin
   },
@@ -110,7 +110,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "auditoria",
     translate: "AUDITORÍA",
     type: "item",
-    icon: "heroicons-outline:computer-desktop",
+    icon: "/assets/icons/nav/audit.png",
     url: Routes.AUDITORY,
     auth: authRoles.admin, // Solo visible para Sentry_Admin
   },
@@ -119,7 +119,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "Documentos",
     translate: "DOCUMENTOS",
     type: "item",
-    icon: "heroicons-outline:document-text",
+    icon: "/assets/icons/nav/documents.png",
     url: Routes.USER_MANUAL,
     auth: authRoles.company, // Solo visible para Sentry_Admin
   },
@@ -137,7 +137,7 @@ const navigationConfig: FuseNavItemType[] = [
     title: "notificaciones",
     translate: "NOTIFICACIONES",
     type: "item",
-    icon: "heroicons-outline:phone-arrow-up-right",
+    icon: "/assets/icons/nav/notifications.png",
     url: Routes.NOTIFICATIONS,
     auth: authRoles.admin, // Solo visible para Sentry_Admin
   },
@@ -146,13 +146,13 @@ const navigationConfig: FuseNavItemType[] = [
     title: "Actividades",
     translate: "ACTIVIDADES",
     type: "collapse",
-    icon: "heroicons-outline:sparkles",
+    icon: "/assets/icons/nav/activities.png",
     auth: authRoles.user, // Visible para todos los usuarios autenticados
     // NOTA: La visibilidad final está controlada por ActivityModuleGuard
     // que valida user.modules.activities
     badge: {
       title: "Más",
-      classes: "px-2 bg-blue-500 text-white",
+      classes: "px-2 bg-[#415EDE] text-white",
     },
     children: [
       {

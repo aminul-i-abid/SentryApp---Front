@@ -1,6 +1,7 @@
 import { useAppDispatch } from "@/store/hooks";
 import UseJwtAuth from "@auth/services/jwt/useJwtAuth";
 import useUser from "@auth/useUser";
+import useFuseLayoutSettings from "@fuse/core/FuseLayout/useFuseLayoutSettings";
 import { showMessage } from "@fuse/core/FuseMessage/fuseMessageSlice";
 import { FuseSettingsConfigType } from "@fuse/core/FuseSettings/FuseSettings";
 import {
@@ -14,6 +15,8 @@ import useI18n from "@i18n/useI18n";
 import Popover, { PopoverProps } from "@mui/material/Popover/Popover";
 import clsx from "clsx";
 import { useState } from "react";
+import { selectFuseNavbar } from "src/components/theme-layouts/components/navbar/navbarSlice";
+import { useAppSelector } from "src/store/hooks";
 
 type UserMenuProps = {
   className?: string;
@@ -36,6 +39,10 @@ function UserMenu(props: UserMenuProps) {
   const { languages, changeLanguage } = useI18n();
   const dispatch = useAppDispatch();
   const [langMenu, setLangMenu] = useState<HTMLElement | null>(null);
+  const navbar = useAppSelector(selectFuseNavbar);
+  const { config } = useFuseLayoutSettings();
+  const folded = config?.navbar?.folded;
+  const foldedClosed = Boolean(folded && !navbar.foldedOpen);
 
   const userMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setUserMenu(event.currentTarget);
@@ -99,12 +106,14 @@ function UserMenu(props: UserMenuProps) {
         {/* Avatar */}
         {user?.photoURL ? (
           <img
-            className="avatar w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-transparent group-hover:ring-gray-200 dark:group-hover:ring-white/10 transition-all"
+            className={`avatar w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-transparent group-hover:ring-gray-200 dark:group-hover:ring-white/10 transition-all ${foldedClosed ? "ml-2.5" : ""}`}
             src={user.photoURL}
             alt="user photo"
           />
         ) : (
-          <div className="avatar w-10 h-10 rounded-full bg-gray-900 dark:bg-gray-700 text-white flex items-center justify-center text-sm font-bold shrink-0 ring-2 ring-transparent group-hover:ring-gray-200 dark:group-hover:ring-white/10 transition-all">
+          <div
+            className={`avatar w-10 h-10 rounded-full bg-gray-900 dark:bg-gray-700 text-white flex items-center justify-center text-sm font-bold shrink-0 ring-2 ring-transparent group-hover:ring-gray-200 dark:group-hover:ring-white/10 transition-all ${foldedClosed ? "ml-2.5" : ""}`}
+          >
             {user?.displayName?.[0]?.toUpperCase()}
           </div>
         )}
@@ -119,14 +128,16 @@ function UserMenu(props: UserMenuProps) {
           </span>
         </div>
 
-        {/* Chevron icon */}
-        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 shrink-0 border border-gray-200 dark:bg-gray-400 dark:border-white/20">
-          <img
-            src="/assets/icons/arrow-left-double.png"
-            alt="menu"
-            className="w-3.5 h-3.5 opacity-50 rotate-180"
-          />
-        </span>
+        {/* Chevron icon (hidden when navbar is folded+closed) */}
+        {!foldedClosed && (
+          <span className="arrow flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 shrink-0 border border-gray-200 dark:bg-gray-400 dark:border-white/20">
+            <img
+              src="/assets/icons/arrow-left-double.png"
+              alt="menu"
+              className="w-3.5 h-3.5 opacity-50 rotate-180"
+            />
+          </span>
+        )}
       </button>
 
       {/* ── Main popover ── */}

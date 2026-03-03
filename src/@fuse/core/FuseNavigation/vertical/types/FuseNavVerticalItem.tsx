@@ -8,6 +8,13 @@ import FuseSvgIcon from "../../../FuseSvgIcon";
 import FuseNavBadge from "../../FuseNavBadge";
 import { FuseNavItemComponentProps } from "../../FuseNavItem";
 
+/**
+ * Check if an icon string is an image file path (png, jpg, jpeg, gif, webp, svg file).
+ */
+function isImageIcon(icon: string): boolean {
+  return /\.(png|jpe?g|gif|webp|svg|ico)(\?.*)?$/i.test(icon);
+}
+
 type ListItemButtonStyleProps = ListItemButtonProps & {
   itempadding: number;
 };
@@ -25,6 +32,7 @@ const Root = styled(ListItemButton)<ListItemButtonStyleProps>(
     color: alpha(theme.palette.text.primary, 0.7),
     cursor: "pointer",
     textDecoration: "none!important",
+    transition: "all .2s ease-in-out",
     "&:hover": {
       color: theme.palette.text.primary,
     },
@@ -37,11 +45,13 @@ const Root = styled(ListItemButton)<ListItemButtonStyleProps>(
       },
       "& > .fuse-list-item-icon": {
         color: "#FFFFFF",
+        filter: "brightness(0) invert(1)",
       },
     },
     "& > .fuse-list-item-icon": {
       marginRight: 16,
       color: "inherit",
+      transition: "margin .2s ease-in-out",
     },
     "& > .fuse-list-item-text": {},
   }),
@@ -78,14 +88,22 @@ function FuseNavVerticalItem(props: FuseNavItemComponentProps) {
         sx={item.sx}
         {...itemProps}
       >
-        {item.icon && (
-          <FuseSvgIcon
-            className={clsx("fuse-list-item-icon shrink-0", item.iconClass)}
-            color="action"
-          >
-            {item.icon}
-          </FuseSvgIcon>
-        )}
+        {item.icon &&
+          (isImageIcon(item.icon) ? (
+            <img
+              className={clsx("fuse-list-item-icon shrink-0", item.iconClass)}
+              src={item.icon}
+              alt=""
+              style={{ width: 20, height: 20, objectFit: "contain" }}
+            />
+          ) : (
+            <FuseSvgIcon
+              className={clsx("fuse-list-item-icon shrink-0", item.iconClass)}
+              color="action"
+            >
+              {item.icon}
+            </FuseSvgIcon>
+          ))}
 
         <ListItemText
           className="fuse-list-item-text"
