@@ -1,5 +1,3 @@
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import LastPageIcon from "@mui/icons-material/LastPage";
 import { Box, IconButton, useTheme } from "@mui/material";
 
 type CirclePaginationProps = {
@@ -92,7 +90,7 @@ function CirclePagination({
 
   const inactiveStyle = {
     ...circleBase,
-    backgroundColor: "transparent",
+    backgroundColor: "#fff",
     color: isDark ? "#ccc" : "#6b7280",
     borderColor: isDark ? "#555" : "#D1D5DB",
     "&:hover": {
@@ -114,6 +112,7 @@ function CirclePagination({
     minWidth: circleSize,
     borderRadius: "50%",
     border: `1.5px solid ${isDark ? "#555" : "#D1D5DB"}`,
+    backgroundColor: "#fff",
     color: isDark ? "#ccc" : "#6b7280",
     "&:hover": {
       backgroundColor: isDark ? "#333" : "#F3F4F6",
@@ -144,7 +143,7 @@ function CirclePagination({
         onClick={(e) => onPageChange(e, 0)}
         sx={arrowBtnSx}
       >
-        <FirstPageIcon fontSize="small" />
+        <img src="./assets/icons/page-arrow-left.png" alt="" />
       </IconButton>
 
       {/* Page numbers */}
@@ -171,7 +170,7 @@ function CirclePagination({
         onClick={(e) => onPageChange(e, totalPages - 1)}
         sx={arrowBtnSx}
       >
-        <LastPageIcon fontSize="small" />
+        <img src="./assets/icons/page-arrow-right.png" alt="" />
       </IconButton>
     </Box>
   );

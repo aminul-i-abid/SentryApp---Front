@@ -4,14 +4,6 @@ import { Routes, buildRoute } from "@/utils/routesEnum";
 import useUser from "@auth/useUser";
 import useAuth from "@fuse/core/FuseAuthProvider/useAuth";
 import FusePageSimple from "@fuse/core/FusePageSimple";
-import AddIcon from "@mui/icons-material/Add";
-import BadgeIcon from "@mui/icons-material/Badge";
-import BusinessIcon from "@mui/icons-material/Business";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import EmailIcon from "@mui/icons-material/Email";
-import HomeIcon from "@mui/icons-material/Home";
-import PhoneIcon from "@mui/icons-material/Phone";
 import {
   Box,
   Button,
@@ -49,9 +41,7 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
     borderStyle: "solid",
     borderColor: theme.palette.divider,
   },
-  "& .FusePageSimple-content": {
-    backgroundColor: theme.palette.background.default,
-  },
+  "& .FusePageSimple-content": {},
   "& .FusePageSimple-content > .container": {
     maxWidth: "100% !important",
     padding: "0 !important",
@@ -301,10 +291,8 @@ function ContractorsDetail() {
         content={
           <Box
             sx={(t) => ({
-              p: 3,
+              p: { xs: 1.5, md: 3 },
               width: "100%",
-              backgroundColor:
-                t.palette.mode === "dark" ? "#121212" : "#F9FAFB",
               minHeight: "100%",
             })}
           >
@@ -313,239 +301,275 @@ function ContractorsDetail() {
               Detalles del contratista:
             </Typography>
 
-            <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: 3,
+                alignItems: "flex-start",
+                backgroundColor: "#fff",
+                p: { xs: 1, md: 2 },
+                borderRadius: "16px",
+                border: "1px solid #EAEAEA",
+                boxSizing: "border-box",
+              }}
+            >
               {/* ===== LEFT COLUMN ===== */}
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                {/* --- Top pills row: Name + RUT --- */}
+              <Box
+                sx={{
+                  flex: 1,
+                  minWidth: 0,
+                  borderRadius: "16px",
+                }}
+              >
                 <Box
                   sx={{
-                    display: "flex",
-                    gap: 2,
-                    mb: 2,
-                    flexWrap: { xs: "wrap", md: "nowrap" },
+                    p: 2,
+                    backgroundColor: "#f7f7f7",
+                    borderRadius: "16px",
+                    mb: 3,
+                    border: "1px solid #EAEAEA",
                   }}
                 >
-                  {/* Name Pill */}
-                  <Paper
-                    elevation={0}
-                    sx={(t) => ({
+                  {/* --- Top pills row: Name + RUT --- */}
+                  <Box
+                    sx={{
                       display: "flex",
-                      alignItems: "center",
                       gap: 2,
-                      px: 2.5,
-                      py: 1.5,
-                      borderRadius: "16px",
-                      border: `1px solid ${t.palette.mode === "dark" ? "#333" : "#E5E7EB"}`,
-                      backgroundColor:
-                        t.palette.mode === "dark" ? "#1e1e1e" : "#fff",
-                      flex: 1,
-                      minWidth: 0,
-                    })}
+                      mb: 2,
+                      flexWrap: { xs: "wrap", md: "nowrap" },
+                    }}
                   >
-                    <Box
+                    {/* Name Pill */}
+                    <Paper
+                      elevation={0}
                       sx={(t) => ({
-                        width: 44,
-                        height: 44,
-                        borderRadius: "12px",
-                        backgroundColor:
-                          t.palette.mode === "dark" ? "#333" : "#F3F4F6",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      })}
-                    >
-                      <BusinessIcon
-                        sx={(t) => ({
-                          color:
-                            t.palette.mode === "dark" ? "#9ca3af" : "#6b7280",
-                        })}
-                      />
-                    </Box>
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
-                      <Typography variant="subtitle1" fontWeight={700} noWrap>
-                        {contractor.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Contratista
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", gap: 0.5, flexShrink: 0 }}>
-                      {user?.role === "Sentry_Admin" && (
-                        <IconButton
-                          size="small"
-                          onClick={handleOpenEdit}
-                          sx={(t) => ({
-                            border: `1px solid ${t.palette.mode === "dark" ? "#555" : "#E5E7EB"}`,
-                            width: 34,
-                            height: 34,
-                          })}
-                        >
-                          <EditIcon
-                            fontSize="small"
-                            sx={{ color: "#415EDE" }}
-                          />
-                        </IconButton>
-                      )}
-                      {user?.role === "Sentry_Admin" && (
-                        <IconButton
-                          size="small"
-                          onClick={handleOpenDelete}
-                          sx={(t) => ({
-                            border: `1px solid ${t.palette.mode === "dark" ? "#555" : "#E5E7EB"}`,
-                            width: 34,
-                            height: 34,
-                          })}
-                        >
-                          <DeleteIcon
-                            fontSize="small"
-                            sx={{ color: "#ef4444" }}
-                          />
-                        </IconButton>
-                      )}
-                    </Box>
-                  </Paper>
-
-                  {/* RUT Pill */}
-                  <Paper
-                    elevation={0}
-                    sx={(t) => ({
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      px: 2.5,
-                      py: 1.5,
-                      borderRadius: "16px",
-                      border: `1px solid ${t.palette.mode === "dark" ? "#333" : "#E5E7EB"}`,
-                      backgroundColor:
-                        t.palette.mode === "dark" ? "#1e1e1e" : "#fff",
-                      minWidth: 200,
-                    })}
-                  >
-                    <Box
-                      sx={(t) => ({
-                        width: 44,
-                        height: 44,
-                        borderRadius: "12px",
+                        gap: 2,
+                        px: 2.5,
+                        py: 1.5,
+                        borderRadius: "16px",
+                        border: `1px solid ${t.palette.mode === "dark" ? "#333" : "#E5E7EB"}`,
                         backgroundColor:
-                          t.palette.mode === "dark" ? "#333" : "#F3F4F6",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
+                          t.palette.mode === "dark" ? "#1e1e1e" : "#fff",
+                        width: { xs: "100%", md: "50%" },
+                        boxSizing: "border-box",
+                        minWidth: 0,
                       })}
                     >
-                      <BadgeIcon
-                        sx={(t) => ({
-                          color:
-                            t.palette.mode === "dark" ? "#9ca3af" : "#6b7280",
-                        })}
-                      />
-                    </Box>
-                    <Box sx={{ minWidth: 0 }}>
                       <Box
-                        sx={{
+                        sx={(t) => ({
+                          width: 44,
+                          height: 44,
+                          borderRadius: "12px",
+                          border: "1px solid #eaeaea",
                           display: "flex",
                           alignItems: "center",
-                          gap: 1,
-                        }}
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        })}
                       >
-                        <Typography variant="subtitle1" fontWeight={700}>
-                          RUT
-                        </Typography>
-                        <Chip
-                          label={contractor.state ? "Activo" : "Inactivo"}
-                          size="small"
-                          sx={{
-                            height: 22,
-                            fontSize: "0.7rem",
-                            fontWeight: 600,
-                            backgroundColor: contractor.state
-                              ? "#415EDE"
-                              : "#ef4444",
-                            color: "#fff",
-                          }}
-                        />
+                        <img src="./assets/icons/cdh.png" alt="" />
                       </Box>
+                      <Box sx={{ minWidth: 0, flex: 1 }}>
+                        <Typography variant="subtitle1" fontWeight={700} noWrap>
+                          {contractor.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Contratista
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: "flex", gap: 1, flexShrink: 0 }}>
+                        {user?.role === "Sentry_Admin" && (
+                          <IconButton
+                            onClick={handleOpenEdit}
+                            sx={(t) => ({
+                              border: `1px solid ${t.palette.mode === "dark" ? "#555" : "#ECECEC"}`,
+                              width: 35,
+                              height: 60,
+                              borderRadius: "50%",
+                              backgroundColor:
+                                t.palette.mode === "dark"
+                                  ? "transparent"
+                                  : "#F7F7F7",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            })}
+                          >
+                            <img
+                              src="./assets/icons/edit.png"
+                              alt=""
+                              style={{
+                                width: 18,
+                                height: 18,
+                                objectFit: "contain",
+                              }}
+                            />
+                          </IconButton>
+                        )}
+                        {user?.role === "Sentry_Admin" && (
+                          <IconButton
+                            onClick={handleOpenDelete}
+                            sx={(t) => ({
+                              border: `1px solid ${t.palette.mode === "dark" ? "#555" : "#ECECEC"}`,
+                              width: 35,
+                              height: 60,
+                              backgroundColor: "#F7F7F7",
+                              borderRadius: "50%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            })}
+                          >
+                            <img
+                              src="./assets/icons/delete.png"
+                              alt=""
+                              style={{
+                                width: 18,
+                                height: 18,
+                                objectFit: "contain",
+                              }}
+                            />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </Paper>
+
+                    {/* RUT Pill */}
+                    <Paper
+                      elevation={0}
+                      sx={(t) => ({
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        px: 2.5,
+                        py: 1.5,
+                        borderRadius: "16px",
+                        border: `1px solid ${t.palette.mode === "dark" ? "#333" : "#E5E7EB"}`,
+                        backgroundColor:
+                          t.palette.mode === "dark" ? "#1e1e1e" : "#fff",
+                        width: { xs: "100%", md: "50%" },
+                        boxSizing: "border-box",
+                      })}
+                    >
+                      <Box
+                        sx={(t) => ({
+                          width: 44,
+                          height: 44,
+                          borderRadius: "12px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                          border: "1px solid #eaeaea",
+                        })}
+                      >
+                        <img src="./assets/icons/rut.png" alt="" />
+                      </Box>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                          }}
+                        >
+                          <Typography variant="subtitle1" fontWeight={700}>
+                            RUT
+                          </Typography>
+                          <Chip
+                            label={contractor.state ? "Activo" : "Inactivo"}
+                            size="small"
+                            sx={{
+                              height: 22,
+                              fontSize: "0.7rem",
+                              fontWeight: 600,
+                              backgroundColor: contractor.state
+                                ? "#415EDE"
+                                : "#ef4444",
+                              color: "#fff",
+                            }}
+                          />
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                          {contractor.rut}
+                        </Typography>
+                      </Box>
+                    </Paper>
+                  </Box>
+
+                  {/* --- Info card: Address, Mail, Phone --- */}
+                  <Paper
+                    elevation={0}
+                    sx={(t) => ({
+                      borderRadius: "16px",
+                      border: `1px solid ${t.palette.mode === "dark" ? "#333" : "#E5E7EB"}`,
+                      backgroundColor:
+                        t.palette.mode === "dark" ? "#1e1e1e" : "#fff",
+                      px: 3,
+                      py: 2.5,
+                    })}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        mb: 1.5,
+                      }}
+                    >
+                      <img src="./assets/icons/address.png" alt="" />
                       <Typography variant="body2" color="text.secondary">
-                        {contractor.rut}
+                        Dirección:
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        {contractor.address || "—"}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        mb: 1.5,
+                      }}
+                    >
+                      <img src="./assets/icons/mail.png" alt="" />
+                      <Typography variant="body2" color="text.secondary">
+                        Correo:
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        {contractor.email || "—"}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                      }}
+                    >
+                      <img src="./assets/icons/phone.png" alt="" />
+                      <Typography variant="body2" color="text.secondary">
+                        Teléfono:
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        {contractor.phone || "—"}
                       </Typography>
                     </Box>
                   </Paper>
                 </Box>
 
-                {/* --- Info card: Address, Mail, Phone --- */}
-                <Paper
-                  elevation={0}
-                  sx={(t) => ({
-                    borderRadius: "16px",
-                    border: `1px solid ${t.palette.mode === "dark" ? "#333" : "#E5E7EB"}`,
-                    backgroundColor:
-                      t.palette.mode === "dark" ? "#1e1e1e" : "#fff",
-                    px: 3,
-                    py: 2.5,
-                    mb: 3,
-                  })}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                      mb: 1.5,
-                    }}
-                  >
-                    <HomeIcon fontSize="small" sx={{ color: "#6b7280" }} />
-                    <Typography variant="body2" color="text.secondary">
-                      Dirección:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {contractor.address || "—"}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                      mb: 1.5,
-                    }}
-                  >
-                    <EmailIcon fontSize="small" sx={{ color: "#6b7280" }} />
-                    <Typography variant="body2" color="text.secondary">
-                      Correo:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {contractor.email || "—"}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                    }}
-                  >
-                    <PhoneIcon fontSize="small" sx={{ color: "#6b7280" }} />
-                    <Typography variant="body2" color="text.secondary">
-                      Teléfono:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {contractor.phone || "—"}
-                    </Typography>
-                  </Box>
-                </Paper>
-
                 {/* --- Contact Person Section --- */}
                 <Paper
                   elevation={0}
                   sx={(t) => ({
+                    backgroundColor: "#F7F7F7",
                     borderRadius: "16px",
-                    border: `1px solid ${t.palette.mode === "dark" ? "#333" : "#E5E7EB"}`,
-                    backgroundColor:
-                      t.palette.mode === "dark" ? "#1e1e1e" : "#fff",
-                    px: 3,
-                    py: 2.5,
+                    p: 2,
+                    border: "1px solid #EAEAEA",
                   })}
                 >
                   {/* Header row */}
@@ -562,8 +586,7 @@ function ContractorsDetail() {
                     <Box
                       sx={{
                         display: "flex",
-                        alignItems: "center",
-                        gap: 2,
+                        flexDirection: "column",
                       }}
                     >
                       <Typography variant="h6" fontWeight={700}>
@@ -577,20 +600,29 @@ function ContractorsDetail() {
                       </Typography>
                     </Box>
                     <Button
-                      variant="outlined"
-                      startIcon={<AddIcon />}
+                      endIcon={
+                        <div className="p-2 bg-[#f7f7f7] rounded-full">
+                          <img
+                            src="./assets/icons/add-person.png"
+                            alt="Agregar"
+                            style={{
+                              width: 21,
+                              height: 21,
+                              objectFit: "contain",
+                              display: "block",
+                            }}
+                          />
+                        </div>
+                      }
                       onClick={handleOpenAddContact}
                       sx={{
                         borderRadius: "24px",
                         textTransform: "none",
                         fontWeight: 600,
-                        borderColor: "#415EDE",
-                        color: "#415EDE",
+                        color: "#000",
                         px: 2,
-                        "&:hover": {
-                          borderColor: "#3347b8",
-                          backgroundColor: "rgba(65,94,222,0.04)",
-                        },
+                        py: 3,
+                        backgroundColor: "#fff",
                       }}
                     >
                       Agregar persona
@@ -628,17 +660,13 @@ function ContractorsDetail() {
                                 size="small"
                                 onClick={() => handleOpenDeleteUser(cu)}
                                 sx={{
-                                  border: "1px solid #fecaca",
+                                  border: "1px solid #eaeaea",
                                   width: 30,
                                   height: 30,
+                                  backgroundColor: "#f7f7f7",
                                 }}
                               >
-                                <DeleteIcon
-                                  sx={{
-                                    color: "#ef4444",
-                                    fontSize: 16,
-                                  }}
-                                />
+                                <img src="./assets/icons/delete.png" alt="" />
                               </IconButton>
                             </Box>
                             {/* Mail */}
@@ -650,9 +678,7 @@ function ContractorsDetail() {
                                 mb: 0.75,
                               }}
                             >
-                              <EmailIcon
-                                sx={{ color: "#6b7280", fontSize: 16 }}
-                              />
+                              <img src="./assets/icons/mail.png" alt="" />
                               <Typography
                                 variant="body2"
                                 color="text.secondary"
@@ -676,9 +702,7 @@ function ContractorsDetail() {
                                 gap: 1,
                               }}
                             >
-                              <PhoneIcon
-                                sx={{ color: "#6b7280", fontSize: 16 }}
-                              />
+                              <img src="./assets/icons/phone.png" alt="" />
                               <Typography
                                 variant="body2"
                                 color="text.secondary"
@@ -767,10 +791,12 @@ function ContractorsDetail() {
                       >
                         <CardMedia
                           component="img"
-                          height="180"
                           image="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
                           alt={camp.name}
-                          sx={{ objectFit: "cover" }}
+                          sx={{
+                            height: { xs: 260, md: 180 },
+                            objectFit: "cover",
+                          }}
                         />
                         {/* Dots indicator */}
                         <Box
@@ -779,6 +805,7 @@ function ContractorsDetail() {
                             justifyContent: "center",
                             gap: 0.5,
                             py: 1,
+                            backgroundColor: "#f7f7f7",
                           }}
                         >
                           {camps.slice(0, 3).map((_, dotIdx) => (
@@ -794,7 +821,14 @@ function ContractorsDetail() {
                             />
                           ))}
                         </Box>
-                        <CardContent sx={{ pt: 0, px: 2, pb: 2 }}>
+                        <CardContent
+                          sx={{
+                            pt: 0,
+                            px: 2,
+                            pb: 2,
+                            backgroundColor: "#f7f7f7",
+                          }}
+                        >
                           <Typography
                             variant="subtitle1"
                             fontWeight={700}

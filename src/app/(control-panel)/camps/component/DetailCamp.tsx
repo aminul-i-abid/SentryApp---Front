@@ -3,9 +3,6 @@ import { buildRoute, Routes } from "@/utils/routesEnum";
 import authRoles from "@auth/authRoles";
 import useAuth from "@fuse/core/FuseAuthProvider/useAuth";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import {
   Box,
   Card,
@@ -116,53 +113,71 @@ function DetailCamp({
             sx={{
               borderRadius: 2,
               width: 120,
-              height: 100,
+              height: 140,
               objectFit: "cover",
               flexShrink: 0,
             }}
           />
-          <Box>
-            <Typography variant="h6" fontWeight={700}>
-              {camp.name}
-            </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}
+              sx={{
+                mb: 4,
+              }}
             >
-              <LocationOnIcon sx={{ fontSize: 16, color: "#ef4444" }} />
-              <Typography variant="body2" color="text.secondary">
-                {camp.location || "Sin ubicación"}
+              <Typography variant="h6" fontWeight={700}>
+                {camp.name}
               </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  mt: 0.5,
+                }}
+              >
+                <img src="./assets/icons/red-location.png" alt="" />
+                <Typography variant="body2" color="text.secondary">
+                  {camp.location || "Sin ubicación"}
+                </Typography>
+              </Box>
             </Box>
+            {!sectorContractor &&
+              authState?.user?.role &&
+              authRoles.admin.includes(authState.user.role as string) && (
+                <Box sx={{ display: "flex", gap: 1.5 }}>
+                  <IconButton
+                    onClick={handleEditClick}
+                    sx={{
+                      bgcolor: "#f7f7f7",
+                      width: 36,
+                      height: 36,
+                      "&:hover": { bgcolor: "#e2e8f0" },
+                      border: "1px solid #ECECEC",
+                    }}
+                  >
+                    <img src="./assets/icons/edit.png" alt="" />
+                  </IconButton>
+                  <IconButton
+                    onClick={handleDeleteClick}
+                    sx={{
+                      bgcolor: "#f7f7f7",
+                      width: 36,
+                      height: 36,
+                      "&:hover": { bgcolor: "#fee2e2" },
+                      border: "1px solid #ECECEC",
+                    }}
+                  >
+                    <img src="./assets/icons/delete.png" alt="" />
+                  </IconButton>
+                </Box>
+              )}
           </Box>
         </Box>
-        {!sectorContractor &&
-          authState?.user?.role &&
-          authRoles.admin.includes(authState.user.role as string) && (
-            <Box sx={{ display: "flex", gap: 1.5, px: 2.5, pb: 2 }}>
-              <IconButton
-                onClick={handleEditClick}
-                sx={{
-                  bgcolor: "#f1f5f9",
-                  width: 36,
-                  height: 36,
-                  "&:hover": { bgcolor: "#e2e8f0" },
-                }}
-              >
-                <EditIcon sx={{ color: "#4f46e5", fontSize: 18 }} />
-              </IconButton>
-              <IconButton
-                onClick={handleDeleteClick}
-                sx={{
-                  bgcolor: "#fef2f2",
-                  width: 36,
-                  height: 36,
-                  "&:hover": { bgcolor: "#fee2e2" },
-                }}
-              >
-                <DeleteIcon sx={{ color: "#ef4444", fontSize: 18 }} />
-              </IconButton>
-            </Box>
-          )}
       </Card>
 
       {/* Date divider */}

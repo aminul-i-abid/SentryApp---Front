@@ -24,10 +24,10 @@ const BlockCard: React.FC<BlockCardProps> = ({
     percentage >= 80
       ? "bg-red-500"
       : percentage >= 50
-        ? "bg-amber-400"
+        ? "bg-amber-400 text-white"
         : percentage > 0
-          ? "bg-blue-500"
-          : "bg-slate-300";
+          ? "bg-blue-500 text-white"
+          : "bg-[#415EDE1F]";
 
   return (
     <button

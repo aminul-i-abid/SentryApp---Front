@@ -1,7 +1,4 @@
 import { RoomResponse } from "@/app/(control-panel)/room/models/RoomResponse";
-import ApartmentIcon from "@mui/icons-material/Apartment";
-import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import { Box, Card, Grid, IconButton, Typography } from "@mui/material";
 
 interface Block {
@@ -46,6 +43,7 @@ function BlockCards({ blocks, onBlockClick }: BlockCardsProps) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
+                  width: "100%",
                 }}
               >
                 <Box>
@@ -60,34 +58,57 @@ function BlockCards({ blocks, onBlockClick }: BlockCardsProps) {
                     <Box
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
-                      <ApartmentIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
+                      <img src="./assets/icons/floors.png" alt="" />
                       <Typography variant="body2" color="text.secondary">
-                        Pisos: {String(block.floors).padStart(2, "0")}
+                        Pisos:{" "}
+                        <span className="text-black">
+                          {String(block.floors).padStart(2, "0")}
+                        </span>
                       </Typography>
                     </Box>
                     <Box
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
-                      <MeetingRoomIcon
-                        sx={{ fontSize: 16, color: "#94a3b8" }}
-                      />
+                      <img src="./assets/icons/roomspavi.png" alt="" />
+
                       <Typography variant="body2" color="text.secondary">
-                        Habitaciones: {block.rooms.length}
+                        Habitaciones:{" "}
+                        <span className="text-black">{block.rooms.length}</span>
                       </Typography>
                     </Box>
                   </Box>
                 </Box>
                 <IconButton
-                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onBlockClick(block.id);
+                  }}
                   sx={{
-                    bgcolor: "#f8fafc",
+                    bgcolor: "#F7F7F7",
                     "&:hover": { bgcolor: "#eef2ff" },
-                    width: 36,
-                    height: 36,
+                    width: 35,
+                    height: 64,
+                    p: 0,
+                    minWidth: 0,
+                    boxSizing: "border-box",
+                    borderRadius: "50%",
+                    border: "1px solid #E5E7EB",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    overflow: "hidden",
                   }}
                 >
-                  <KeyboardDoubleArrowRightIcon
-                    sx={{ fontSize: 20, color: "#4f46e5" }}
+                  <img
+                    src="./assets/icons/arrow-right-double.png"
+                    className="rotate-180"
+                    alt=""
+                    style={{
+                      width: 20,
+                      height: 20,
+                      objectFit: "fill",
+                      display: "block",
+                    }}
                   />
                 </IconButton>
               </Box>

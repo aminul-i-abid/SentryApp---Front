@@ -3,9 +3,6 @@ import { Routes, buildRoute } from "@/utils/routesEnum";
 import useAuth from "@fuse/core/FuseAuthProvider/useAuth";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
@@ -299,6 +296,7 @@ function Contractors() {
                       return {
                         "& th": {
                           backgroundColor: isDark ? "#1e1e1e" : "#fff",
+                          py: "12px",
                           borderTop: `1px solid ${borderColor}`,
                           borderBottom: `1px solid ${borderColor}`,
                           "&:first-of-type": {
@@ -349,16 +347,16 @@ function Contractors() {
                 style={{
                   backgroundColor:
                     theme.palette.mode === "dark" ? "#1e1e1e" : "#fff",
-                  border: `1px solid ${theme.palette.mode === "dark" ? "#444" : "#e6e3e3"}`,
+                  border: `1px solid ${theme.palette.mode === "dark" ? "#444" : "#eaeaea"}`,
                   borderRadius: "12px",
-                  padding: "6px 6px",
+                  padding: "4px 6px",
                   minWidth: 1200,
                 }}
               >
                 <Table
                   sx={{
                     borderCollapse: "separate",
-                    borderSpacing: "0 4px",
+                    borderSpacing: "0 5px",
                     tableLayout: "fixed",
                     minWidth: 1200,
                     width: "100%",
@@ -409,7 +407,7 @@ function Contractors() {
                                     ? "#2a2a2a"
                                     : "#F3F4F6",
                                 borderBottom: "none",
-                                py: "11px",
+                                py: "6px",
                                 whiteSpace: "nowrap",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
@@ -514,7 +512,7 @@ function Contractors() {
                       minWidth: 240,
                       p: 0,
                       backgroundColor: isDark ? "#2a2a2a" : "#F3F4F6",
-                      border: `1px solid ${isDark ? "#444" : "#E5E7EB"}`,
+                      border: `1px solid ${isDark ? "#444" : "#eaeaea"}`,
                       overflow: "hidden",
                     };
                   },
@@ -550,13 +548,7 @@ function Contractors() {
                   })}
                 >
                   <ListItemIcon sx={{ minWidth: 32 }}>
-                    <InfoOutlinedIcon
-                      fontSize="small"
-                      sx={(t) => ({
-                        color:
-                          t.palette.mode === "dark" ? "#9ca3af" : "#6b7280",
-                      })}
-                    />
+                    <img src="./assets/icons/info.png" alt="" />
                   </ListItemIcon>
                   <ListItemText
                     primary="Información activa"
@@ -588,13 +580,7 @@ function Contractors() {
                   })}
                 >
                   <ListItemIcon sx={{ minWidth: 32 }}>
-                    <EditIcon
-                      fontSize="small"
-                      sx={(t) => ({
-                        color:
-                          t.palette.mode === "dark" ? "#9ca3af" : "#6b7280",
-                      })}
-                    />
+                    <img src="./assets/icons/edit-black.png" alt="" />
                   </ListItemIcon>
                   <ListItemText
                     primary="Editar información"
@@ -615,7 +601,7 @@ function Contractors() {
                   })}
                 >
                   <ListItemIcon sx={{ minWidth: 32 }}>
-                    <DeleteIcon fontSize="small" sx={{ color: "#ef4444" }} />
+                    <img src="./assets/icons/delete.png" alt="" />
                   </ListItemIcon>
                   <ListItemText
                     primary="Eliminar"

@@ -33,7 +33,7 @@ const OccupancyBadge: React.FC<OccupancyBadgeProps> = ({
       <span className="text-lg font-bold text-slate-800 dark:text-white mt-1.5 capitalize">
         {label}
       </span>
-      <span className="text-md text-slate-400 dark:text-slate-500 mt-0.5">
+      <span className="text-md text-gray-500 dark:text-slate-500 mt-0.5">
         {occupied}/{total}
       </span>
     </div>
