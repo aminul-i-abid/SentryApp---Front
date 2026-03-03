@@ -85,14 +85,14 @@ function DetailCamp({
       <div className="flex justify-start mb-3">
         <IconButton
           sx={{
-            bgcolor: "#f1f5f9",
+            bgcolor: "#fff",
             width: 36,
             height: 36,
             "&:hover": { bgcolor: "#e2e8f0" },
           }}
           onClick={handleBackClick}
         >
-          <ArrowBackIcon sx={{ color: "#4f46e5", fontSize: 20 }} />
+          <ArrowBackIcon sx={{ color: "#000", fontSize: 20 }} />
         </IconButton>
       </div>
 
@@ -105,7 +105,15 @@ function DetailCamp({
           backgroundColor: "#fff",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", p: 2.5, gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            p: 1.5,
+            gap: 2,
+            border: "1px solid #E2E2E2",
+          }}
+        >
           <CardMedia
             component="img"
             image="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
@@ -182,11 +190,37 @@ function DetailCamp({
 
       {/* Date divider */}
       <Box sx={{ display: "flex", alignItems: "center", my: 3 }}>
-        <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          {/* Dotted Line */}
+          <Box
+            sx={{
+              flex: 1,
+              borderTop: "2px dashed #415EDE",
+            }}
+          />
+
+          {/* Diamond at end */}
+          <Box
+            sx={{
+              width: 5,
+              height: 5,
+              backgroundColor: "#415EDE",
+              transform: "rotate(45deg)",
+              ml: 1,
+              flexShrink: 0,
+            }}
+          />
+        </Box>
         <Typography
-          variant="body2"
-          color="text.secondary"
-          fontWeight={500}
+          variant="h6"
+          color="black"
+          fontWeight={700}
           sx={{ mx: 2, whiteSpace: "nowrap" }}
         >
           {contractorName
@@ -197,7 +231,33 @@ function DetailCamp({
                 year: "numeric",
               })}
         </Typography>
-        <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          {/* Diamond at start */}
+          <Box
+            sx={{
+              width: 5,
+              height: 5,
+              backgroundColor: "#415EDE",
+              transform: "rotate(45deg)",
+              mr: 1,
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Dotted Line */}
+          <Box
+            sx={{
+              flex: 1,
+              borderTop: "2px dashed #415EDE",
+            }}
+          />
+        </Box>
       </Box>
 
       {/* Stats grid */}
@@ -300,16 +360,68 @@ function DetailCamp({
       {tagSummaryOrdered && tagSummaryOrdered.length > 0 && (
         <>
           <Box sx={{ display: "flex", alignItems: "center", my: 3 }}>
-            <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flex: 1,
+              }}
+            >
+              {/* Dotted Line */}
+              <Box
+                sx={{
+                  flex: 1,
+                  borderTop: "2px dashed #415EDE",
+                }}
+              />
+
+              {/* Diamond at end */}
+              <Box
+                sx={{
+                  width: 5,
+                  height: 5,
+                  backgroundColor: "#415EDE",
+                  transform: "rotate(45deg)",
+                  ml: 1,
+                  flexShrink: 0,
+                }}
+              />
+            </Box>
             <Typography
-              variant="body2"
-              color="text.secondary"
-              fontWeight={500}
+              variant="h6"
+              color="black"
+              fontWeight={700}
               sx={{ mx: 2, whiteSpace: "nowrap" }}
             >
               Habitaciones por estándar
             </Typography>
-            <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flex: 1,
+              }}
+            >
+              {/* Diamond at start */}
+              <Box
+                sx={{
+                  width: 5,
+                  height: 5,
+                  backgroundColor: "#415EDE",
+                  transform: "rotate(45deg)",
+                  mr: 1,
+                  flexShrink: 0,
+                }}
+              />
+
+              {/* Dotted Line */}
+              <Box
+                sx={{
+                  flex: 1,
+                  borderTop: "2px dashed #415EDE",
+                }}
+              />
+            </Box>
           </Box>
           <Grid container spacing={2}>
             {tagSummaryOrdered.map(({ tag, count }) => (
