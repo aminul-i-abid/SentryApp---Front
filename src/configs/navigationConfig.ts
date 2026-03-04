@@ -18,7 +18,7 @@ i18n.addResourceBundle("es", "navigation", es);
 const navigationConfig: FuseNavItemType[] = [
   {
     id: "dashboard-component",
-    title: "resumen",
+    title: "DASHBOARD",
     translate: "DASHBOARD",
     type: "item",
     icon: "/assets/icons/nav/dash.png",
@@ -44,7 +44,7 @@ const navigationConfig: FuseNavItemType[] = [
 	},*/
   {
     id: "contractors-component",
-    title: "Contratistas",
+    title: "CONTRATISTAS",
     translate: "CONTRATISTAS",
     type: "item",
     icon: "/assets/icons/nav/contractor.png",
@@ -53,7 +53,7 @@ const navigationConfig: FuseNavItemType[] = [
   },
   {
     id: "camps-component",
-    title: "Campamentos",
+    title: "CAMPAMENTOS",
     translate: "CAMPAMENTOS",
     type: "item",
     icon: "/assets/icons/nav/camp.png",
@@ -62,7 +62,7 @@ const navigationConfig: FuseNavItemType[] = [
   },
   {
     id: "room-component",
-    title: "Habitaciones",
+    title: "HABITACIONES",
     translate: "HABITACIONES",
     type: "item",
     icon: "/assets/icons/nav/rooms.png",
@@ -71,7 +71,7 @@ const navigationConfig: FuseNavItemType[] = [
   },
   {
     id: "reserve-component",
-    title: "Reservas",
+    title: "RESERVAS",
     translate: "RESERVAS",
     type: "item",
     icon: "/assets/icons/nav/reservations.png",
@@ -80,7 +80,7 @@ const navigationConfig: FuseNavItemType[] = [
   },
   {
     id: "guests-component",
-    title: "invitado",
+    title: "HUÉSPEDES",
     translate: "HUÉSPEDES",
     type: "item",
     icon: "/assets/icons/nav/guests.png",
@@ -89,7 +89,7 @@ const navigationConfig: FuseNavItemType[] = [
   },
   {
     id: "calendar-component",
-    title: "Calendario",
+    title: "CALENDARIO",
     translate: "CALENDARIO",
     type: "item",
     icon: "/assets/icons/nav/calendar.png",
@@ -98,7 +98,7 @@ const navigationConfig: FuseNavItemType[] = [
   },
   {
     id: "reports-component",
-    title: "informes",
+    title: "REPORTES",
     translate: "REPORTES",
     type: "item",
     icon: "/assets/icons/nav/reports.png",
@@ -107,7 +107,7 @@ const navigationConfig: FuseNavItemType[] = [
   },
   {
     id: "auditory-component",
-    title: "auditoria",
+    title: "AUDITORÍA",
     translate: "AUDITORÍA",
     type: "item",
     icon: "/assets/icons/nav/audit.png",
@@ -116,7 +116,7 @@ const navigationConfig: FuseNavItemType[] = [
   },
   {
     id: "user-manual-component",
-    title: "Documentos",
+    title: "DOCUMENTOS",
     translate: "DOCUMENTOS",
     type: "item",
     icon: "/assets/icons/nav/documents.png",
@@ -134,7 +134,7 @@ const navigationConfig: FuseNavItemType[] = [
   // },
   {
     id: "notifications-component",
-    title: "notificaciones",
+    title: "NOTIFICACIONES",
     translate: "NOTIFICACIONES",
     type: "item",
     icon: "/assets/icons/nav/notifications.png",
@@ -143,7 +143,7 @@ const navigationConfig: FuseNavItemType[] = [
   },
   {
     id: "activities-component",
-    title: "Actividades",
+    title: "ACTIVIDADES",
     translate: "ACTIVIDADES",
     type: "collapse",
     icon: "/assets/icons/nav/activities.png",

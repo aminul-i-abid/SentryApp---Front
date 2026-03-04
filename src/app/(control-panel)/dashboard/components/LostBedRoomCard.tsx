@@ -1,69 +1,99 @@
-import React from 'react';
-import { Paper, Typography, Box, Grid, Chip } from '@mui/material';
-import BedIcon from '@mui/icons-material/Bed';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import tagRoleMap from '../../tag/enum/RoleTag';
-import { LostBedRoomContract } from '../models/LostBedRoomContract';
+import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import { Box, Chip } from "@mui/material";
+import React from "react";
+import tagRoleMap from "../../tag/enum/RoleTag";
+import { LostBedRoomContract } from "../models/LostBedRoomContract";
 
-interface LostBedRoomCardProps {
-    room: LostBedRoomContract;
-}
-
-const tagColorMap: Record<number, { bg: string; text: string; accent: string }> = {
-    0: { bg: '#10B98120', text: '#047857', accent: '#10B981' }, // Manager
-    1: { bg: '#F59E0B20', text: '#B45309', accent: '#F59E0B' }, // Supervisor
-    2: { bg: '#8B5CF620', text: '#5B21B6', accent: '#8B5CF6' }  // Trabajador
+const tagColorMap: Record<
+  number,
+  { bg: string; text: string; accent: string }
+> = {
+  0: { bg: "#10B98120", text: "#047857", accent: "#10B981" }, // Manager
+  1: { bg: "#F59E0B20", text: "#B45309", accent: "#F59E0B" }, // Supervisor
+  2: { bg: "#8B5CF620", text: "#5B21B6", accent: "#8B5CF6" }, // Trabajador
 };
 
-const LostBedRoomCard: React.FC<LostBedRoomCardProps> = ({ room }) => {
-    const colors = tagColorMap[room.tag] || tagColorMap[2];
-    return (
-        <Grid item xs={12}>
-            <Paper
-                elevation={2}
-                sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    border: `1px solid #e0e0e0`,
-                }}
-            >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <MeetingRoomIcon sx={{  mr: 1.2, color: '#1976d2' }} />
-                        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.05rem', color: '#1976d2' }}>
-                            Habitación {room.roomNumber}
-                        </Typography>
-                    </Box>
-                    <Chip 
-                        label={tagRoleMap[room.tag] || `Tag ${room.tag}`} 
-                        size="small" 
-                        sx={{ 
-                            backgroundColor: colors.accent, 
-                            color: '#fff',
-                            fontWeight: 600
-                        }} 
-                    />
-                </Box>
+interface LostBedRoomCardProps {
+  room: LostBedRoomContract;
+}
 
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box sx={{ display: 'flex', gap: 4 }}>
-                        <Box>
-                            <Typography variant="caption" sx={{ color: '#64748B' }}>Camas Estándar</Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 600 }}>{room.expectedBeds}</Typography>
-                        </Box>
-                        <Box>
-                            <Typography variant="caption" sx={{ color: '#64748B' }}>Camas Reales</Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 600 }}>{room.actualBeds}</Typography>
-                        </Box>
-                        <Box>
-                            <Typography variant="caption" sx={{ color: '#64748B' }}>Camas Perdidas</Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 700 }}>{room.lostBeds}</Typography>
-                        </Box>
-                    </Box>
-                </Box>
-            </Paper>
-        </Grid>
-    );
+const LostBedRoomCard: React.FC<LostBedRoomCardProps> = ({ room }) => {
+  const colors = tagColorMap[room.tag] || tagColorMap[2];
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 1,
+        bgcolor: "#f7f7f7",
+        borderRadius: 2.5,
+        p: 1.5,
+        transition: "box-shadow 0.2s",
+        "&:hover": { boxShadow: "0 4px 12px rgba(0,0,0,0.08)" },
+        border: `1px solid #EEEEEE`,
+      }}
+    >
+      {/* Top row: icon + room name + tag badge */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            borderRadius: 2,
+            bgcolor: "#e8eaf6",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <MeetingRoomIcon sx={{ fontSize: 24, color: "#1976d2" }} />
+        </Box>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box sx={{ fontWeight: 700, fontSize: "1rem", color: "#1e293b" }}>
+            Room {room.roomNumber}
+          </Box>
+        </Box>
+        <Chip
+          label={tagRoleMap[room.tag] || `Tag ${room.tag}`}
+          size="small"
+          sx={{
+            backgroundColor: colors.accent,
+            color: "#fff",
+            fontWeight: 600,
+            fontSize: "0.65rem",
+            height: 22,
+            "& .MuiChip-label": { px: 1 },
+          }}
+        />
+      </Box>
+
+      {/* Details */}
+      <Box
+        sx={{ fontSize: "0.8rem", color: "#64748b", lineHeight: 1.8, pl: 0.5 }}
+      >
+        <Box>
+          • Camas Estándar:{" "}
+          <Box component="span" sx={{ fontWeight: 600, color: "#1e293b" }}>
+            {String(room.expectedBeds).padStart(2, "0")}
+          </Box>
+        </Box>
+        <Box>
+          • Camas Reales:{" "}
+          <Box component="span" sx={{ fontWeight: 600, color: "#1e293b" }}>
+            {String(room.actualBeds).padStart(2, "0")}
+          </Box>
+        </Box>
+        <Box>
+          • Camas Perdidas:{" "}
+          <Box component="span" sx={{ fontWeight: 600, color: "#1e293b" }}>
+            {String(room.lostBeds).padStart(2, "0")}
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  );
 };
 
 export default LostBedRoomCard;

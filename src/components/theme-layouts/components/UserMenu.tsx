@@ -121,7 +121,7 @@ function UserMenu(props: UserMenuProps) {
         {/* Name + email */}
         <div className="flex flex-col flex-1 min-w-0">
           <span className="title text-[13px] font-semibold text-gray-900 dark:text-white truncate leading-tight">
-            ¡{user?.displayName}!
+            {user?.displayName}
           </span>
           <span className="subtitle text-[11px] text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5">
             {user?.email}
@@ -318,12 +318,12 @@ function UserMenu(props: UserMenuProps) {
             >
               <FuseSvgIcon
                 size={18}
-                className="text-gray-500 dark:text-gray-400 shrink-0"
+                className="text-red-400 dark:text-red-400 shrink-0"
               >
                 heroicons-outline:arrow-right-on-rectangle
               </FuseSvgIcon>
-              <span className="text-[13px] font-medium text-gray-700 dark:text-gray-200 flex-1">
-                Cerrar sesión Perfil
+              <span className="text-[13px] font-medium text-red-400 dark:text-red-400 flex-1">
+                Sign Out
               </span>
             </button>
           </div>

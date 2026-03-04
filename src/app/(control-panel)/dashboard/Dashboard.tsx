@@ -286,6 +286,24 @@ function Dashboard() {
     return dashboardData.tagDetails.reduce((s, t) => s + (t.lostBeds || 0), 0);
   }, [dashboardData]);
 
+  // Disabled rooms count
+  const disabledRoomsCount = useMemo(() => {
+    if (!dashboardData?.tagDetails) return 0;
+    return dashboardData.tagDetails.reduce(
+      (s, t) => s + (t.disabledRooms || 0),
+      0,
+    );
+  }, [dashboardData]);
+
+  // Disabled beds count
+  const disabledBedsCount = useMemo(() => {
+    if (!dashboardData?.tagDetails) return 0;
+    return dashboardData.tagDetails.reduce(
+      (s, t) => s + (t.disabledBeds || 0),
+      0,
+    );
+  }, [dashboardData]);
+
   // Overall occupancy (today) using tagDetails + occupancySummary
   const occupancyMain = useMemo(() => {
     if (
@@ -413,7 +431,7 @@ function Dashboard() {
             {/* === Title + Contractor filter row === */}
             <div className="flex items-center justify-between flex-wrap gap-4">
               <h2 className="text-3xl font-bold text-slate-800 dark:text-white">
-                Resumen del panel de control
+                Panel de Control
               </h2>
               {isAdmin && (
                 <div className="relative" ref={dropdownRef}>
@@ -592,6 +610,81 @@ function Dashboard() {
                         bgClass="bg-white"
                       />
                     ))}
+                  </div>
+                </div>
+
+                {/* Disabled Rooms + Beds Lost per Standard row */}
+                <div className="bg-[#f7f7f7] rounded-xl p-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Disabled Rooms */}
+                    <button
+                      type="button"
+                      onClick={() => setIsSidebarOpen(true)}
+                      className="rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm px-5 py-4 text-left hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={1.8}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 104 0V7a2 2 0 00-2-2zm0 10a2 2 0 00-2 2v3a2 2 0 104 0v-3a2 2 0 00-2-2z"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                          Habitaciones Deshabilitadas
+                        </span>
+                      </div>
+                      <p className="text-3xl font-bold text-slate-800 dark:text-white">
+                        {disabledRoomsCount}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        {disabledBedsCount} camas
+                      </p>
+                    </button>
+
+                    {/* Beds Lost per Standard */}
+                    <button
+                      type="button"
+                      onClick={() => setIsLostBedsSidebarOpen(true)}
+                      className="rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm px-5 py-4 text-left hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-500 group-hover:bg-amber-100 transition-colors">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={1.8}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                          Camas Perdidas por Estándar
+                        </span>
+                      </div>
+                      <p className="text-3xl font-bold text-slate-800 dark:text-white">
+                        {lostBeds}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Por cambio de categoría
+                      </p>
+                    </button>
                   </div>
                 </div>
 

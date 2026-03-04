@@ -1,7 +1,7 @@
 const locale = {
   APPLICATIONS: "تطبيقات",
   EXAMPLE: "مثال",
-  DASHBOARD: "ملخص",
+  DASHBOARD: "لوحة القيادة",
   CONTRATISTAS: "المقاولون",
   CAMPAMENTOS: "المخيمات",
   HABITACIONES: "الغرف",

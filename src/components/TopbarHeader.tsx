@@ -30,7 +30,7 @@ export default function TopbarHeader() {
           </div>
           <div className="hidden lg:block">
             <p className="text-lg text-slate-700 font-bold dark:text-slate-100 leading-tight mb-0.5">
-              ¡{user?.displayName || ""}!
+              {user?.displayName || ""}
             </p>
             <p className="text-sm text-slate-400 dark:text-slate-400">
               {user?.email || ""}

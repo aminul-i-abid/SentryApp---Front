@@ -1,82 +1,158 @@
-import React, { useEffect, useState } from 'react';
-import { Drawer, Typography, Box, IconButton, Grid } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import { getLostBeds } from '../dashboardService';
-import { LostBedRoomContract } from '../models/LostBedRoomContract';
-import LostBedRoomCard from './LostBedRoomCard';
+import CloseIcon from "@mui/icons-material/Close";
+import { Box, Drawer, IconButton, Skeleton } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { getLostBeds } from "../dashboardService";
+import { LostBedRoomContract } from "../models/LostBedRoomContract";
+import LostBedRoomCard from "./LostBedRoomCard";
 
 interface LostBedsDetailSidebarProps {
-    selectedContractor: string;
-    open: boolean;
-    onClose: () => void;
+  selectedContractor: string;
+  open: boolean;
+  onClose: () => void;
 }
 
-const LostBedsDetailSidebar: React.FC<LostBedsDetailSidebarProps> = ({ selectedContractor, open, onClose }) => {
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<LostBedRoomContract[] | null>(null);
+const LostBedsDetailSidebar: React.FC<LostBedsDetailSidebarProps> = ({
+  selectedContractor,
+  open,
+  onClose,
+}) => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<LostBedRoomContract[] | null>(null);
 
-    const fetchLostBeds = async () => {
-        setLoading(true);
-        try {
-            const contractorId = selectedContractor;
-            const response = await getLostBeds(contractorId);
-            if (response.succeeded) {
-                setData(response.data);
-            } else {
-                setData(null);
-            }
-        } catch (error) {
-            console.error('Error fetching lost beds:', error);
-            setData(null);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchLostBeds = async () => {
+    setLoading(true);
+    try {
+      const response = await getLostBeds(selectedContractor);
 
-    useEffect(() => {
-        if (open) {
-            fetchLostBeds();
-        }
-    }, [open, selectedContractor]);
+      if (response.succeeded) {
+        setData(response.data);
+      } else {
+        setData(null);
+      }
+    } catch (error) {
+      console.error("Error fetching lost beds:", error);
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <Drawer
-            anchor="right"
-            open={open}
-            onClose={onClose}
-            sx={{ '& .MuiDrawer-paper': { width: { xs: '100%', sm: '70vw', md: '40vw' }, maxWidth: '1000px', boxShadow: '-4px 0 8px rgba(0,0,0,0.1)', bgcolor: '#f5f5f5' } }}
+  useEffect(() => {
+    if (open) {
+      fetchLostBeds();
+    }
+  }, [open, selectedContractor]);
+
+  return (
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backdropFilter: "blur(4px)",
+            backgroundColor: "rgba(0,0,0,0.25)",
+          },
+        },
+      }}
+      sx={{
+        "& .MuiDrawer-paper": {
+          width: { xs: "100%", sm: "80vw", md: "50vw", lg: "40vw" },
+          maxWidth: "720px",
+          boxShadow: "-8px 0 24px rgba(0,0,0,0.12)",
+          bgcolor: "#ffffff",
+          border: "none",
+        },
+      }}
+    >
+      <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        {/* Header */}
+        <Box
+          sx={{
+            bgcolor: "#ffffff",
+            px: { xs: 2.5, sm: 3.5 },
+            py: 2.5,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
         >
-            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <Box sx={{ background: 'linear-gradient(135deg,rgb(252, 252, 252) 0%,rgb(244, 244, 244) 100%)', color: 'black', p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
-                            Camas Perdidas
-                        </Typography>
-                    </Box>
-                    <IconButton onClick={onClose} size="small" sx={{ color: 'black', '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' }}}>
-                        <CloseIcon />
-                    </IconButton>
-                </Box>
-                <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-                    {loading ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-                            <Typography>Cargando...</Typography>
-                        </Box>
-                    ) : data && data.length > 0 ? (
-                        <Grid container spacing={2}>
-                            {data.map((room, idx) => (
-                                <LostBedRoomCard key={idx} room={room} />
-                            ))}
-                        </Grid>
-                    ) : (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-                            <Typography color="text.secondary">No hay camas perdidas</Typography>
-                        </Box>
-                    )}
-                </Box>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "1.25rem",
+              fontWeight: 700,
+              color: "#1e293b",
+            }}
+          >
+            Camas Perdidas
+          </h2>
+          <IconButton
+            onClick={onClose}
+            size="small"
+            sx={{
+              color: "#ef4444",
+              border: "1px solid #d1d5db",
+              borderRadius: "8px",
+              width: 34,
+              height: 34,
+              "&:hover": { bgcolor: "#fef2f2" },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: "auto", p: { xs: 2, sm: 2.5 } }}>
+          {loading ? (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                gap: 2,
+              }}
+            >
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton
+                  key={i}
+                  variant="rectangular"
+                  height={110}
+                  sx={{ borderRadius: 2 }}
+                />
+              ))}
             </Box>
-        </Drawer>
-    );
+          ) : data && data.length > 0 ? (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                gap: 2,
+              }}
+            >
+              {data.map((room, idx) => (
+                <LostBedRoomCard key={idx} room={room} />
+              ))}
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "200px",
+                color: "#94a3b8",
+                fontSize: "0.95rem",
+              }}
+            >
+              No hay camas perdidas
+            </Box>
+          )}
+        </Box>
+      </Box>
+    </Drawer>
+  );
 };
 
 export default LostBedsDetailSidebar;

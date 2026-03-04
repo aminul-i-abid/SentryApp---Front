@@ -87,6 +87,8 @@ function CampCard({
         cursor: "pointer",
         transition: "transform 0.2s ease-in-out",
         "&:hover": { transform: "translateY(-4px)" },
+        backgroundColor: "white",
+        borderRadius: "16px",
       }}
       onClick={() => onCardClick(camp.id)}
     >
@@ -94,9 +96,10 @@ function CampCard({
       <Box
         sx={{
           position: "relative",
-          borderRadius: "16px",
           overflow: "hidden",
           aspectRatio: "4 / 3",
+          borderTopRightRadius: "16px",
+          borderTopLeftRadius: "16px",
         }}
       >
         <Box
@@ -172,7 +175,15 @@ function CampCard({
       </Box>
 
       {/* Card info */}
-      <Box sx={{ pt: 1.5, px: 0.5 }}>
+      <Box
+        sx={{
+          py: 2,
+          px: 1.5,
+          display: "flex",
+          flexDirection: "column",
+          gap: 0.5,
+        }}
+      >
         <Typography
           variant="subtitle1"
           sx={{

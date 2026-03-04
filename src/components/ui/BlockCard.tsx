@@ -37,7 +37,7 @@ const BlockCard: React.FC<BlockCardProps> = ({
     >
       <div className="flex flex-col py-3 gap-3">
         <span
-          className={`text-[11px] font-semibold text-[#415EDE] uppercase tracking-wide w-full px-3 py-1 ${headerColor} rounded-tr-xl rounded-br-xl`}
+          className={`text-[10px] font-semibold text-[#415EDE] uppercase tracking-wide w-full px-3 py-1 ${headerColor} rounded-tr-xl rounded-br-xl leading-tight break-words hyphens-auto`}
         >
           {name}
         </span>
