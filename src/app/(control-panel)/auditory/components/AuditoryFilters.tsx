@@ -1,396 +1,650 @@
-import React, { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, Box, Divider, Grid, TextField, Button, Typography, Autocomplete, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import { getRooms } from '@/app/(control-panel)/room/roomService';
-import { getCamps } from '@/app/(control-panel)/camps/campsService';
-import { getBlocks, getBlockByCampId } from '@/app/(control-panel)/block/blockService';
-import { getContractors } from '@/app/(control-panel)/contractors/contractorsService';
-import { getDoorLockAccessLogsExcel } from '../auditoryService';
-import { styled, useTheme } from '@mui/material/styles';
-import { Clear, FilterAlt, Download } from '@mui/icons-material';
-import { AuditoryTables, AUDITORY_TABLE_OPTIONS } from '../models/AuditoryTables';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/store/store';
-import { setAuditoryFilters, resetAuditoryFilters } from '@/store/auditoryFiltersSlice';
-import { useLoading } from '@/contexts/LoadingContext';
-import useUser from '@auth/useUser';
+import {
+  getBlockByCampId,
+  getBlocks,
+} from "@/app/(control-panel)/block/blockService";
+import { getCamps } from "@/app/(control-panel)/camps/campsService";
+import { getContractors } from "@/app/(control-panel)/contractors/contractorsService";
+import { useLoading } from "@/contexts/LoadingContext";
+import {
+  resetAuditoryFilters,
+  setAuditoryFilters,
+} from "@/store/auditoryFiltersSlice";
+import { RootState } from "@/store/store";
+import useUser from "@auth/useUser";
+import { Download } from "@mui/icons-material";
+import {
+  Autocomplete,
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { format, isValid, parseISO } from "date-fns";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getDoorLockAccessLogsExcel } from "../auditoryService";
+import {
+  AUDITORY_TABLE_OPTIONS,
+  AuditoryTables,
+} from "../models/AuditoryTables";
 
 interface AuditoryFiltersProps {
-    selectedTable: AuditoryTables | '';
-    onTableChange: (event: SelectChangeEvent<AuditoryTables | ''>) => void;
+  selectedTable: AuditoryTables | "";
+  onTableChange: (event: SelectChangeEvent<AuditoryTables | "">) => void;
 }
 
-const AuditoryFilters = ({ selectedTable, onTableChange }: AuditoryFiltersProps) => {
+const AuditoryFilters = ({
+  selectedTable,
+  onTableChange,
+}: AuditoryFiltersProps) => {
+  const theme = useTheme();
+  const dispatch = useDispatch();
+  const filters = useSelector((state: RootState) => state.auditoryFilters);
+  const { showLoading, hideLoading } = useLoading();
+  const { data: user } = useUser();
+  const hasTTLock = user?.modules?.ttlock === true;
 
-    const theme = useTheme();
-    const dispatch = useDispatch();
-    const filters = useSelector((state: RootState) => state.auditoryFilters);
-    const { showLoading, hideLoading } = useLoading();
-    const { data: user } = useUser();
-    const hasTTLock = user?.modules?.ttlock === true;
+  const [camps, setCamps] = useState([]);
+  const [blocks, setBlocks] = useState([]);
+  const [contractors, setContractors] = useState([]);
+  const [allRooms, setAllRooms] = useState([]);
+  const [filteredRooms, setFilteredRooms] = useState([]);
+  const [loadingRooms, setLoadingRooms] = useState(false);
 
-    const [camps, setCamps] = useState([]);
-    const [blocks, setBlocks] = useState([]);
-    const [contractors, setContractors] = useState([]);
-    const [allRooms, setAllRooms] = useState([]);
-    const [filteredRooms, setFilteredRooms] = useState([]);
-    const [loadingRooms, setLoadingRooms] = useState(false);
-    // Fetch rooms (now from blocks)
-    const updateRoomsFromBlocks = (blocks: any[]) => {
-        // Extract all rooms from all blocks
-        const allRoomsFromBlocks = blocks.flatMap((block: any) => block.rooms || []);
-        setAllRooms(allRoomsFromBlocks);
-        setFilteredRooms(allRoomsFromBlocks);
-    };
-    const [loadingCamps, setLoadingCamps] = useState(false);
-    const [loadingBlocks, setLoadingBlocks] = useState(false);
-    const [loadingContractors, setLoadingContractors] = useState(false);
-    // Fetch contractors
-    const fetchContractors = async () => {
-        setLoadingContractors(true);
-        try {
-            const res = await getContractors();
-            setContractors(res.data || []);
-        } finally {
-            setLoadingContractors(false);
-        }
-    };
+  const updateRoomsFromBlocks = (blocks: any[]) => {
+    const allRoomsFromBlocks = blocks.flatMap(
+      (block: any) => block.rooms || [],
+    );
+    setAllRooms(allRoomsFromBlocks);
+    setFilteredRooms(allRoomsFromBlocks);
+  };
 
-    // Fetch camps
-    const fetchCamps = async () => {
-        setLoadingCamps(true);
-        try {
-            const res = await getCamps();
-            setCamps(res.data || []);
-        } finally {
-            setLoadingCamps(false);
-        }
-    };
+  const [loadingCamps, setLoadingCamps] = useState(false);
+  const [loadingBlocks, setLoadingBlocks] = useState(false);
+  const [loadingContractors, setLoadingContractors] = useState(false);
 
-    // Fetch blocks (by camp if selected)
-    const fetchBlocks = async (campId?: number) => {
-        setLoadingBlocks(true);
-        try {
-            let res;
-            if (campId) {
-                res = await getBlockByCampId(campId);
-            } else {
-                res = await getBlocks();
-            }
-            const blocksData = res.data || [];
-            setBlocks(blocksData);
-            updateRoomsFromBlocks(blocksData);
-        } finally {
-            setLoadingBlocks(false);
-        }
-    };
+  const fetchContractors = async () => {
+    setLoadingContractors(true);
+    try {
+      const res = await getContractors();
+      setContractors(res.data || []);
+    } finally {
+      setLoadingContractors(false);
+    }
+  };
 
-    useEffect(() => {
-        fetchCamps();
-        fetchContractors();
-        updateRoomsFromBlocks([]);
-    }, []);
+  const fetchCamps = async () => {
+    setLoadingCamps(true);
+    try {
+      const res = await getCamps();
+      setCamps(res.data || []);
+    } finally {
+      setLoadingCamps(false);
+    }
+  };
 
-    useEffect(() => {
-        if (filters.campId) {
-            fetchBlocks(filters.campId);
-        } else {
-            fetchBlocks();
-        }
-    }, [filters.campId, selectedTable]);
+  const fetchBlocks = async (campId?: number) => {
+    setLoadingBlocks(true);
+    try {
+      let res;
+      if (campId) {
+        res = await getBlockByCampId(campId);
+      } else {
+        res = await getBlocks();
+      }
+      const blocksData = res.data || [];
+      setBlocks(blocksData);
+      updateRoomsFromBlocks(blocksData);
+    } finally {
+      setLoadingBlocks(false);
+    }
+  };
 
-    // Filter rooms when block selection changes
-    useEffect(() => {
-        filterRoomsByBlocks(filters.blockId || []);
-    }, [filters.blockId, allRooms]);
+  useEffect(() => {
+    fetchCamps();
+    fetchContractors();
+    updateRoomsFromBlocks([]);
+  }, []);
 
-    const handleResetFilters = () => {
-        dispatch(resetAuditoryFilters());
-    };
+  useEffect(() => {
+    if (filters.campId) {
+      fetchBlocks(filters.campId);
+    } else {
+      fetchBlocks();
+    }
+  }, [filters.campId, selectedTable]);
 
-    const handleDownloadExcel = async () => {
-        try {
-            showLoading('Se está generando el reporte Excel, aguarde un instante...');
-            await getDoorLockAccessLogsExcel();
-        } catch (error) {
-            console.error('Error downloading Excel:', error);
-            // Aquí podrías mostrar un toast o notificación de error
-        } finally {
-            hideLoading();
-        }
-    };
+  useEffect(() => {
+    filterRoomsByBlocks(filters.blockId || []);
+  }, [filters.blockId, allRooms]);
 
-    // Función para manejar cambios en los filtros (Autocomplete)
-    const handleFilterChange = (field: keyof typeof filters, value: any) => {
-        dispatch(setAuditoryFilters({ [field]: value && value.length > 0 ? value : null }));
-    };
+  const handleResetFilters = () => {
+    dispatch(resetAuditoryFilters());
+  };
 
-    // Función para manejar cambios en los filtros de Select
-    const handleSelectChange = (field: keyof typeof filters, value: any) => {
-        dispatch(setAuditoryFilters({ [field]: value }));
-    };
+  const handleDownloadExcel = async () => {
+    try {
+      showLoading("Se está generando el reporte Excel, aguarde un instante...");
+      await getDoorLockAccessLogsExcel();
+    } catch (error) {
+      console.error("Error downloading Excel:", error);
+    } finally {
+      hideLoading();
+    }
+  };
 
-    // Filter rooms based on selected blocks
-    const filterRoomsByBlocks = (selectedBlockIds: number[]) => {
-        if (!selectedBlockIds || selectedBlockIds.length === 0) {
-            setFilteredRooms(allRooms);
-        } else {
-            const filtered = allRooms.filter((room: any) =>
-                selectedBlockIds.includes(room.blockId)
-            );
-            setFilteredRooms(filtered);
-        }
-    };
+  const handleFilterChange = (field: keyof typeof filters, value: any) => {
+    dispatch(
+      setAuditoryFilters({
+        [field]: value && value.length > 0 ? value : null,
+      }),
+    );
+  };
 
-    useEffect(() => {
-        // Si cambia la tabla seleccionada, podrías resetear filtros o actualizar el filtro de tabla
-        dispatch(setAuditoryFilters({ table: selectedTable }));
-    }, [selectedTable, dispatch]);
+  const handleSelectChange = (field: keyof typeof filters, value: any) => {
+    dispatch(setAuditoryFilters({ [field]: value }));
+  };
 
+  const filterRoomsByBlocks = (selectedBlockIds: number[]) => {
+    if (!selectedBlockIds || selectedBlockIds.length === 0) {
+      setFilteredRooms(allRooms);
+    } else {
+      const filtered = allRooms.filter((room: any) =>
+        selectedBlockIds.includes(room.blockId),
+      );
+      setFilteredRooms(filtered);
+    }
+  };
 
-    return (
-        <Card>
-            <CardHeader
-                title={
-                    <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
-                        <Box display="flex" alignItems="center" gap={1}>
-                            <FilterAlt sx={{ color: theme.palette.primary.main }} />
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                                Filtros
-                            </Typography>
-                        </Box>
-                        <FormControl variant="outlined" sx={{ minWidth: 300 }}>
-                            <InputLabel id="table-select-label">Tabla de Auditoría</InputLabel>
-                            <Select
-                                labelId="table-select-label"
-                                id="table-select"
-                                value={selectedTable}
-                                onChange={onTableChange}
-                                label="Tabla de Auditoría"
-                                size="small"
-                            >
-                                <MenuItem value="">
-                                    <em>Selecciona una tabla</em>
-                                </MenuItem>
-                                {AUDITORY_TABLE_OPTIONS.filter(option => !option.requiresTTLock || hasTTLock).map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.display}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                }
+  useEffect(() => {
+    dispatch(setAuditoryFilters({ table: selectedTable }));
+  }, [selectedTable, dispatch]);
+
+  return (
+    <Box
+      sx={{
+        backgroundColor: "#fff",
+        padding: 3,
+        borderRadius: "12px",
+      }}
+    >
+      {/* Header row: title + table selector */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 3,
+        }}
+      >
+        <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b" }}>
+          Filters
+        </Typography>
+
+        <FormControl
+          variant="outlined"
+          size="small"
+          sx={{
+            minWidth: 220,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "8px",
+              backgroundColor: "#fff",
+            },
+          }}
+        >
+          <InputLabel id="table-select-label">Audit Table</InputLabel>
+          <Select
+            labelId="table-select-label"
+            id="table-select"
+            value={selectedTable}
+            onChange={onTableChange}
+            label="Audit Table"
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  backgroundColor: "#fff",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  maxHeight: 300,
+                },
+              },
+            }}
+          >
+            <MenuItem value="">
+              <em>Select a table</em>
+            </MenuItem>
+            {AUDITORY_TABLE_OPTIONS.filter(
+              (option) => !option.requiresTTLock || hasTTLock,
+            ).map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.display}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Filters row */}
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            alignItems: "center",
+          }}
+        >
+          {/* Start date */}
+          <DatePicker
+            label="Start date"
+            value={filters.fechaDesde ? parseISO(filters.fechaDesde) : null}
+            onChange={(date: Date | null) => {
+              if (date && isValid(date)) {
+                handleFilterChange("fechaDesde", format(date, "yyyy-MM-dd"));
+              } else {
+                handleFilterChange("fechaDesde", "");
+              }
+            }}
+            slotProps={{
+              desktopPaper: {
+                sx: {
+                  backgroundColor: "#fff",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  borderRadius: "12px",
+                },
+              },
+              textField: {
+                size: "small",
+                sx: {
+                  minWidth: 200,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "8px",
+                    backgroundColor: "#fff",
+                  },
+                },
+              },
+            }}
+          />
+
+          {/* End date */}
+          <DatePicker
+            label="End date"
+            value={filters.fechaHasta ? parseISO(filters.fechaHasta) : null}
+            onChange={(date: Date | null) => {
+              if (date && isValid(date)) {
+                handleFilterChange("fechaHasta", format(date, "yyyy-MM-dd"));
+              } else {
+                handleFilterChange("fechaHasta", "");
+              }
+            }}
+            slotProps={{
+              desktopPaper: {
+                sx: {
+                  backgroundColor: "#fff",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  borderRadius: "12px",
+                },
+              },
+              textField: {
+                size: "small",
+                sx: {
+                  minWidth: 200,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "8px",
+                    backgroundColor: "#fff",
+                  },
+                },
+              },
+            }}
+          />
+
+          {/* Conditional autocompletes based on table */}
+          {selectedTable === AuditoryTables.DOORLOCKACCESSLOGS && (
+            <Autocomplete
+              multiple
+              options={blocks}
+              getOptionLabel={(option: any) => option.name}
+              value={blocks.filter((b: any) =>
+                (filters.blockId ?? []).includes(b.id),
+              )}
+              onChange={(_, value) => {
+                const selectedIds = value.map((v: any) => v.id);
+                handleFilterChange("blockId", selectedIds);
+                filterRoomsByBlocks(selectedIds);
+              }}
+              loading={loadingBlocks}
+              disableCloseOnSelect
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Pavilion"
+                  placeholder="Search..."
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "8px",
+                      backgroundColor: "#fff",
+                    },
+                  }}
+                />
+              )}
+              renderTags={(selected) =>
+                selected.length > 0 ? [`${selected.length} selected`] : []
+              }
+              componentsProps={{
+                paper: {
+                  sx: {
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  },
+                },
+              }}
+              sx={{ minWidth: 200 }}
             />
-            <Divider />
-            <CardContent sx={{ pt: 3 }}>
-                <Grid container spacing={3} alignItems="center">
-                    {/* Autocomplete Pabellón para Historial de Accesos */}
-                    {selectedTable === AuditoryTables.DOORLOCKACCESSLOGS && (
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Autocomplete
-                            multiple
-                            options={blocks}
-                            getOptionLabel={(option: any) => option.name}
-                            value={blocks.filter((b: any) => (filters.blockId ?? []).includes(b.id))}
-                            onChange={(_, value) => {
-                                const selectedIds = value.map((v: any) => v.id);
-                                handleFilterChange('blockId', selectedIds);
-                                filterRoomsByBlocks(selectedIds);
-                            }}
-                            loading={loadingBlocks}
-                            disableCloseOnSelect
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                            size="small"
-                            renderInput={(params) => <TextField {...params} label="Pabellón" placeholder="Buscar..." size="small" sx={{ minHeight: 40 }} />}
-                            renderTags={(selected) => selected.length > 0 ? [`${selected.length} seleccionados`] : []}
-                            sx={{ minHeight: 40 }}
-                        />
-                    </Grid>
-                    )}
-                    {/* Autocomplete Rooms */}
-                    {(selectedTable === AuditoryTables.RESERVATIONS || selectedTable === AuditoryTables.DOORLOCK || selectedTable === AuditoryTables.ROOMDISABLEDSTATES || selectedTable === AuditoryTables.WHATSAPP || selectedTable === AuditoryTables.ROOM || selectedTable === AuditoryTables.DOORLOCKACCESSLOGS) && (
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Autocomplete
-                            multiple
-                            options={filteredRooms}
-                            getOptionLabel={(option: any) => option.roomNumber ? `${option.roomNumber}` : option.id}
-                            value={filteredRooms.filter((r: any) => (filters.roomId ?? []).includes(r.id))}
-                            onChange={(_, value) => handleFilterChange('roomId', value.map((v: any) => v.id))}
-                            loading={loadingRooms}
-                            disableCloseOnSelect
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                            size="small"
-                            renderInput={(params) => <TextField {...params} label="Habitación" placeholder="Buscar..." size="small" sx={{ minHeight: 40 }} />}
-                            renderTags={(selected) => selected.length > 0 ? [`${selected.length} seleccionadas`] : []}
-                            sx={{ minHeight: 40 }}
-                        />
-                    </Grid>
-                    )}
-                    {/* Autocomplete Contractor */}
-                    {selectedTable === AuditoryTables.COMPANY && (
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Autocomplete
-                            multiple
-                            options={contractors}
-                            getOptionLabel={(option: any) => option.name}
-                            value={contractors.filter((c: any) => (filters.companyId ?? []).includes(c.id))}
-                            onChange={(_, value) => handleFilterChange('companyId', value.map((v: any) => v.id))}
-                            loading={loadingContractors}
-                            disableCloseOnSelect
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                            size="small"
-                            renderInput={(params) => <TextField {...params} label="Contratista" placeholder="Buscar..." size="small" sx={{ minHeight: 40 }} />}
-                            renderTags={(selected) => selected.length > 0 ? [`${selected.length} seleccionados`] : []}
-                            sx={{ minHeight: 40 }}
-                        />
-                    </Grid>
-                    )}
-                    {/* Autocomplete Campamento */}
-                    {(selectedTable === AuditoryTables.BLOCK || selectedTable === AuditoryTables.CAMP) && (
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Autocomplete
-                            multiple
-                            options={camps}
-                            getOptionLabel={(option: any) => option.name}
-                            value={camps.filter((c: any) => (filters.campId ?? []).includes(c.id))}
-                            onChange={(_, value) => handleFilterChange('campId', value.map((v: any) => v.id))}
-                            loading={loadingCamps}
-                            disableCloseOnSelect
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                            size="small"
-                            renderInput={(params) => <TextField {...params} label="Campamento" placeholder="Buscar..." size="small" sx={{ minHeight: 40 }} />}
-                            renderTags={(selected) => selected.length > 0 ? [`${selected.length} seleccionados`] : []}
-                            sx={{ minHeight: 40 }}
-                        />
-                    </Grid>
-                    )}
-                    {/* Autocomplete Bloque/Pabellón */}
-                    {(selectedTable === AuditoryTables.BLOCK || selectedTable === AuditoryTables.ROOM) && (
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Autocomplete
-                            multiple
-                            options={blocks}
-                            getOptionLabel={(option: any) => option.name}
-                            value={blocks.filter((b: any) => (filters.blockId ?? []).includes(b.id))}
-                            onChange={(_, value) => handleFilterChange('blockId', value.map((v: any) => v.id))}
-                            loading={loadingBlocks}
-                            disableCloseOnSelect
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                            size="small"
-                            renderInput={(params) => <TextField {...params} label="Bloque" placeholder="Buscar..." size="small" sx={{ minHeight: 40 }} />}
-                            renderTags={(selected) => selected.length > 0 ? [`${selected.length} seleccionados`] : []}
-                            sx={{ minHeight: 40 }}
-                        />
-                    </Grid>
-                    )}
-                    {/* Filtro de Éxito para Historial de Accesos */}
-                    {selectedTable === AuditoryTables.DOORLOCKACCESSLOGS && (
-                    <Grid item xs={12} sm={6} md={2}>
-                        <FormControl fullWidth size="small" sx={{ minHeight: 40 }}>
-                            <InputLabel>Estado del Acceso</InputLabel>
-                            <Select
-                                name="success"
-                                value={filters.success !== null && filters.success !== undefined ? String(filters.success) : ''}
-                                onChange={(e: SelectChangeEvent<string>) => {
-                                    const value = e.target.value;
-                                    handleSelectChange('success', value === '' ? null : Number(value));
-                                }}
-                                label="Estado del Acceso"
-                            >
-                                <MenuItem value="">
-                                    <em>Todos</em>
-                                </MenuItem>
-                                <MenuItem value="1">Exitoso</MenuItem>
-                                <MenuItem value="0">Fallido</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    )}
-                    {/* Fecha Desde */}
-                    <Grid item xs={12} sm={6} md={2}>
-                        <TextField
-                            fullWidth
-                            label="Fecha Desde"
-                            type="date"
-                            value={filters.fechaDesde || ''}
-                            onChange={(e) => handleFilterChange('fechaDesde', e.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            size="small"
-                            sx={{
-                                minHeight: 40,
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: 1,
-                                }
-                            }}
-                        />
-                    </Grid>
+          )}
 
-                    {/* Fecha Hasta */}
-                    <Grid item xs={12} sm={6} md={2}>
-                        <TextField
-                            fullWidth
-                            label="Fecha Hasta"
-                            type="date"
-                            value={filters.fechaHasta || ''}
-                            onChange={(e) => handleFilterChange('fechaHasta', e.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            size="small"
-                            sx={{
-                                minHeight: 40,
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: 1,
-                                }
-                            }}
-                        />
-                    </Grid>
+          {(selectedTable === AuditoryTables.RESERVATIONS ||
+            selectedTable === AuditoryTables.DOORLOCK ||
+            selectedTable === AuditoryTables.ROOMDISABLEDSTATES ||
+            selectedTable === AuditoryTables.WHATSAPP ||
+            selectedTable === AuditoryTables.ROOM ||
+            selectedTable === AuditoryTables.DOORLOCKACCESSLOGS) && (
+            <Autocomplete
+              multiple
+              options={filteredRooms}
+              getOptionLabel={(option: any) =>
+                option.roomNumber ? `${option.roomNumber}` : option.id
+              }
+              value={filteredRooms.filter((r: any) =>
+                (filters.roomId ?? []).includes(r.id),
+              )}
+              onChange={(_, value) =>
+                handleFilterChange(
+                  "roomId",
+                  value.map((v: any) => v.id),
+                )
+              }
+              loading={loadingRooms}
+              disableCloseOnSelect
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Room"
+                  placeholder="Search..."
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "8px",
+                      backgroundColor: "#fff",
+                    },
+                  }}
+                />
+              )}
+              renderTags={(selected) =>
+                selected.length > 0 ? [`${selected.length} selected`] : []
+              }
+              componentsProps={{
+                paper: {
+                  sx: {
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  },
+                },
+              }}
+              sx={{ minWidth: 200 }}
+            />
+          )}
 
-                    {/* Botón Descargar Auditoría - Solo para Historial de Accesos */}
-                    {selectedTable === AuditoryTables.DOORLOCKACCESSLOGS && (
-                        <Grid item xs={12} sm={6} md={3}>
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                color="primary"
-                                startIcon={<Download />}
-                                onClick={handleDownloadExcel}
-                                sx={{
-                                    borderRadius: 1,
-                                    padding: '12px 16px',
-                                    textTransform: 'none',
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Descargar Auditoría
-                            </Button>
-                        </Grid>
-                    )}
+          {selectedTable === AuditoryTables.COMPANY && (
+            <Autocomplete
+              multiple
+              options={contractors}
+              getOptionLabel={(option: any) => option.name}
+              value={contractors.filter((c: any) =>
+                (filters.companyId ?? []).includes(c.id),
+              )}
+              onChange={(_, value) =>
+                handleFilterChange(
+                  "companyId",
+                  value.map((v: any) => v.id),
+                )
+              }
+              loading={loadingContractors}
+              disableCloseOnSelect
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Contractor"
+                  placeholder="Search..."
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "8px",
+                      backgroundColor: "#fff",
+                    },
+                  }}
+                />
+              )}
+              renderTags={(selected) =>
+                selected.length > 0 ? [`${selected.length} selected`] : []
+              }
+              componentsProps={{
+                paper: {
+                  sx: {
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  },
+                },
+              }}
+              sx={{ minWidth: 200 }}
+            />
+          )}
 
-                    {/* Botón Resetear */}
-                    <Grid item xs={12} sm={6} md={selectedTable === AuditoryTables.DOORLOCKACCESSLOGS ? 3 : 4}>
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            color="secondary"
-                            startIcon={<Clear />}
-                            onClick={handleResetFilters}
-                            sx={{
-                                borderRadius: 1,
-                                padding: '12px 16px',
-                                textTransform: 'none',
-                                fontWeight: 600,
-                            }}
-                        >
-                            Resetear
-                        </Button>
-                    </Grid>
-                </Grid>
-            </CardContent>
-        </Card>
-    )
-}
+          {(selectedTable === AuditoryTables.BLOCK ||
+            selectedTable === AuditoryTables.CAMP) && (
+            <Autocomplete
+              multiple
+              options={camps}
+              getOptionLabel={(option: any) => option.name}
+              value={camps.filter((c: any) =>
+                (filters.campId ?? []).includes(c.id),
+              )}
+              onChange={(_, value) =>
+                handleFilterChange(
+                  "campId",
+                  value.map((v: any) => v.id),
+                )
+              }
+              loading={loadingCamps}
+              disableCloseOnSelect
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Camp"
+                  placeholder="Search..."
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "8px",
+                      backgroundColor: "#fff",
+                    },
+                  }}
+                />
+              )}
+              renderTags={(selected) =>
+                selected.length > 0 ? [`${selected.length} selected`] : []
+              }
+              componentsProps={{
+                paper: {
+                  sx: {
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  },
+                },
+              }}
+              sx={{ minWidth: 200 }}
+            />
+          )}
 
-export default AuditoryFilters
+          {(selectedTable === AuditoryTables.BLOCK ||
+            selectedTable === AuditoryTables.ROOM) && (
+            <Autocomplete
+              multiple
+              options={blocks}
+              getOptionLabel={(option: any) => option.name}
+              value={blocks.filter((b: any) =>
+                (filters.blockId ?? []).includes(b.id),
+              )}
+              onChange={(_, value) =>
+                handleFilterChange(
+                  "blockId",
+                  value.map((v: any) => v.id),
+                )
+              }
+              loading={loadingBlocks}
+              disableCloseOnSelect
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              size="small"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Block"
+                  placeholder="Search..."
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "8px",
+                      backgroundColor: "#fff",
+                    },
+                  }}
+                />
+              )}
+              renderTags={(selected) =>
+                selected.length > 0 ? [`${selected.length} selected`] : []
+              }
+              componentsProps={{
+                paper: {
+                  sx: {
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  },
+                },
+              }}
+              sx={{ minWidth: 200 }}
+            />
+          )}
+
+          {selectedTable === AuditoryTables.DOORLOCKACCESSLOGS && (
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 160,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "8px",
+                  backgroundColor: "#fff",
+                },
+              }}
+            >
+              <InputLabel>Access Status</InputLabel>
+              <Select
+                name="success"
+                value={
+                  filters.success !== null && filters.success !== undefined
+                    ? String(filters.success)
+                    : ""
+                }
+                onChange={(e: SelectChangeEvent<string>) => {
+                  const value = e.target.value;
+                  handleSelectChange(
+                    "success",
+                    value === "" ? null : Number(value),
+                  );
+                }}
+                label="Access Status"
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      backgroundColor: "#fff",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                    },
+                  },
+                }}
+              >
+                <MenuItem value="">
+                  <em>All</em>
+                </MenuItem>
+                <MenuItem value="1">Successful</MenuItem>
+                <MenuItem value="0">Failed</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+
+          {/* Download button for DoorLock Access Logs */}
+          {selectedTable === AuditoryTables.DOORLOCKACCESSLOGS && (
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<Download />}
+              onClick={handleDownloadExcel}
+              sx={{
+                borderRadius: "20px",
+                padding: "8px 20px",
+                textTransform: "none",
+                fontWeight: 600,
+              }}
+            >
+              Download Audit
+            </Button>
+          )}
+
+          {/* Reset Filtering */}
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="flex items-center gap-1.5 text-red-500 font-medium border border-[#EAEAEA] rounded-full px-4 py-2 hover:bg-red-50 transition-colors cursor-pointer whitespace-nowrap bg-[#F7F7F7]"
+          >
+            Reset Filtering
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </Box>
+      </LocalizationProvider>
+    </Box>
+  );
+};
+
+export default AuditoryFilters;

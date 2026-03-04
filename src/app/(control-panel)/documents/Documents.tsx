@@ -1,4 +1,4 @@
-import NavbarToggleButton from "@/components/theme-layouts/components/navbar/NavbarToggleButton";
+import TopbarHeader from "@/components/TopbarHeader";
 import RowActionMenu from "@/components/ui/RowActionMenu";
 import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
 import useUser from "@auth/useUser";
@@ -327,12 +327,7 @@ function Documents() {
   return (
     <>
       <Root
-        header={
-          <div className="p-6 flex items-center justify-between">
-            {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
-            <h2 className="text-2xl font-bold">Documentos</h2>
-          </div>
-        }
+        header={<TopbarHeader />}
         content={
           <div className="p-6 w-full">
             <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>

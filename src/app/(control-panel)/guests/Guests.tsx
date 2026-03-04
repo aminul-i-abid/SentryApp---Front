@@ -1,5 +1,5 @@
 import { ConfirmationModal } from "@/components/ConfirmationModal";
-import NavbarToggleButton from "@/components/theme-layouts/components/navbar/NavbarToggleButton";
+import TopbarHeader from "@/components/TopbarHeader";
 import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
 import useUser from "@auth/useUser";
 import useAuth from "@fuse/core/FuseAuthProvider/useAuth";
@@ -705,12 +705,7 @@ function Guests() {
   return (
     <>
       <Root
-        header={
-          <div className="p-6 flex items-center justify-between">
-            {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
-            <h2 className="text-2xl font-bold">Lista de Huéspedes</h2>
-          </div>
-        }
+        header={<TopbarHeader />}
         content={
           <div className="p-6 w-full">
             {/* Top actions */}

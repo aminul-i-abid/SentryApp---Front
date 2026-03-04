@@ -1,4 +1,4 @@
-import NavbarToggleButton from "@/components/theme-layouts/components/navbar/NavbarToggleButton";
+import TopbarHeader from "@/components/TopbarHeader";
 import FormDialog from "@/components/ui/FormDialog";
 import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
 import FusePageSimple from "@fuse/core/FusePageSimple";
@@ -399,12 +399,7 @@ function Notifications() {
   return (
     <>
       <Root
-        header={
-          <div className="p-6 flex items-center justify-between">
-            {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
-            <h2 className="text-2xl font-bold">Notificaciones</h2>
-          </div>
-        }
+        header={<TopbarHeader />}
         content={
           <div className="p-6 w-full">
             <Box display="flex" justifyContent="flex-end" mb={2}>

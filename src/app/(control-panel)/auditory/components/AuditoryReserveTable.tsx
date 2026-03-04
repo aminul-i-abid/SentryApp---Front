@@ -1,29 +1,31 @@
-import React, { useState, useEffect } from 'react'
-import RoomDetailSidebar from '@/app/(control-panel)/room/components/RoomDetailSidebar';
-import ReserveDetailSidebar from '@/app/(control-panel)/reserve/component/ReserveDetailSidebar';
-import { getReservationsLogs } from '../auditoryService';
-import { Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, CircularProgress, Alert, Chip, Typography } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
-import { ReserveLogDto, PaginatedReserveLogsDto } from '../models/ReserveLogDto';
-import { Routes, buildRoute } from '@/utils/routesEnum';
+import ReserveDetailSidebar from "@/app/(control-panel)/reserve/component/ReserveDetailSidebar";
+import RoomDetailSidebar from "@/app/(control-panel)/room/components/RoomDetailSidebar";
+import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
+import { RootState } from "@/store/store";
+import { Routes, buildRoute } from "@/utils/routesEnum";
+import { Chip, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { getReservationsLogs } from "../auditoryService";
+import { ReserveLogDto } from "../models/ReserveLogDto";
 
 const AuditoryReserveTable = () => {
   const [roomSidebarOpen, setRoomSidebarOpen] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [reserveSidebarOpen, setReserveSidebarOpen] = useState(false);
-  const [selectedReserveId, setSelectedReserveId] = useState<number | null>(null);
+  const [selectedReserveId, setSelectedReserveId] = useState<number | null>(
+    null,
+  );
   const [data, setData] = useState<ReserveLogDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage] = useState(15);
 
-  // Obtener filtros del estado global
   const filters = useSelector((state: RootState) => state.auditoryFilters);
 
-  const fetchData = async (pageNumber: number = 1, pageSize: number = 10) => {
+  const fetchData = async (pageNumber: number = 1, pageSize: number = 15) => {
     setLoading(true);
     setError(null);
     try {
@@ -31,8 +33,8 @@ const AuditoryReserveTable = () => {
       setData(response.data.items);
       setTotalCount(response.data.totalCount);
     } catch (err: any) {
-      setError('Error al cargar los datos de auditoría de reservas');
-      console.error('Error fetching reserve logs:', err);
+      setError("Error loading reservation audit data");
+      console.error("Error fetching reserve logs:", err);
     } finally {
       setLoading(false);
     }
@@ -40,202 +42,239 @@ const AuditoryReserveTable = () => {
 
   useEffect(() => {
     fetchData(page + 1, rowsPerPage);
-  }, [page, rowsPerPage, filters.fechaDesde, filters.fechaHasta, filters.roomId]);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  }, [
+    page,
+    rowsPerPage,
+    filters.fechaDesde,
+    filters.fechaHasta,
+    filters.roomId,
+  ]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleString("es-ES", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const formatDateOnly = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES');
+    return new Date(dateString).toLocaleDateString("es-ES");
   };
 
-  const getActivityColor = (activity: string | null) => {
+  const getActivityColor = (
+    activity: string | null,
+  ): "success" | "warning" | "error" | "default" => {
     switch (activity?.toLowerCase()) {
-      case 'create':
-      case 'created':
-        return 'success';
-      case 'update':
-      case 'updated':
-        return 'warning';
-      case 'delete':
-      case 'deleted':
-        return 'error';
+      case "create":
+      case "created":
+        return "success";
+      case "update":
+      case "updated":
+        return "warning";
+      case "delete":
+      case "deleted":
+        return "error";
       default:
-        return 'default';
+        return "default";
     }
   };
 
-    return (
-      <>
-        <Card>
-          {error && (
-            <Alert severity="error" sx={{ margin: 2 }}>
-              {error}
-            </Alert>
-          )}
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Bulk ID</TableCell>
-                  <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Reserva</TableCell>
-                  <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Habitación Asignada</TableCell>
-                  <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Habitación</TableCell>
-                  <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Check In</TableCell>
-                  <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Check Out</TableCell>
-                  <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Acción</TableCell>
-                  <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Fecha</TableCell>
-                  <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Creado por</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={9} align="center">
-                      <Box display="flex" flexDirection="column" alignItems="center" padding="40px 0">
-                        <CircularProgress size={40} />
-                        <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-                          Cargando datos...
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ) : data.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={9} align="center">
-                      <Box display="flex" flexDirection="column" alignItems="center" padding="40px 0">
-                        <Typography variant="body2" color="textSecondary">
-                          No hay datos disponibles
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  data.map((row) => (
-                    <TableRow key={row.id} hover>
-                      <TableCell
-                        sx={{
-                          fontSize: '0.75rem',
-                          cursor: row.guid && row.idBulkReservation ? 'pointer' : 'default',
-                          color: row.guid && row.idBulkReservation ? '#0A74DA' : 'inherit',
-                          textDecoration: row.guid && row.idBulkReservation ? 'underline' : 'none',
-                          textUnderlineOffset: '2px',
-                          fontWeight: row.guid && row.idBulkReservation ? 600 : 'inherit',
-                          transition: 'color 0.2s',
-                        }}
-                        onClick={() => {
-                          if (row.guid && row.idBulkReservation) {
-                            const url = buildRoute(Routes.RESERVE_BULK, { id: String(row.idBulkReservation) });
-                            window.open(url, '_blank');
-                          }
-                        }}
-                      >
-                        {row.guid || '-'}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontSize: '0.75rem',
-                          cursor: row.idReservation ? 'pointer' : 'default',
-                          color: row.idReservation ? '#0A74DA' : 'inherit',
-                          textDecoration: row.idReservation ? 'underline' : 'none',
-                          textUnderlineOffset: '2px',
-                          fontWeight: row.idReservation ? 600 : 'inherit',
-                          transition: 'color 0.2s',
-                        }}
-                        onClick={() => {
-                          if (row.idReservation) {
-                            setSelectedReserveId(row.idReservation);
-                            setReserveSidebarOpen(true);
-                          }
-                        }}
-                      >
-                         {row.idReservation} - {row.nameGuest}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem', textAlign: 'center' }}>
-                        <Chip 
-                          label={row.roomAssigned ? 'Sí' : 'No'} 
-                          color={row.roomAssigned ? 'success' : 'error'}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontSize: '0.75rem',
-                          cursor: row.idRoom ? 'pointer' : 'default',
-                          color: row.idRoom ? '#0A74DA' : 'inherit',
-                          textDecoration: row.idRoom ? 'underline' : 'none',
-                          textUnderlineOffset: '2px',
-                          fontWeight: row.idRoom ? 600 : 'inherit',
-                          transition: 'color 0.2s',
-                        }}
-                        onClick={() => {
-                          if (row.idRoom) {
-                            setSelectedRoomId(row.idRoom);
-                            setRoomSidebarOpen(true);
-                          }
-                        }}
-                      >
-                        {row.roomNumber || '-'}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem' }}>{formatDateOnly(row.checkIn)}</TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem' }}>{formatDateOnly(row.checkOut)}</TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem' }}>
-                        <Chip 
-                          label={row.activityEnumDescription || 'N/A'} 
-                          color={getActivityColor(row.activityEnumDescription)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem' }}>{formatDate(row.created)}</TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem' }}>{row.nameCreatedBy || row.createdBy || '-'}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Box display="flex" justifyContent="center" alignItems="center" width="100%" mt={1}>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, 50]}
-              component="div"
-              count={totalCount}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="Filas por página:"
-              labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
-            />
-          </Box>
-        </Card>
-        <RoomDetailSidebar
-          open={roomSidebarOpen}
-          onClose={() => setRoomSidebarOpen(false)}
-          roomId={selectedRoomId}
-        />
-        <ReserveDetailSidebar
-          open={reserveSidebarOpen}
-          onClose={() => setReserveSidebarOpen(false)}
-          reserveId={selectedReserveId}
-        />
-      </>
-    );
-}
+  const columns = useMemo<TableColumnDef<ReserveLogDto>[]>(
+    () => [
+      {
+        id: "guid",
+        label: "Bulk ID",
+        width: "120px",
+        render: (row) => {
+          const isClickable = row.guid && row.idBulkReservation;
+          return (
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: "0.8rem",
+                cursor: isClickable ? "pointer" : "default",
+                color: isClickable ? "#0A74DA" : "inherit",
+                textDecoration: isClickable ? "underline" : "none",
+                textUnderlineOffset: "2px",
+                fontWeight: isClickable ? 600 : "inherit",
+                "&:hover": isClickable ? { opacity: 0.8 } : {},
+              }}
+              onClick={() => {
+                if (isClickable) {
+                  const url = buildRoute(Routes.RESERVE_BULK, {
+                    id: String(row.idBulkReservation),
+                  });
+                  window.open(url, "_blank");
+                }
+              }}
+            >
+              {row.guid || "-"}
+            </Typography>
+          );
+        },
+      },
+      {
+        id: "nameGuest",
+        label: "Reserva",
+        width: "200px",
+        render: (row) => (
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: "0.8rem",
+              cursor: row.idReservation ? "pointer" : "default",
+              color: row.idReservation ? "#0A74DA" : "inherit",
+              textDecoration: row.idReservation ? "underline" : "none",
+              textUnderlineOffset: "2px",
+              fontWeight: row.idReservation ? 600 : "inherit",
+              "&:hover": row.idReservation ? { opacity: 0.8 } : {},
+            }}
+            onClick={() => {
+              if (row.idReservation) {
+                setSelectedReserveId(row.idReservation);
+                setReserveSidebarOpen(true);
+              }
+            }}
+          >
+            {row.idReservation
+              ? `${row.idReservation} - ${row.nameGuest}`
+              : row.nameGuest || "-"}
+          </Typography>
+        ),
+      },
+      {
+        id: "roomAssigned",
+        label: "Habitación Asignada",
+        width: "140px",
+        align: "center",
+        render: (row) => (
+          <Chip
+            label={row.roomAssigned ? "Sí" : "No"}
+            color={row.roomAssigned ? "success" : "error"}
+            size="small"
+          />
+        ),
+      },
+      {
+        id: "roomNumber",
+        label: "Habitación",
+        width: "110px",
+        render: (row) => (
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: "0.8rem",
+              cursor: row.idRoom ? "pointer" : "default",
+              color: row.idRoom ? "#0A74DA" : "inherit",
+              textDecoration: row.idRoom ? "underline" : "none",
+              textUnderlineOffset: "2px",
+              fontWeight: row.idRoom ? 600 : "inherit",
+              "&:hover": row.idRoom ? { opacity: 0.8 } : {},
+            }}
+            onClick={() => {
+              if (row.idRoom) {
+                setSelectedRoomId(row.idRoom);
+                setRoomSidebarOpen(true);
+              }
+            }}
+          >
+            {row.roomNumber || "-"}
+          </Typography>
+        ),
+      },
+      {
+        id: "checkIn",
+        label: "Check In",
+        width: "110px",
+        render: (row) => (
+          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+            {formatDateOnly(row.checkIn)}
+          </Typography>
+        ),
+      },
+      {
+        id: "checkOut",
+        label: "Check Out",
+        width: "110px",
+        render: (row) => (
+          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+            {formatDateOnly(row.checkOut)}
+          </Typography>
+        ),
+      },
+      {
+        id: "activityEnumDescription",
+        label: "Acción",
+        width: "100px",
+        align: "center",
+        render: (row) => (
+          <Chip
+            label={row.activityEnumDescription || "N/A"}
+            color={getActivityColor(row.activityEnumDescription)}
+            size="small"
+          />
+        ),
+      },
+      {
+        id: "created",
+        label: "Fecha",
+        width: "150px",
+        render: (row) => (
+          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+            {formatDate(row.created)}
+          </Typography>
+        ),
+      },
+      {
+        id: "nameCreatedBy",
+        label: "Creado por",
+        width: "180px",
+        render: (row) => (
+          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+            {row.nameCreatedBy || row.createdBy || "-"}
+          </Typography>
+        ),
+      },
+    ],
+    [],
+  );
 
-export default AuditoryReserveTable
+  const handlePageChange = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  return (
+    <>
+      <StyledTable<ReserveLogDto>
+        columns={columns}
+        data={data}
+        getRowId={(row) => String(row.id)}
+        loading={loading}
+        loadingMessage="Cargando datos..."
+        emptyMessage={error || "No se encontraron datos de auditoría"}
+        pagination={{
+          count: totalCount,
+          page,
+          rowsPerPage,
+          onPageChange: handlePageChange,
+        }}
+        minWidth={1300}
+      />
+      <RoomDetailSidebar
+        open={roomSidebarOpen}
+        onClose={() => setRoomSidebarOpen(false)}
+        roomId={selectedRoomId}
+      />
+      <ReserveDetailSidebar
+        open={reserveSidebarOpen}
+        onClose={() => setReserveSidebarOpen(false)}
+        reserveId={selectedReserveId}
+      />
+    </>
+  );
+};
+
+export default AuditoryReserveTable;

@@ -1,196 +1,230 @@
-import React from "react"
+import { CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    Grid,
-    TextField,
+    Box,
+    Checkbox,
     FormControl,
+    FormControlLabel,
     InputLabel,
-    Select,
     MenuItem,
     OutlinedInput,
-    Chip,
-    Box,
-    Button,
-    Divider,
+    Select,
     Typography,
-    FormControlLabel,
-    Checkbox,
-} from "@mui/material"
-import { useTheme } from "@mui/material/styles"
-import { FilterAlt, Clear, RadioButtonUnchecked, CheckCircle } from "@mui/icons-material"
-import { ContractorResponse } from "../../contractors/models/ContractorResponse"
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { format, isValid, parseISO } from "date-fns";
+import React from "react";
+import { ContractorResponse } from "../../contractors/models/ContractorResponse";
 
 interface FiltersSectionProps {
-    filters: {
-        fechaDesde: string
-        fechaHasta: string
-        contratistas: number[]
-        active: boolean
-    }
-    contractors: ContractorResponse[]
-    isLoadingContractors: boolean
-    isAdmin: boolean
-    user?: any
-    onFilterChange: (field: string, value: any) => void
-    onResetFilters: () => void
+  filters: {
+    fechaDesde: string;
+    fechaHasta: string;
+    contratistas: number[];
+    active: boolean;
+  };
+  contractors: ContractorResponse[];
+  isLoadingContractors: boolean;
+  isAdmin: boolean;
+  user?: any;
+  onFilterChange: (field: string, value: any) => void;
+  onResetFilters: () => void;
 }
 
-const FiltersSection: React.FC<FiltersSectionProps> = ({ 
+const FiltersSection: React.FC<FiltersSectionProps> = ({
   filters,
   contractors,
   isLoadingContractors,
   isAdmin,
   user,
   onFilterChange,
-  onResetFilters
+  onResetFilters,
 }) => {
-    const theme = useTheme()
+  const theme = useTheme();
 
-    return (
-        <Card
-            sx={{
-                border: "1px solid #e2e8f0",
-                borderRadius: 2,
-                "&:hover": {
-                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                },
-            }}
+  return (
+    <Box
+      sx={{
+        backgroundColor: "#fff",
+        padding: 3,
+        borderRadius: "12px",
+      }}
+    >
+      {/* Title */}
+      <Typography
+        variant="h5"
+        sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
+      >
+        Filters
+      </Typography>
+
+      {/* Row: Start date, End date, Contractors, Active, Reset */}
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            alignItems: "center",
+          }}
         >
-            <CardHeader
-                title={
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <FilterAlt sx={{ color: theme.palette.primary.main }} />
-                        <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
-                            Filtros
-                        </Typography>
-                    </Box>
-                }
-            />
-            <Divider />
-            <CardContent sx={{ pt: 3 }}>
-                <Grid container spacing={3} alignItems="center">
-                    {/* Fecha Desde */}
-                    <Grid item xs={12} sm={6} md={2}>
-                        <TextField
-                            fullWidth
-                            label="Fecha Desde"
-                            type="date"
-                            value={filters.fechaDesde}
-                            onChange={(e) => onFilterChange("fechaDesde", e.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            sx={{
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: 1,
-                                },
-                            }}
-                        />
-                    </Grid>
+          {/* Start date */}
+          <DatePicker
+            label="Start date"
+            value={filters.fechaDesde ? parseISO(filters.fechaDesde) : null}
+            onChange={(date: Date | null) => {
+              if (date && isValid(date)) {
+                onFilterChange("fechaDesde", format(date, "yyyy-MM-dd"));
+              } else {
+                onFilterChange("fechaDesde", "");
+              }
+            }}
+            slotProps={{
+              desktopPaper: {
+                sx: {
+                  backgroundColor: "#fff",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  borderRadius: "12px",
+                },
+              },
+              textField: {
+                size: "small",
+                sx: {
+                  minWidth: 200,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "8px",
+                    backgroundColor: "#fff",
+                  },
+                },
+              },
+            }}
+          />
 
-                    {/* Fecha Hasta */}
-                    <Grid item xs={12} sm={6} md={2}>
-                        <TextField
-                            fullWidth
-                            label="Fecha Hasta"
-                            type="date"
-                            value={filters.fechaHasta}
-                            onChange={(e) => onFilterChange("fechaHasta", e.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            sx={{
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: 1,
-                                },
-                            }}
-                        />
-                    </Grid>
+          {/* End date */}
+          <DatePicker
+            label="End date"
+            value={filters.fechaHasta ? parseISO(filters.fechaHasta) : null}
+            onChange={(date: Date | null) => {
+              if (date && isValid(date)) {
+                onFilterChange("fechaHasta", format(date, "yyyy-MM-dd"));
+              } else {
+                onFilterChange("fechaHasta", "");
+              }
+            }}
+            slotProps={{
+              desktopPaper: {
+                sx: {
+                  backgroundColor: "#fff",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  borderRadius: "12px",
+                },
+              },
+              textField: {
+                size: "small",
+                sx: {
+                  minWidth: 200,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "8px",
+                    backgroundColor: "#fff",
+                  },
+                },
+              },
+            }}
+          />
 
-                    {/* Select Múltiple de Contratistas */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        {isAdmin && (
-                            <FormControl fullWidth>
-                                <InputLabel>Contratistas</InputLabel>
-                                <Select
-                                    multiple
-                                    value={filters.contratistas}
-                                    onChange={(e) => onFilterChange("contratistas", e.target.value)}
-                                    input={<OutlinedInput label="Contratistas" />}
-                                    renderValue={(selected) => (
-                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                            {selected.map((contractorId) => {
-                                                const contractor = contractors.find((c) => c.id === contractorId)
-                                                return <Chip key={contractorId} label={contractor?.name || `Contratista ${contractorId}`} size="small" />
-                                            })}
-                                        </Box>
-                                    )}
-                                    disabled={isLoadingContractors}
-                                    sx={{
-                                        borderRadius: 1,
-                                    }}
-                                >
-                                    {contractors.map((contractor) => (
-                                        <MenuItem key={contractor.id} value={contractor.id}>
-                                            {contractor.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        )}
-                    </Grid>
+          {/* Contractors (admin only) */}
+          {isAdmin && (
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 200,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "8px",
+                  backgroundColor: "#fff",
+                },
+              }}
+            >
+              <InputLabel>Contractors</InputLabel>
+              <Select
+                multiple
+                value={filters.contratistas}
+                onChange={(e) => onFilterChange("contratistas", e.target.value)}
+                input={<OutlinedInput label="Contractors" />}
+                renderValue={(selected) => {
+                  if (selected.length === 0) return null;
+                  if (selected.length === 1) {
+                    const c = contractors.find((ct) => ct.id === selected[0]);
+                    return c?.name || `Contractor ${selected[0]}`;
+                  }
+                  return `${selected.length} selected`;
+                }}
+                disabled={isLoadingContractors}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      backgroundColor: "#fff",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                      maxHeight: 300,
+                    },
+                  },
+                }}
+              >
+                {contractors.map((contractor) => (
+                  <MenuItem key={contractor.id} value={contractor.id}>
+                    {contractor.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
 
-                    {/* Checkbox Activos */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={filters.active}
-                                    onChange={(e) => onFilterChange("active", e.target.checked)}
-                                    icon={<RadioButtonUnchecked />}
-                                    checkedIcon={<CheckCircle />}
-                                    sx={{
-                                        "&.Mui-checked": {
-                                            color: theme.palette.primary.main,
-                                        },
-                                        "&:hover": {
-                                            backgroundColor: "rgba(10, 116, 218, 0.04)",
-                                        },
-                                    }}
-                                />
-                            }
-                            label="Reservas activas"
-                            sx={{
-                                margin: 0,
-                                alignItems: "center",
-                            }}
-                        />
-                    </Grid>
+          {/* Active checkbox */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={filters.active}
+                onChange={(e) => onFilterChange("active", e.target.checked)}
+                icon={<RadioButtonUnchecked />}
+                checkedIcon={<CheckCircle />}
+                sx={{
+                  "&.Mui-checked": {
+                    color: theme.palette.primary.main,
+                  },
+                }}
+              />
+            }
+            label="Active reservations"
+            sx={{ margin: 0 }}
+          />
 
-                    {/* Botón Resetear */}
-                    <Grid item xs={12} sm={6} md={2}>
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            color="secondary"
-                            startIcon={<Clear />}
-                            onClick={onResetFilters}
-                            sx={{
-                                borderRadius: 1,
-                                padding: "12px 16px",
-                                textTransform: "none",
-                                fontWeight: 600,
-                            }}
-                        >
-                            Resetear
-                        </Button>
-                    </Grid>
-                </Grid>
-            </CardContent>
-        </Card>
-    )
-}
+          {/* Reset Filtering */}
+          <button
+            type="button"
+            onClick={onResetFilters}
+            className="flex items-center gap-1.5 text-red-500 font-medium border border-[#EAEAEA] rounded-full px-4 py-2 hover:bg-red-50 transition-colors cursor-pointer whitespace-nowrap bg-[#F7F7F7]"
+          >
+            Reset Filtering
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </Box>
+      </LocalizationProvider>
+    </Box>
+  );
+};
 
-export default FiltersSection
+export default FiltersSection;

@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react'
-import RoomDetailSidebar from '@/app/(control-panel)/room/components/RoomDetailSidebar';
-import { Routes, buildRoute } from '@/utils/routesEnum';
-import { getRoomLogs } from '../auditoryService';
-import { Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, Chip } from '@mui/material';
-import { RoomLogDto, PaginatedRoomLogsDto } from '../models/RoomLogDto';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
+import RoomDetailSidebar from "@/app/(control-panel)/room/components/RoomDetailSidebar";
+import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
+import { RootState } from "@/store/store";
+import { Routes, buildRoute } from "@/utils/routesEnum";
+import { Chip, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { getRoomLogs } from "../auditoryService";
+import { RoomLogDto } from "../models/RoomLogDto";
 
 const AuditoryRoomTable = () => {
   const [data, setData] = useState<RoomLogDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-  
-  // Obtenemos los filtros del estado global
+  const [rowsPerPage] = useState<number>(10);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+
   const filters = useSelector((state: RootState) => state.auditoryFilters);
 
   const fetchData = async () => {
@@ -29,7 +31,7 @@ const AuditoryRoomTable = () => {
         setTotalCount(0);
       }
     } catch (error) {
-      console.error('Error fetching room logs:', error);
+      console.error("Error fetching room logs:", error);
       setData([]);
       setTotalCount(0);
     } finally {
@@ -39,153 +41,165 @@ const AuditoryRoomTable = () => {
 
   useEffect(() => {
     fetchData();
-  }, [page, rowsPerPage, filters.fechaDesde, filters.fechaHasta, filters.roomId, filters.blockId]);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  }, [
+    page,
+    rowsPerPage,
+    filters.fechaDesde,
+    filters.fechaHasta,
+    filters.roomId,
+    filters.blockId,
+  ]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleString("es-ES", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
-  const getStatusColor = (status: number) => {
+  const getStatusColor = (
+    status: number,
+  ): "error" | "success" | "warning" | "default" => {
     switch (status) {
-      case 0: return 'error';     // Fallido
-      case 1: return 'success';   // Exitoso
-      case 2: return 'warning';   // Pendiente
-      default: return 'default';
+      case 0:
+        return "error";
+      case 1:
+        return "success";
+      case 2:
+        return "warning";
+      default:
+        return "default";
     }
   };
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+  const columns = useMemo<TableColumnDef<RoomLogDto>[]>(
+    () => [
+      {
+        id: "roomNumber",
+        label: "Habitación",
+        render: (row) => (
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: "0.8rem",
+              cursor: row.roomId ? "pointer" : "default",
+              color: row.roomId ? "#0A74DA" : "inherit",
+              textDecoration: row.roomId ? "underline" : "none",
+              textUnderlineOffset: "2px",
+              fontWeight: row.roomId ? 600 : "inherit",
+            }}
+            onClick={() => {
+              if (row.roomId) {
+                setSelectedRoomId(row.roomId);
+                setSidebarOpen(true);
+              }
+            }}
+          >
+            {row.roomNumber || "-"}
+          </Typography>
+        ),
+      },
+      {
+        id: "message",
+        label: "Mensaje",
+        render: (row) => (
+          <Typography
+            variant="body2"
+            noWrap
+            title={row.message || ""}
+            sx={{ fontSize: "0.8rem" }}
+          >
+            {row.message || "-"}
+          </Typography>
+        ),
+      },
+      {
+        id: "blockName",
+        label: "Bloque",
+        render: (row) => (
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: "0.8rem",
+              cursor: row.blockId ? "pointer" : "default",
+              color: row.blockId ? "#0A74DA" : "inherit",
+              textDecoration: row.blockId ? "underline" : "none",
+              textUnderlineOffset: "2px",
+              fontWeight: row.blockId ? 600 : "inherit",
+            }}
+            onClick={() => {
+              if (row.blockId) {
+                const url = buildRoute(Routes.CAMPS_BLOCK_ROOM, {
+                  id: String(row.blockId),
+                });
+                window.open(url, "_blank");
+              }
+            }}
+          >
+            {row.blockName || "-"}
+          </Typography>
+        ),
+      },
+      {
+        id: "statusDescription",
+        label: "Estado",
+        render: (row) => (
+          <Chip
+            label={row.statusDescription || "Sin estado"}
+            color={getStatusColor(row.status)}
+            size="small"
+          />
+        ),
+      },
+      {
+        id: "activityEnumDescription",
+        label: "Acción",
+        render: (row) => (
+          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+            {row.activityEnumDescription || "-"}
+          </Typography>
+        ),
+      },
+      {
+        id: "created",
+        label: "Fecha",
+        render: (row) => (
+          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+            {formatDate(row.created)}
+          </Typography>
+        ),
+      },
+      {
+        id: "nameCreatedBy",
+        label: "Creado por",
+        render: (row) => (
+          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+            {row.nameCreatedBy || row.createdBy || "-"}
+          </Typography>
+        ),
+      },
+    ],
+    [],
+  );
+
   return (
     <>
-      <Card>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Habitación</TableCell>
-                <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Mensaje</TableCell>
-                <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Bloque</TableCell>
-                <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Estado</TableCell>
-                <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Acción</TableCell>
-                <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Fecha</TableCell>
-                <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Creado por</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0' }}>
-                      <span style={{ color: '#888' }}>Cargando datos...</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : data.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0' }}>
-                      <span style={{ color: '#888' }}>No hay datos disponibles</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data.map((row) => (
-                  <TableRow key={row.id} hover>
-                    <TableCell
-                      sx={{
-                        fontSize: '0.85rem',
-                        cursor: row.roomId ? 'pointer' : 'default',
-                        color: row.roomId ? '#0A74DA' : 'inherit',
-                        textDecoration: row.roomId ? 'underline' : 'none',
-                        textUnderlineOffset: '2px',
-                        fontWeight: row.roomId ? 600 : 'inherit',
-                        transition: 'color 0.2s',
-                      }}
-                      onClick={() => {
-                        if (row.roomId) {
-                          setSelectedRoomId(row.roomId);
-                          setSidebarOpen(true);
-                        }
-                      }}
-                    >
-                      {row.roomNumber || '-'}
-                    </TableCell>
-                    <TableCell sx={{ fontSize: '0.85rem', maxWidth: 200 }}>
-                      <Typography variant="body2" noWrap title={row.message || ''}>
-                        {row.message || '-'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontSize: '0.85rem',
-                        cursor: row.blockId ? 'pointer' : 'default',
-                        color: row.blockId ? '#0A74DA' : 'inherit',
-                        textDecoration: row.blockId ? 'underline' : 'none',
-                        textUnderlineOffset: '2px',
-                        fontWeight: row.blockId ? 600 : 'inherit',
-                        transition: 'color 0.2s',
-                      }}
-                      onClick={() => {
-                        if (row.blockId) {
-                          const url = buildRoute(Routes.CAMPS_BLOCK_ROOM, { id: String(row.blockId) });
-                          window.open(url, '_blank');
-                        }
-                      }}
-                    >
-                      {row.blockName || '-'}
-                    </TableCell>
-                    <TableCell sx={{ fontSize: '0.85rem' }}>
-                      <Chip 
-                        label={row.statusDescription || 'Sin estado'} 
-                        color={getStatusColor(row.status)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell sx={{ fontSize: '0.85rem' }}>
-                      {row.activityEnumDescription || '-'}
-                    </TableCell>
-                    <TableCell sx={{ fontSize: '0.85rem' }}>
-                      {formatDate(row.created)}
-                    </TableCell>
-                    <TableCell sx={{ fontSize: '0.85rem' }}>
-                      {row.nameCreatedBy || row.createdBy || '-'}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-          <Box display="flex" justifyContent="center" alignItems="center" width="100%" mt={1}>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, 50]}
-              component="div"
-              count={totalCount}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="Filas por página:"
-              labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
-            />
-          </Box>
-        </TableContainer>
-      </Card>
+      <StyledTable<RoomLogDto>
+        columns={columns}
+        data={data}
+        getRowId={(row) => String(row.id)}
+        loading={loading}
+        emptyMessage="No hay datos disponibles"
+        pagination={{
+          count: totalCount,
+          page,
+          rowsPerPage,
+          onPageChange: (_e, newPage) => setPage(newPage),
+        }}
+      />
       <RoomDetailSidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -193,6 +207,6 @@ const AuditoryRoomTable = () => {
       />
     </>
   );
-}
+};
 
-export default AuditoryRoomTable
+export default AuditoryRoomTable;

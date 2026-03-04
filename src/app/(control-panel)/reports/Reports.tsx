@@ -1,52 +1,63 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import FusePageSimple from '@fuse/core/FusePageSimple';
-import { styled, useTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
-import NavbarToggleButton from '@/components/theme-layouts/components/navbar/NavbarToggleButton';
-import { useSnackbar } from 'notistack';
-import { useLoading } from '@/contexts/LoadingContext';
-import { getContractors } from '../contractors/contractorsService';
-import { ContractorResponse } from '../contractors/models/ContractorResponse';
-import { generateExcelReport, ReportExcelRequest } from './reportsService';
-import FiltersSection from './components/FiltersSection';
-import ReservationsOptions from './components/ReservationsOptions';
-import RoomsOptions from './components/RoomsOptions';
-import SpecificFieldsSelector, { SpecificFields } from './components/SpecificFieldsSelector';
-import DownloadButton from './components/DownloadButton';
-import { Grid } from '@mui/material';
-import useUser from "@auth/useUser"
+import TopbarHeader from "@/components/TopbarHeader";
+import { useLoading } from "@/contexts/LoadingContext";
+import useUser from "@auth/useUser";
+import FusePageSimple from "@fuse/core/FusePageSimple";
+import { Grid, useMediaQuery } from "@mui/material";
+import { styled, useTheme } from "@mui/material/styles";
+import { useSnackbar } from "notistack";
+import React, { useEffect, useState } from "react";
+import { getContractors } from "../contractors/contractorsService";
+import { ContractorResponse } from "../contractors/models/ContractorResponse";
+import DownloadButton from "./components/DownloadButton";
+import FiltersSection from "./components/FiltersSection";
+import SpecificFieldsSelector, {
+  SpecificFields,
+} from "./components/SpecificFieldsSelector";
+import { generateExcelReport, ReportExcelRequest } from "./reportsService";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
-  '& .FusePageSimple-header': {
+  "& .FusePageSimple-header": {
     backgroundColor: theme.palette.background.paper,
     borderBottomWidth: 1,
-    borderStyle: 'solid',
-    borderColor: theme.palette.divider
+    borderStyle: "solid",
+    borderColor: theme.palette.divider,
   },
-  '& .FusePageSimple-content': {},
-  '& .FusePageSimple-sidebarHeader': {},
-  '& .FusePageSimple-sidebarContent': {}
+  "& .FusePageSimple-content": {},
+  "& .FusePageSimple-content > .container": {
+    maxWidth: "100% !important",
+    padding: "0 !important",
+    width: "100%",
+  },
+  "& .FusePageSimple-header > .container": {
+    maxWidth: "100% !important",
+    padding: "0 !important",
+    width: "100%",
+  },
+  "& .FusePageSimple-sidebarHeader": {},
+  "& .FusePageSimple-sidebarContent": {},
 }));
 
 const Reports: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
   const { enqueueSnackbar } = useSnackbar();
   const { showLoading, hideLoading } = useLoading();
-  const { data: user } = useUser()
-  console.log("User in Reports:", user)
+  const { data: user } = useUser();
+  console.log("User in Reports:", user);
 
   // Verificar si el usuario es admin
-  const isAdmin = user?.role === "Sentry_Admin" || (Array.isArray(user?.role) && user?.role.includes("Sentry_Admin"))
+  const isAdmin =
+    user?.role === "Sentry_Admin" ||
+    (Array.isArray(user?.role) && user?.role.includes("Sentry_Admin"));
 
   // Estados para los filtros
   const [filters, setFilters] = useState({
-    fechaDesde: '',
-    fechaHasta: '',
+    fechaDesde: "",
+    fechaHasta: "",
     contratistas: [] as number[],
-    active: true
+    active: true,
   });
 
   // Estados para contratistas
@@ -57,14 +68,14 @@ const Reports: React.FC = () => {
   const [reservasOptions, setReservasOptions] = useState({
     informacionHuesped: false,
     informacionContratistas: false,
-    informacionTtlock: false
+    informacionTtlock: false,
   });
 
   // Estados para las opciones de Habitaciones
   const [habitacionesOptions, setHabitacionesOptions] = useState({
     piso: false,
     camas: false,
-    cantReservas: false
+    cantReservas: false,
   });
 
   // Estados para los campos específicos
@@ -81,7 +92,7 @@ const Reports: React.FC = () => {
     checkin: false,
     checkout: false,
     contratista: false,
-    pin: false
+    pin: false,
   });
 
   // Cargar contratistas al montar el componente
@@ -93,12 +104,16 @@ const Reports: React.FC = () => {
         if (response.succeeded) {
           setContractors(response.data || []);
         } else {
-          console.error('Error fetching contractors:', response.message);
-          enqueueSnackbar('Error al cargar los contratistas', { variant: 'error' });
+          console.error("Error fetching contractors:", response.message);
+          enqueueSnackbar("Error al cargar los contratistas", {
+            variant: "error",
+          });
         }
       } catch (error) {
-        console.error('Error fetching contractors:', error);
-        enqueueSnackbar('Error al cargar los contratistas', { variant: 'error' });
+        console.error("Error fetching contractors:", error);
+        enqueueSnackbar("Error al cargar los contratistas", {
+          variant: "error",
+        });
       } finally {
         setIsLoadingContractors(false);
       }
@@ -109,50 +124,50 @@ const Reports: React.FC = () => {
 
   // Función para manejar cambios en los filtros
   const handleFilterChange = (field: string, value: any) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   // Función para resetear filtros
   const handleResetFilters = () => {
     setFilters({
-      fechaDesde: '',
-      fechaHasta: '',
+      fechaDesde: "",
+      fechaHasta: "",
       contratistas: [],
-      active: true
+      active: true,
     });
   };
 
   // Función para manejar cambios en las opciones de Reservas
   const handleReservasChange = (option: string) => {
-    setReservasOptions(prev => ({
+    setReservasOptions((prev) => ({
       ...prev,
-      [option]: !prev[option as keyof typeof prev]
+      [option]: !prev[option as keyof typeof prev],
     }));
   };
 
   // Función para manejar cambios en las opciones de Habitaciones
   const handleHabitacionesChange = (option: string) => {
-    setHabitacionesOptions(prev => ({
+    setHabitacionesOptions((prev) => ({
       ...prev,
-      [option]: !prev[option as keyof typeof prev]
+      [option]: !prev[option as keyof typeof prev],
     }));
   };
 
   // Función para manejar cambios en los campos específicos
   const handleSpecificFieldChange = (field: string) => {
-    setSpecificFields(prev => ({
+    setSpecificFields((prev) => ({
       ...prev,
-      [field]: !prev[field as keyof typeof prev]
+      [field]: !prev[field as keyof typeof prev],
     }));
   };
 
   // Función para descargar Excel
   const handleDownloadExcel = async () => {
     try {
-      showLoading('Se está generando el reporte Excel, aguarde un instante...');
+      showLoading("Se está generando el reporte Excel, aguarde un instante...");
 
       // Mapear los valores de los checkboxes al formato esperado por el API
       const reportRequest: ReportExcelRequest = {
@@ -169,44 +184,42 @@ const Reports: React.FC = () => {
           checkin: specificFields.checkin,
           checkout: specificFields.checkout,
           contratista: specificFields.contratista,
-          pin: specificFields.pin
+          pin: specificFields.pin,
         },
         // Agregar los filtros
         startDate: filters.fechaDesde || undefined,
         endDate: filters.fechaHasta || undefined,
-        companyIds: filters.contratistas.length > 0 ? filters.contratistas : undefined,
-        active: filters.active
+        companyIds:
+          filters.contratistas.length > 0 ? filters.contratistas : undefined,
+        active: filters.active,
       };
 
       await generateExcelReport(reportRequest);
 
-      enqueueSnackbar('Reporte Excel generado y descargado exitosamente', { variant: 'success' });
+      enqueueSnackbar("Reporte Excel generado y descargado exitosamente", {
+        variant: "success",
+      });
     } catch (error) {
-      console.error('Error al generar el reporte:', error);
-      enqueueSnackbar('Error al generar el reporte Excel', { variant: 'error' });
+      console.error("Error al generar el reporte:", error);
+      enqueueSnackbar("Error al generar el reporte Excel", {
+        variant: "error",
+      });
     } finally {
       hideLoading();
     }
   };
 
   // Contar opciones seleccionadas
-  const specificFieldsSelectedCount = Object.values(specificFields).filter(Boolean).length;
+  const specificFieldsSelectedCount =
+    Object.values(specificFields).filter(Boolean).length;
   const totalSelected = specificFieldsSelectedCount;
 
   return (
     <Root
-      header={
-        <div className='p-6 flex items-center justify-between'>
-          {isMobile && <NavbarToggleButton className='h-10 w-10 p-0' />}
-          <div className='flex items-center space-x-3'>
-            <h2 className='text-2xl font-bold text-gray-800'>Reportes</h2>
-          </div>
-        </div>
-      }
+      header={<TopbarHeader />}
       content={
-        <div className='p-6'>
-          <div className='flex flex-col space-y-3'>
-
+        <div className="p-6">
+          <div className="flex flex-col space-y-3">
             {/* Sección de Filtros */}
             <FiltersSection
               filters={filters}
