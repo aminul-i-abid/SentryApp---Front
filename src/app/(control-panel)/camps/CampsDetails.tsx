@@ -25,7 +25,9 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
     borderStyle: "solid",
     borderColor: theme.palette.divider,
   },
-  "& .FusePageSimple-content": {},
+  "& .FusePageSimple-content": {
+    backgroundColor: theme.palette.common.white,
+  },
   "& .container": {
     maxWidth: "100% !important",
     padding: "0 !important",
@@ -283,13 +285,20 @@ function CampDetail() {
       <Root
         header={<TopbarHeader />}
         content={
-          <div className="px-8 py-6 w-full">
-            <Typography variant="h5" fontWeight={700} sx={{ mb: 3 }}>
+          <div className="p-6 w-full">
+            <Typography variant="h5" fontWeight={700}>
               Detalles del campamento:
             </Typography>
-            <Grid container spacing={3}>
+            <Box
+              className="py-4"
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", lg: "40% 58%" },
+                gap: 3,
+              }}
+            >
               {/* Left Column */}
-              <Grid item xs={12} md={4}>
+              <Grid className="pb-5 bg-[#f7f7f7] rounded-lg p-4">
                 <DetailCamp
                   camp={camp}
                   fetchData={fetchData}
@@ -297,7 +306,7 @@ function CampDetail() {
                 />
               </Grid>
               {/* Right Column */}
-              <Grid item xs={12} md={8}>
+              <div className="rounded-lg bg-[#f7f7f7] min-w-0 p-4">
                 <Box
                   sx={{
                     display: "flex",
@@ -318,7 +327,7 @@ function CampDetail() {
                       sx={{
                         borderRadius: 3,
                         px: 3,
-                        py: 1,
+                        py: 3,
                         textTransform: "none",
                         fontWeight: 600,
                         color: "#fff",
@@ -353,8 +362,8 @@ function CampDetail() {
                     />
                   )}
                 </Box>
-              </Grid>
-            </Grid>
+              </div>
+            </Box>
           </div>
         }
       />

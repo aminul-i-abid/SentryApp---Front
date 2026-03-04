@@ -378,7 +378,7 @@ function ReservationManagement() {
         content={
           <div className="p-6">
             {/* Filters */}
-            <Box className="mb-6 flex items-center gap-4 flex-wrap">
+            <Box className="mb-6 flex items-center gap-4 flex-wrap bg-white p-3 rounded-lg shadow-sm">
               <FormControl size="small" sx={{ width: 200 }}>
                 <InputLabel id="status-filter-label">
                   {t("management.filters.status")}

@@ -1,197 +1,248 @@
-import React from 'react';
+import SearchIcon from "@mui/icons-material/Search";
 import {
-    Box,
-    TextField,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    OutlinedInput,
-    Chip,
-    SelectChangeEvent,
-    Stack,
-    Button,
-    Autocomplete,
-    Radio,
-    RadioGroup,
-    FormControlLabel,
-    FormLabel,
-    Typography,
-} from '@mui/material';
-import { ContractorResponse } from '../../../contractors/models/ContractorResponse';
+  Autocomplete,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  FormControlLabel,
+  InputAdornment,
+  Radio,
+  RadioGroup,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import React from "react";
+import { ContractorResponse } from "../../../contractors/models/ContractorResponse";
 
 interface RoomTableFiltersProps {
-    searchText: string;
-    selectedCompanies: string[];
-    selectedBlocks: string[];
-    batteryFilter: string;
-    companies: string[];
-    blocks: string[];
-    contractors: ContractorResponse[];
-    onSearchChange: (value: string) => void;
-    onCompaniesChange: (companies: string[]) => void;
-    onBlocksChange: (blocks: string[]) => void;
-    onBatteryFilterChange: (filter: string) => void;
-    onClearFilters: () => void;
+  searchText: string;
+  selectedCompanies: string[];
+  selectedBlocks: string[];
+  batteryFilter: string;
+  companies: string[];
+  blocks: string[];
+  contractors: ContractorResponse[];
+  onSearchChange: (value: string) => void;
+  onCompaniesChange: (companies: string[]) => void;
+  onBlocksChange: (blocks: string[]) => void;
+  onBatteryFilterChange: (filter: string) => void;
+  onClearFilters: () => void;
 }
 
+const accentColor = "#415EDE";
+
 const RoomTableFilters: React.FC<RoomTableFiltersProps> = ({
-    searchText,
-    selectedCompanies,
-    selectedBlocks,
-    batteryFilter,
-    companies,
-    blocks,
-    contractors,
-    onSearchChange,
-    onCompaniesChange,
-    onBlocksChange,
-    onBatteryFilterChange,
-    onClearFilters,
+  searchText,
+  selectedCompanies,
+  selectedBlocks,
+  batteryFilter,
+  companies,
+  blocks,
+  onSearchChange,
+  onCompaniesChange,
+  onBlocksChange,
+  onBatteryFilterChange,
+  onClearFilters,
 }) => {
-    const handleCompanyFilterChange = (event: SelectChangeEvent<string[]>) => {
-        const value = event.target.value;
-        const companies = typeof value === 'string' ? value.split(',') : value;
-        onCompaniesChange(companies);
-    };
+  return (
+    <Box sx={{ width: 340, maxHeight: "80vh", overflowY: "auto" }}>
+      {/* Header */}
+      <Box sx={{ px: 2.5, pt: 2.5, pb: 1.5 }}>
+        <Typography
+          variant="subtitle1"
+          fontWeight={700}
+          sx={{ color: "#1E293B" }}
+        >
+          Filtros
+        </Typography>
+      </Box>
 
-    const handleBlockFilterChange = (event: SelectChangeEvent<string[]>) => {
-        const value = event.target.value;
-        const blocks = typeof value === 'string' ? value.split(',') : value;
-        onBlocksChange(blocks);
-    };
+      <Divider />
 
-    return (
-        <Box sx={{ p: 2, width: 400, maxHeight: '80vh', overflowY: 'auto' }}>
+      <Box sx={{ px: 2.5, py: 2 }}>
+        {/* Search */}
+        <TextField
+          fullWidth
+          placeholder="Buscar habitación"
+          value={searchText}
+          onChange={(e) => onSearchChange(e.target.value)}
+          size="small"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 18, color: "#9CA3AF" }} />
+                </InputAdornment>
+              ),
+            },
+          }}
+          sx={{
+            mb: 2,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "10px",
+              backgroundColor: "#F9FAFB",
+              "&.Mui-focused": {
+                backgroundColor: "#fff",
+              },
+            },
+          }}
+        />
+
+        {/* Contractor filter */}
+        <Autocomplete
+          multiple
+          id="company-filter-autocomplete"
+          options={companies}
+          value={selectedCompanies}
+          onChange={(_event, newValue) => onCompaniesChange(newValue)}
+          renderInput={(params) => (
             <TextField
-                fullWidth
-                label="Buscar habitación"
-                placeholder="Buscar por habitación, contratista o piso..."
-                value={searchText}
-                onChange={(e) => onSearchChange(e.target.value)}
-                sx={{ mb: 2 }}
-                variant="outlined"
+              {...params}
+              placeholder="Filtrar por Contratista"
+              size="small"
+            />
+          )}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                {...getTagProps({ index })}
+                key={option}
+                label={option}
                 size="small"
-            />
+                sx={{
+                  borderRadius: "6px",
+                  backgroundColor: "#EEF2FF",
+                  color: accentColor,
+                  fontWeight: 500,
+                  "& .MuiChip-deleteIcon": { color: accentColor, opacity: 0.6 },
+                }}
+              />
+            ))
+          }
+          sx={{
+            mb: 2,
+            "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+          }}
+          disableCloseOnSelect
+          limitTags={2}
+        />
 
-            <Autocomplete
-                multiple
-                id="company-filter-autocomplete"
-                options={companies}
-                value={selectedCompanies}
-                onChange={(event, newValue) => onCompaniesChange(newValue)}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label="Filtrar por Contratista"
-                        placeholder="Selecciona contratistas..."
-                        size="small"
-                    />
-                )}
-                renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                        <Chip
-                            {...getTagProps({ index })}
-                            key={option}
-                            label={option}
-                            size="small"
-                        />
-                    ))
-                }
-                sx={{ mb: 2 }}
-                disableCloseOnSelect
-                limitTags={2}
+        {/* Block filter */}
+        <Autocomplete
+          multiple
+          id="block-filter-autocomplete"
+          options={blocks}
+          value={selectedBlocks}
+          onChange={(_event, newValue) => onBlocksChange(newValue)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder="Filtrar por Pabellón"
+              size="small"
             />
+          )}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                {...getTagProps({ index })}
+                key={option}
+                label={option}
+                size="small"
+                sx={{
+                  borderRadius: "6px",
+                  backgroundColor: "#EEF2FF",
+                  color: accentColor,
+                  fontWeight: 500,
+                  "& .MuiChip-deleteIcon": { color: accentColor, opacity: 0.6 },
+                }}
+              />
+            ))
+          }
+          sx={{
+            mb: 2,
+            "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+          }}
+          disableCloseOnSelect
+          limitTags={2}
+        />
 
-            <Autocomplete
-                multiple
-                id="block-filter-autocomplete"
-                options={blocks}
-                value={selectedBlocks}
-                onChange={(event, newValue) => onBlocksChange(newValue)}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label="Filtrar por Pabellón"
-                        placeholder="Selecciona pabellones..."
-                        size="small"
-                    />
-                )}
-                renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                        <Chip
-                            {...getTagProps({ index })}
-                            key={option}
-                            label={option}
-                            size="small"
-                        />
-                    ))
-                }
-                sx={{ mb: 2 }}
-                disableCloseOnSelect
-                limitTags={2}
-            />
+        {/* Battery filter */}
+        <Typography
+          variant="body2"
+          fontWeight={600}
+          sx={{ color: "#475569", mb: 1 }}
+        >
+          Filtro de Batería
+        </Typography>
 
-            <FormControl component="fieldset" sx={{ mb: 2, width: '100%' }}>
-                <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem' }}>
-                    Filtro de Batería
-                </FormLabel>
-                <RadioGroup
-                    value={batteryFilter}
-                    onChange={(e) => onBatteryFilterChange(e.target.value)}
+        <RadioGroup
+          value={batteryFilter}
+          onChange={(e) => onBatteryFilterChange(e.target.value)}
+          sx={{ gap: 0.25, ml: 0.5 }}
+        >
+          {[
+            { value: "all", label: "Todas las habitaciones" },
+            { value: "with-battery", label: "Con nivel de batería" },
+            { value: "without-battery", label: "Sin nivel de batería" },
+            { value: "low", label: "Batería baja (< 35%)" },
+            { value: "medium", label: "Batería media (35% - 65%)" },
+            { value: "high", label: "Batería alta (> 65%)" },
+          ].map((opt) => (
+            <FormControlLabel
+              key={opt.value}
+              value={opt.value}
+              control={
+                <Radio
+                  size="small"
+                  sx={{
+                    color: "#CBD5E1",
+                    "&.Mui-checked": { color: accentColor },
+                    p: "4px",
+                  }}
+                />
+              }
+              label={
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#374151", fontSize: "0.8125rem" }}
                 >
-                    <FormControlLabel
-                        value="all"
-                        control={<Radio size="small" />}
-                        label="Todas las habitaciones"
-                    />
-                    <FormControlLabel
-                        value="with-battery"
-                        control={<Radio size="small" />}
-                        label="Con nivel de batería"
-                    />
-                    <FormControlLabel
-                        value="without-battery"
-                        control={<Radio size="small" />}
-                        label="Sin nivel de batería"
-                    />
-                    <FormControlLabel
-                        value="low"
-                        control={<Radio size="small" />}
-                        label={
-                            <Box>
-                                <Typography variant="body2">Batería baja (&lt; 35%)</Typography>
-                            </Box>
-                        }
-                    />
-                    <FormControlLabel
-                        value="medium"
-                        control={<Radio size="small" />}
-                        label={
-                            <Box>
-                                <Typography variant="body2">Batería media (35% - 65%)</Typography>
-                            </Box>
-                        }
-                    />
-                    <FormControlLabel
-                        value="high"
-                        control={<Radio size="small" />}
-                        label={
-                            <Box>
-                                <Typography variant="body2">Batería alta (&gt; 65%)</Typography>
-                            </Box>
-                        }
-                    />
-                </RadioGroup>
-            </FormControl>
+                  {opt.label}
+                </Typography>
+              }
+              sx={{ mx: 0, "& .MuiFormControlLabel-label": { ml: 0.5 } }}
+            />
+          ))}
+        </RadioGroup>
+      </Box>
 
-            <Stack direction="row" spacing={2} sx={{ mt: 2, justifyContent: 'flex-end' }}>
-                <Button onClick={onClearFilters} variant="outlined">
-                    Limpiar filtros
-                </Button>
-            </Stack>
-        </Box>
-    );
+      <Divider />
+
+      {/* Actions */}
+      <Stack
+        direction="row"
+        spacing={1.5}
+        sx={{ px: 2.5, py: 1.5, justifyContent: "flex-end" }}
+      >
+        <Button
+          onClick={onClearFilters}
+          variant="outlined"
+          size="small"
+          sx={{
+            borderRadius: "8px",
+            borderColor: "#E2E8F0",
+            color: "#64748B",
+            textTransform: "none",
+            fontWeight: 600,
+            "&:hover": { borderColor: "#CBD5E1", backgroundColor: "#F8FAFC" },
+          }}
+        >
+          Limpiar filtros
+        </Button>
+      </Stack>
+    </Box>
+  );
 };
 
 export default RoomTableFilters;

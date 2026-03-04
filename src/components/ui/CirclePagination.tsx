@@ -41,23 +41,27 @@ function CirclePagination({
     // Always include first page
     pages.push(0);
 
-    if (page <= 2) {
-      // Near start: 0 1 2 ... last
-      pages.push(1, 2, "ellipsis", totalPages - 1);
-    } else if (page >= totalPages - 3) {
-      // Near end: 0 ... n-3 n-2 n-1
-      pages.push("ellipsis", totalPages - 3, totalPages - 2, totalPages - 1);
-    } else {
-      // Middle: 0 ... page-1 page page+1 ... last
-      pages.push(
-        "ellipsis",
-        page - 1,
-        page,
-        page + 1,
-        "ellipsis",
-        totalPages - 1,
-      );
+    // Determine the visible range around the current page
+    const rangeStart = Math.max(1, page - 1);
+    const rangeEnd = Math.min(totalPages - 2, page + 1);
+
+    // Ellipsis between first page and range start
+    if (rangeStart > 1) {
+      pages.push("ellipsis");
     }
+
+    // Pages in the visible range
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+      pages.push(i);
+    }
+
+    // Ellipsis between range end and last page
+    if (rangeEnd < totalPages - 2) {
+      pages.push("ellipsis");
+    }
+
+    // Always include last page
+    pages.push(totalPages - 1);
 
     return pages;
   };

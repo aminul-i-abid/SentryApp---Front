@@ -76,7 +76,7 @@ function Notifications() {
     },
   ];
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
   const [searchTerm, setSearchTerm] = useState("");
   const [audienceFilter, setAudienceFilter] = useState<
     AudienceNotification | number

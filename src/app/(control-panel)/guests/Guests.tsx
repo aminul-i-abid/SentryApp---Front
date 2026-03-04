@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
+import SearchIcon from "@mui/icons-material/Search";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import {
   Badge,
@@ -18,6 +19,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  InputAdornment,
   Paper,
   Table,
   TableBody,
@@ -101,7 +103,7 @@ function Guests() {
   const [searchValue, setSearchValue] = useState("");
   const [guests, setGuests] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [contractors, setContractors] = useState([]);
@@ -733,37 +735,88 @@ function Guests() {
 
             {/* Filters */}
             <Box
-              display="flex"
-              flexDirection={{ xs: "column", sm: "row" }}
-              flexWrap="wrap"
-              alignItems={{ xs: "stretch", sm: "center" }}
-              gap={2}
-              mb={3}
+              sx={(t) => {
+                const isDark = t.palette.mode === "dark";
+                return {
+                  display: "flex",
+                  flexDirection: { xs: "column", md: "row" },
+                  flexWrap: "wrap",
+                  alignItems: { xs: "stretch", md: "center" },
+                  gap: 1.5,
+                  mb: 3,
+                  backgroundColor: isDark ? "#1e1e1e" : "#fff",
+                  border: `1px solid ${isDark ? "#444" : "#e6e3e3"}`,
+                  borderRadius: "12px",
+                  p: 2,
+                };
+              }}
             >
               <TextField
                 variant="outlined"
                 size="small"
-                placeholder="Nombre o Apellido o RUT o Habitación..."
+                placeholder="Nombre, Apellido, RUT o Habitación..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSearch();
                 }}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon sx={{ fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+                sx={(t) => {
+                  const isDark = t.palette.mode === "dark";
+                  return {
+                    flex: { xs: "1 1 100%", md: "1 1 220px" },
+                    minWidth: 200,
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: isDark ? "#2a2a2a" : "#F3F4F6",
+                      "& fieldset": {
+                        borderColor: isDark ? "#444" : "#e6e3e3",
+                      },
+                      "&:hover fieldset": { borderColor: "#415EDE" },
+                      "&.Mui-focused fieldset": { borderColor: "#415EDE" },
+                    },
+                  };
+                }}
               />
               {isSentryAdmin && (
                 <TextField
                   select
-                  label="Filtrar por Contratista"
+                  label="Contratista"
                   size="small"
                   value={selectedCompanyId}
                   onChange={(e) => setSelectedCompanyId(e.target.value)}
-                  style={{ minWidth: 180 }}
                   slotProps={{
                     inputLabel: { shrink: true },
                     select: { native: true },
                   }}
-                  sx={{ width: { xs: "100%", sm: "auto" } }}
+                  sx={(t) => {
+                    const isDark = t.palette.mode === "dark";
+                    return {
+                      minWidth: 160,
+                      flex: { xs: "1 1 100%", sm: "0 1 auto" },
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "10px",
+                        backgroundColor: isDark ? "#2a2a2a" : "#F3F4F6",
+                        "& fieldset": {
+                          borderColor: isDark ? "#444" : "#e6e3e3",
+                        },
+                        "&:hover fieldset": { borderColor: "#415EDE" },
+                        "&.Mui-focused fieldset": { borderColor: "#415EDE" },
+                      },
+                      "& .MuiInputLabel-root": {
+                        fontWeight: 500,
+                        "&.Mui-focused": { color: "#415EDE" },
+                      },
+                    };
+                  }}
                 >
                   <option value="">Todas</option>
                   {contractors.map((c) => (
@@ -775,16 +828,34 @@ function Guests() {
               )}
               <TextField
                 select
-                label="Estado de Reserva"
+                label="Estado"
                 size="small"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                style={{ minWidth: 140 }}
                 slotProps={{
                   inputLabel: { shrink: true },
                   select: { native: true },
                 }}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
+                sx={(t) => {
+                  const isDark = t.palette.mode === "dark";
+                  return {
+                    minWidth: 130,
+                    flex: { xs: "1 1 100%", sm: "0 1 auto" },
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: isDark ? "#2a2a2a" : "#F3F4F6",
+                      "& fieldset": {
+                        borderColor: isDark ? "#444" : "#e6e3e3",
+                      },
+                      "&:hover fieldset": { borderColor: "#415EDE" },
+                      "&.Mui-focused fieldset": { borderColor: "#415EDE" },
+                    },
+                    "& .MuiInputLabel-root": {
+                      fontWeight: 500,
+                      "&.Mui-focused": { color: "#415EDE" },
+                    },
+                  };
+                }}
               >
                 <option value="">Todos</option>
                 <option value={0}>Activo</option>
@@ -793,16 +864,34 @@ function Guests() {
               </TextField>
               <TextField
                 select
-                label="Filtrar por Pabellón"
+                label="Pabellón"
                 size="small"
                 value={selectedBlockId}
                 onChange={(e) => setSelectedBlockId(e.target.value)}
-                style={{ minWidth: 140 }}
                 slotProps={{
                   inputLabel: { shrink: true },
                   select: { native: true },
                 }}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
+                sx={(t) => {
+                  const isDark = t.palette.mode === "dark";
+                  return {
+                    minWidth: 130,
+                    flex: { xs: "1 1 100%", sm: "0 1 auto" },
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: isDark ? "#2a2a2a" : "#F3F4F6",
+                      "& fieldset": {
+                        borderColor: isDark ? "#444" : "#e6e3e3",
+                      },
+                      "&:hover fieldset": { borderColor: "#415EDE" },
+                      "&.Mui-focused fieldset": { borderColor: "#415EDE" },
+                    },
+                    "& .MuiInputLabel-root": {
+                      fontWeight: 500,
+                      "&.Mui-focused": { color: "#415EDE" },
+                    },
+                  };
+                }}
               >
                 <option value="">Todos</option>
                 {blocks.map((block) => (
@@ -813,16 +902,34 @@ function Guests() {
               </TextField>
               <TextField
                 select
-                label="Filtrar por PIN"
+                label="PIN"
                 size="small"
                 value={pinFilter}
                 onChange={(e) => setPinFilter(e.target.value)}
-                style={{ minWidth: 140 }}
                 slotProps={{
                   inputLabel: { shrink: true },
                   select: { native: true },
                 }}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
+                sx={(t) => {
+                  const isDark = t.palette.mode === "dark";
+                  return {
+                    minWidth: 120,
+                    flex: { xs: "1 1 100%", sm: "0 1 auto" },
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: isDark ? "#2a2a2a" : "#F3F4F6",
+                      "& fieldset": {
+                        borderColor: isDark ? "#444" : "#e6e3e3",
+                      },
+                      "&:hover fieldset": { borderColor: "#415EDE" },
+                      "&.Mui-focused fieldset": { borderColor: "#415EDE" },
+                    },
+                    "& .MuiInputLabel-root": {
+                      fontWeight: 500,
+                      "&.Mui-focused": { color: "#415EDE" },
+                    },
+                  };
+                }}
               >
                 <option value="">Todos</option>
                 <option value="without">Sin PIN</option>

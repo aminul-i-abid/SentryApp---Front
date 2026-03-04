@@ -97,7 +97,7 @@ function Reserve() {
   const { data: user } = useUser();
   const [openModal, setOpenModal] = React.useState(false);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage] = React.useState(10);
+  const [rowsPerPage] = React.useState(15);
   const [reserves, setReserves] = useState<BulkReserve[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);

@@ -282,7 +282,7 @@ function MyReservations() {
         content={
           <div className="p-6">
             {/* Date Filter */}
-            <Box className="mb-6 flex items-center gap-4">
+            <Box className="mb-6 flex items-center gap-4 bg-white p-3 rounded-lg shadow-sm w-fit">
               <TextField
                 label={t("reservations.filters.fromDate")}
                 type="date"

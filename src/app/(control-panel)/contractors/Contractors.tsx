@@ -12,15 +12,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Paper,
   Popover,
   Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   useMediaQuery,
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
@@ -31,7 +24,7 @@ import AddContractorModal from "./component/AddContractorModal";
 import EditContractorModal from "./component/EditContractorModal";
 
 import TopbarHeader from "@/components/TopbarHeader";
-import CirclePagination from "@/components/ui/CirclePagination";
+import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
 import {
   createContractor,
   deleteContractor,
@@ -67,7 +60,7 @@ function Contractors() {
   const [contractors, setContractors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -111,6 +104,50 @@ function Contractors() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  const contractorColumns: TableColumnDef<any>[] = [
+    { id: "name", label: "Nombre", width: "14%", render: (row) => row.name },
+    { id: "rut", label: "RUT", width: "10%", render: (row) => row.rut },
+    {
+      id: "contactPerson",
+      label: "Persona de contacto",
+      width: "16%",
+      render: (row) => row.contactPerson,
+    },
+    {
+      id: "contactEmail",
+      label: "Correo electrónico de contacto",
+      width: "18%",
+      render: (row) => row.contactEmail,
+    },
+    {
+      id: "contactPhone",
+      label: "Número de teléfono de contacto",
+      width: "16%",
+      render: (row) => row.contactPhone,
+    },
+    {
+      id: "rooms",
+      label: "Habitaciones",
+      width: "8%",
+      render: (row) => String(row.rooms?.length ?? 0).padStart(2, "0"),
+    },
+    {
+      id: "state",
+      label: "Estado",
+      width: "8%",
+      render: (row) => (
+        <span
+          style={{
+            color:
+              theme.palette.mode === "dark" ? "#e0e0e0" : "#000000",
+          }}
+        >
+          {row.state ? "Activos" : "Inactivos"}
+        </span>
+      ),
+    },
+  ];
 
   const handleDeleteClick = (contractor) => {
     setSelectedContractor(contractor);
@@ -259,233 +296,46 @@ function Contractors() {
                 Nuevos contratistas
               </Button>
             </div>
-            <TableContainer
-              component={Paper}
-              elevation={0}
-              sx={{
-                border: "none",
-                boxShadow: "none",
-                backgroundColor: "transparent",
-                overflowX: "auto",
-              }}
-            >
-              <Table
-                sx={{
-                  borderCollapse: "separate",
-                  borderSpacing: "0 8px",
-                  tableLayout: "fixed",
-                  minWidth: 1200,
-                  width: "100%",
-                }}
-              >
-                <colgroup>
-                  <col style={{ width: "14%" }} />
-                  <col style={{ width: "10%" }} />
-                  <col style={{ width: "16%" }} />
-                  <col style={{ width: "18%" }} />
-                  <col style={{ width: "16%" }} />
-                  <col style={{ width: "8%" }} />
-                  <col style={{ width: "8%" }} />
-                  <col style={{ width: "10%" }} />
-                </colgroup>
-                <TableHead>
-                  <TableRow
-                    sx={(t) => {
-                      const isDark = t.palette.mode === "dark";
-                      const borderColor = isDark ? "#444" : "#e6e3e3";
-                      return {
-                        "& th": {
-                          backgroundColor: isDark ? "#1e1e1e" : "#fff",
-                          py: "12px",
-                          borderTop: `1px solid ${borderColor}`,
-                          borderBottom: `1px solid ${borderColor}`,
-                          "&:first-of-type": {
-                            borderLeft: `1px solid ${borderColor}`,
-                            borderTopLeftRadius: "12px",
-                            borderBottomLeftRadius: "12px",
-                          },
-                          "&:last-of-type": {
-                            borderRight: `1px solid ${borderColor}`,
-                            borderTopRightRadius: "12px",
-                            borderBottomRightRadius: "12px",
-                          },
-                        },
-                      };
-                    }}
+            <StyledTable
+              columns={contractorColumns}
+              data={contractors.slice(
+                page * rowsPerPage,
+                page * rowsPerPage + rowsPerPage,
+              )}
+              getRowId={(row) => row.id}
+              loading={loading}
+              renderActions={(contractor) => (
+                <>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleContractorClick(contractor.id)}
+                    sx={(t) => ({
+                      color:
+                        t.palette.mode === "dark" ? "#9ca3af" : "#6b7280",
+                    })}
                   >
-                    <TableCell sx={{ color: "#415EDE", fontWeight: 600 }}>
-                      Nombre
-                    </TableCell>
-                    <TableCell sx={{ color: "#415EDE", fontWeight: 600 }}>
-                      RUT
-                    </TableCell>
-                    <TableCell sx={{ color: "#415EDE", fontWeight: 600 }}>
-                      Persona de contacto
-                    </TableCell>
-                    <TableCell sx={{ color: "#415EDE", fontWeight: 600 }}>
-                      Correo electrónico de contacto
-                    </TableCell>
-                    <TableCell sx={{ color: "#415EDE", fontWeight: 600 }}>
-                      Número de teléfono de contacto
-                    </TableCell>
-                    <TableCell sx={{ color: "#415EDE", fontWeight: 600 }}>
-                      Habitaciones
-                    </TableCell>
-                    <TableCell sx={{ color: "#415EDE", fontWeight: 600 }}>
-                      Estado
-                    </TableCell>
-                    <TableCell
-                      sx={{ color: "#415EDE", fontWeight: 600 }}
-                      align="center"
-                    >
-                      acción
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-              </Table>
-              <div
-                style={{
-                  backgroundColor:
-                    theme.palette.mode === "dark" ? "#1e1e1e" : "#fff",
-                  border: `1px solid ${theme.palette.mode === "dark" ? "#444" : "#eaeaea"}`,
-                  borderRadius: "12px",
-                  padding: "4px 6px",
-                  minWidth: 1200,
-                }}
-              >
-                <Table
-                  sx={{
-                    borderCollapse: "separate",
-                    borderSpacing: "0 5px",
-                    tableLayout: "fixed",
-                    minWidth: 1200,
-                    width: "100%",
-                  }}
-                >
-                  <colgroup>
-                    <col style={{ width: "14%" }} />
-                    <col style={{ width: "10%" }} />
-                    <col style={{ width: "16%" }} />
-                    <col style={{ width: "18%" }} />
-                    <col style={{ width: "16%" }} />
-                    <col style={{ width: "8%" }} />
-                    <col style={{ width: "8%" }} />
-                    <col style={{ width: "10%" }} />
-                  </colgroup>
-                  <TableBody>
-                    {contractors.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={8} align="center">
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "center",
-                              padding: "40px 0",
-                            }}
-                          >
-                            <span style={{ color: "#888" }}>
-                              No se encontraron datos
-                            </span>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      contractors
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage,
-                        )
-                        .map((contractor) => (
-                          <TableRow
-                            key={contractor.id}
-                            hover
-                            sx={(t) => ({
-                              "& td": {
-                                backgroundColor:
-                                  t.palette.mode === "dark"
-                                    ? "#2a2a2a"
-                                    : "#F3F4F6",
-                                borderBottom: "none",
-                                py: "6px",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                "&:first-of-type": {
-                                  borderTopLeftRadius: "12px",
-                                  borderBottomLeftRadius: "12px",
-                                },
-                                "&:last-of-type": {
-                                  borderTopRightRadius: "12px",
-                                  borderBottomRightRadius: "12px",
-                                },
-                              },
-                            })}
-                          >
-                            <TableCell>{contractor.name}</TableCell>
-                            <TableCell>{contractor.rut}</TableCell>
-                            <TableCell>{contractor.contactPerson}</TableCell>
-                            <TableCell>{contractor.contactEmail}</TableCell>
-                            <TableCell>{contractor.contactPhone}</TableCell>
-                            <TableCell>
-                              {String(contractor.rooms?.length ?? 0).padStart(
-                                2,
-                                "0",
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <span
-                                style={{
-                                  color:
-                                    theme.palette.mode === "dark"
-                                      ? "#e0e0e0"
-                                      : "#000000",
-                                }}
-                              >
-                                {contractor.state ? "Activos" : "Inactivos"}
-                              </span>
-                            </TableCell>
-                            <TableCell align="center">
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  handleContractorClick(contractor.id)
-                                }
-                                sx={(t) => ({
-                                  color:
-                                    t.palette.mode === "dark"
-                                      ? "#9ca3af"
-                                      : "#6b7280",
-                                })}
-                              >
-                                <VisibilityIcon fontSize="small" />
-                              </IconButton>
-                              <IconButton
-                                size="small"
-                                onClick={(e) => handleMenuOpen(e, contractor)}
-                                sx={(t) => ({
-                                  color:
-                                    t.palette.mode === "dark"
-                                      ? "#9ca3af"
-                                      : "#6b7280",
-                                })}
-                              >
-                                <MoreVertIcon fontSize="small" />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-              <CirclePagination
-                count={contractors.length}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                onPageChange={handleChangePage}
-              />
-            </TableContainer>
+                    <VisibilityIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleMenuOpen(e, contractor)}
+                    sx={(t) => ({
+                      color:
+                        t.palette.mode === "dark" ? "#9ca3af" : "#6b7280",
+                    })}
+                  >
+                    <MoreVertIcon fontSize="small" />
+                  </IconButton>
+                </>
+              )}
+              actionsLabel="acción"
+              pagination={{
+                count: contractors.length,
+                page,
+                rowsPerPage,
+                onPageChange: handleChangePage,
+              }}
+            />
 
             {/* Action menu popover */}
             <Popover
