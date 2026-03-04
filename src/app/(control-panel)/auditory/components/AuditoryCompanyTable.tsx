@@ -16,7 +16,7 @@ const AuditoryCompanyTable = () => {
 
   const filters = useSelector((state: RootState) => state.auditoryFilters);
 
-  const fetchData = async () => {
+  const fetchData = async (p0: number, rowsPerPage: number) => {
     setLoading(true);
     try {
       const response = await getCompaniesLogs(page + 1, rowsPerPage);
