@@ -10,13 +10,11 @@ import Battery60Icon from "@mui/icons-material/Battery60";
 import BatteryFullIcon from "@mui/icons-material/BatteryFull";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import HistoryIcon from "@mui/icons-material/History";
 import InfoIcon from "@mui/icons-material/Info";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import SearchIcon from "@mui/icons-material/Search";
 import {
@@ -671,7 +669,7 @@ function RoomCards({
           {
             key: "active",
             label: "Información activa",
-            icon: <InfoOutlinedIcon fontSize="small" />,
+            icon: <img src="/assets/icons/info.png" />,
             toggle: true,
             checked: !room.disabled,
             onClick: () => handleDisabledChange(room, !room.disabled),
@@ -679,7 +677,7 @@ function RoomCards({
           {
             key: "edit",
             label: "Editar información",
-            icon: <EditIcon fontSize="small" />,
+            icon: <img src="/assets/icons/edit-black.png" />,
             onClick: () => handleRoomClick(room),
           },
           {
@@ -703,9 +701,8 @@ function RoomCards({
           {
             key: "delete",
             label: "Eliminar",
-            icon: <DeleteOutlineIcon fontSize="small" />,
+            icon: <img src="/assets/icons/delete.png" />,
             color: "error.main",
-            dividerAbove: true,
             onClick: () => {
               setSelectedRoom(room);
               setIsDeleteModalOpen(true);
