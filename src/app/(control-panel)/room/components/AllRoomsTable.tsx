@@ -14,7 +14,6 @@ import {
   Modal,
   Popover,
   Select,
-  Stack,
   TextField,
   Toolbar,
   Tooltip,
@@ -902,48 +901,135 @@ const AllRoomsTable: React.FC<AllRoomsTableProps> = ({ contractors }) => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: { xs: "90vw", sm: 440 },
             bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
+            borderRadius: "16px",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+            p: 0,
+            overflow: "hidden",
           }}
         >
-          <Typography variant="h6" component="h2" mb={2}>
-            {pendingDisabledState ? "Deshabilitar" : "Habilitar"} Habitaciï¿½n
-          </Typography>
-          <Typography variant="body2" mb={3}>
-            ï¿½Estï¿½s seguro que deseas{" "}
-            {pendingDisabledState ? "deshabilitar" : "habilitar"} la
-            habitaciï¿½n <strong>{selectedRoom?.roomNumber}</strong>?
-          </Typography>
-          <TextField
-            fullWidth
-            label={
-              pendingDisabledState ? "Motivo (requerido)" : "Motivo (opcional)"
-            }
-            placeholder={`Ingresa el motivo para ${pendingDisabledState ? "deshabilitar" : "habilitar"} la habitaciï¿½n...`}
-            value={disableComments}
-            onChange={(e) => setDisableComments(e.target.value)}
-            multiline
-            rows={3}
-            sx={{ mb: 3 }}
-            required={pendingDisabledState}
-          />
-          <Stack direction="row" spacing={2} sx={{ "& > *": { flex: 1 } }}>
-            <Button onClick={handleDisableCancel} variant="outlined" fullWidth>
+          {/* Header */}
+          <Box
+            sx={{
+              px: 3,
+              pt: 3,
+              pb: 2,
+              borderBottom: "1px solid #eaeaea",
+              bgcolor: "#FAFBFC",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                fontSize: "1.1rem",
+                color: pendingDisabledState ? "#DC2626" : "#16A34A",
+              }}
+            >
+              {pendingDisabledState ? "Deshabilitar" : "Habilitar"} Habitación
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ color: "text.secondary", mt: 0.5, fontSize: "0.875rem" }}
+            >
+              ¿Estás seguro que deseas{" "}
+              {pendingDisabledState ? "deshabilitar" : "habilitar"} la
+              habitación <strong>{selectedRoom?.roomNumber}</strong>?
+            </Typography>
+          </Box>
+
+          {/* Body */}
+          <Box sx={{ px: 3, py: 2.5 }}>
+            <TextField
+              fullWidth
+              label={
+                pendingDisabledState
+                  ? "Motivo (requerido)"
+                  : "Motivo (opcional)"
+              }
+              placeholder={`Ingresa el motivo para ${pendingDisabledState ? "deshabilitar" : "habilitar"} la habitación...`}
+              value={disableComments}
+              onChange={(e) => setDisableComments(e.target.value)}
+              multiline
+              rows={3}
+              required={pendingDisabledState}
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                  bgcolor: "#F3F4F6",
+                  fontSize: "0.9rem",
+                  "& fieldset": { borderColor: "#E5E7EB" },
+                  "&:hover fieldset": { borderColor: "#415EDE" },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#415EDE",
+                    borderWidth: 2,
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  fontSize: "0.9rem",
+                  "&.Mui-focused": { color: "#415EDE" },
+                },
+              }}
+            />
+          </Box>
+
+          {/* Footer */}
+          <Box
+            sx={{
+              px: 3,
+              pb: 3,
+              pt: 0.5,
+              display: "flex",
+              gap: 1.5,
+            }}
+          >
+            <Button
+              onClick={handleDisableCancel}
+              fullWidth
+              variant="outlined"
+              sx={{
+                borderRadius: "12px",
+                textTransform: "none",
+                fontWeight: 600,
+                py: 1.2,
+                borderColor: "#E5E7EB",
+                color: "text.secondary",
+                "&:hover": {
+                  borderColor: "#D1D5DB",
+                  bgcolor: "#F9FAFB",
+                },
+              }}
+            >
               Cancelar
             </Button>
             <Button
               onClick={handleDisableConfirm}
-              variant="contained"
-              color={pendingDisabledState ? "error" : "success"}
               fullWidth
+              variant="contained"
               disabled={pendingDisabledState && !disableComments.trim()}
+              sx={{
+                borderRadius: "12px",
+                textTransform: "none",
+                fontWeight: 600,
+                py: 1.2,
+                boxShadow: "none",
+                bgcolor: pendingDisabledState ? "#DC2626" : "#16A34A",
+                color: "#fff",
+                "&:hover": {
+                  bgcolor: pendingDisabledState ? "#B91C1C" : "#15803D",
+                  boxShadow: "none",
+                },
+                "&.Mui-disabled": {
+                  bgcolor: "#E5E7EB",
+                  color: "#9CA3AF",
+                },
+              }}
             >
               {pendingDisabledState ? "Deshabilitar" : "Habilitar"}
             </Button>
-          </Stack>
+          </Box>
         </Box>
       </Modal>
 
