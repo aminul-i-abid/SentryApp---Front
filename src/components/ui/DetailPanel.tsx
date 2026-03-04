@@ -47,6 +47,8 @@ export interface DetailPanelProps {
 export interface DetailSectionProps {
   /** Section title */
   title: string;
+  /** Optional icon shown to the left of the title */
+  icon?: React.ReactNode;
   /** Optional subtitle / description below the title */
   subtitle?: string;
   /** Right-side action element (e.g. "Show All" link) */
@@ -62,6 +64,7 @@ export interface DetailSectionProps {
  */
 export function DetailSection({
   title,
+  icon,
   subtitle,
   action,
   children,
@@ -77,9 +80,8 @@ export function DetailSection({
         mb: 0,
         // Dotted separator between sections with vertical breathing room
         ...(!hideSeparator && {
-          pb: 3.5,
-          mb: 2.5,
-          borderBottom: "2px dashed #C5CAD4",
+          pb: 3,
+          mb: 2,
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 0,
         }),
@@ -93,21 +95,40 @@ export function DetailSection({
           mb: children ? 2 : 0,
         }}
       >
-        <Box>
-          <Typography
-            variant="subtitle1"
-            sx={{ fontWeight: 700, color: "#1a1a1a", fontSize: "0.95rem" }}
-          >
-            {title}
-          </Typography>
-          {subtitle && (
-            <Typography
-              variant="caption"
-              sx={{ color: "#94A3B8", display: "block", mt: 0.25 }}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+          {icon && (
+            <Box
+              sx={{
+                width: 34,
+                height: 34,
+                borderRadius: "10px",
+                bgcolor: "#F4F6FF",
+                border: "1px solid #E6EEF9",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
             >
-              {subtitle}
-            </Typography>
+              {icon}
+            </Box>
           )}
+          <Box>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: 700, color: "#1a1a1a", fontSize: "0.95rem" }}
+            >
+              {title}
+            </Typography>
+            {subtitle && (
+              <Typography
+                variant="caption"
+                sx={{ color: "#94A3B8", display: "block", mt: 0.25 }}
+              >
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
         </Box>
         {action}
       </Box>
@@ -135,26 +156,47 @@ export interface InfoRowProps {
  */
 export function InfoRow({ icon, label, value }: InfoRowProps) {
   return (
-    <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 0.75,
+      }}
+    >
       {icon && (
-        <Box sx={{ color: "#94A3B8", mt: 0.25, fontSize: 16, display: "flex" }}>
+        <Box
+          sx={{
+            color: "#94A3B8",
+            fontSize: 16,
+            display: "flex",
+            flexShrink: 0,
+          }}
+        >
           {icon}
         </Box>
       )}
-      <Box>
-        <Typography
-          variant="caption"
-          sx={{ color: "#94A3B8", lineHeight: 1.2 }}
-        >
-          {label}
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: 600, color: "#1a1a1a", lineHeight: 1.3 }}
-        >
-          {value}
-        </Typography>
-      </Box>
+      <Typography
+        variant="body2"
+        sx={{
+          color: "#686868",
+          fontSize: "0.78rem",
+          lineHeight: 1.3,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {label}:
+      </Typography>
+      <Typography
+        variant="body2"
+        sx={{
+          fontWeight: 500,
+          color: "#1a1a1a",
+          fontSize: "0.75rem",
+          lineHeight: 1.3,
+        }}
+      >
+        {value}
+      </Typography>
     </Box>
   );
 }

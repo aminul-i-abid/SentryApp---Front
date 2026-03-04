@@ -16,11 +16,6 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
-import ApartmentIcon from "@mui/icons-material/Apartment";
-import BedIcon from "@mui/icons-material/Bed";
-import BusinessIcon from "@mui/icons-material/Business";
-import HomeIcon from "@mui/icons-material/Home";
-import LayersIcon from "@mui/icons-material/Layers";
 import LockIcon from "@mui/icons-material/Lock";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 
@@ -636,38 +631,38 @@ const RoomDetailSidebar: React.FC<RoomDetailSidebarProps> = ({
               </Alert>
             </Collapse>
 
-            <Grid container spacing={2}>
+            <Grid container spacing={1.5}>
               <Grid item xs={6}>
                 <InfoRow
-                  icon={<HomeIcon sx={{ fontSize: 16 }} />}
+                  icon={<img src="./assets/icons/roomspavi.png" />}
                   label="Número de habitación"
                   value={room.roomNumber}
                 />
               </Grid>
               <Grid item xs={6}>
                 <InfoRow
-                  icon={<BedIcon sx={{ fontSize: 16 }} />}
+                  icon={<img src="./assets/icons/nob.png" />}
                   label="Número de camas"
                   value={String(room.beds).padStart(2, "0")}
                 />
               </Grid>
               <Grid item xs={6}>
                 <InfoRow
-                  icon={<BusinessIcon sx={{ fontSize: 16 }} />}
+                  icon={<img src="./assets/icons/camp.png" />}
                   label="Campamento"
                   value={room.company?.name || "N/A"}
                 />
               </Grid>
               <Grid item xs={6}>
                 <InfoRow
-                  icon={<ApartmentIcon sx={{ fontSize: 16 }} />}
+                  icon={<img src="./assets/icons/block.png" />}
                   label="Bloque"
                   value={room.block?.name || "N/A"}
                 />
               </Grid>
               <Grid item xs={6}>
                 <InfoRow
-                  icon={<LayersIcon sx={{ fontSize: 16 }} />}
+                  icon={<img src="./assets/icons/floors.png" />}
                   label="Piso"
                   value={String(room.floorNumber).padStart(2, "0")}
                 />
@@ -723,7 +718,7 @@ const RoomDetailSidebar: React.FC<RoomDetailSidebarProps> = ({
           {/* ============ Lock Information ============ */}
           {isSentryAdmin && hasTTLock && (
             <DetailSection title="Información de la cerradura">
-              <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid container spacing={1.5} sx={{ mb: 2 }}>
                 <Grid item xs={6}>
                   <InfoRow
                     icon={<LockIcon sx={{ fontSize: 16 }} />}
@@ -779,6 +774,46 @@ const RoomDetailSidebar: React.FC<RoomDetailSidebarProps> = ({
               </Box>
             </DetailSection>
           )}
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            {/* Diamond at first */}
+            <Box
+              sx={{
+                width: 5,
+                height: 5,
+                backgroundColor: "#415EDE",
+                transform: "rotate(45deg)",
+                mr: 1,
+                flexShrink: 0,
+              }}
+            />
+
+            {/* Dotted Line */}
+            <Box
+              sx={{
+                flex: 1,
+                borderTop: "1px dashed #415EDE",
+              }}
+            />
+
+            {/* Diamond at end */}
+            <Box
+              sx={{
+                width: 5,
+                height: 5,
+                backgroundColor: "#415EDE",
+                transform: "rotate(45deg)",
+                ml: 1,
+                flexShrink: 0,
+              }}
+            />
+          </Box>
 
           {/* ============ Lock Activity ============ */}
           {isSentryAdmin && hasTTLock && ttlockId && ttlockId.length > 0 && (
@@ -907,9 +942,57 @@ const RoomDetailSidebar: React.FC<RoomDetailSidebarProps> = ({
             </DetailSection>
           )}
 
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            {/* Diamond at first */}
+            <Box
+              sx={{
+                width: 5,
+                height: 5,
+                backgroundColor: "#415EDE",
+                transform: "rotate(45deg)",
+                mr: 1,
+                flexShrink: 0,
+              }}
+            />
+
+            {/* Dotted Line */}
+            <Box
+              sx={{
+                flex: 1,
+                borderTop: "1px dashed #415EDE",
+              }}
+            />
+
+            {/* Diamond at end */}
+            <Box
+              sx={{
+                width: 5,
+                height: 5,
+                backgroundColor: "#415EDE",
+                transform: "rotate(45deg)",
+                ml: 1,
+                flexShrink: 0,
+              }}
+            />
+          </Box>
+
           {/* ============ Status Change History ============ */}
           <DetailSection
             title="Historial de cambios de estado"
+            icon={
+              <Box
+                component="img"
+                src="/assets/icons/sch.png"
+                alt="status history"
+                sx={{ width: 20, height: 20, objectFit: "contain" }}
+              />
+            }
             subtitle={
               disabledHistory.length === 0
                 ? "No se han registrado cambios de estado."
@@ -958,6 +1041,14 @@ const RoomDetailSidebar: React.FC<RoomDetailSidebarProps> = ({
           {hasTTLock && (
             <DetailSection
               title="Historial de PINs únicos"
+              icon={
+                <Box
+                  component="img"
+                  src="/assets/icons/uph.png"
+                  alt="unique pin history"
+                  sx={{ width: 20, height: 20, objectFit: "contain" }}
+                />
+              }
               subtitle={
                 pinUniqueHistory.length === 0
                   ? "No hay PINs únicos registrados para esta habitación."
@@ -1007,6 +1098,14 @@ const RoomDetailSidebar: React.FC<RoomDetailSidebarProps> = ({
           {/* ============ Issues ============ */}
           <DetailSection
             title="Incidencias"
+            icon={
+              <Box
+                component="img"
+                src="/assets/icons/issue.png"
+                alt="issues"
+                sx={{ width: 20, height: 20, objectFit: "contain" }}
+              />
+            }
             subtitle={
               incidents.length === 0
                 ? "No hay incidencias registradas para esta habitación."
@@ -1070,6 +1169,46 @@ const RoomDetailSidebar: React.FC<RoomDetailSidebarProps> = ({
               </Box>
             )}
           </DetailSection>
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            {/* Diamond at first */}
+            <Box
+              sx={{
+                width: 5,
+                height: 5,
+                backgroundColor: "#415EDE",
+                transform: "rotate(45deg)",
+                mr: 1,
+                flexShrink: 0,
+              }}
+            />
+
+            {/* Dotted Line */}
+            <Box
+              sx={{
+                flex: 1,
+                borderTop: "1px dashed #415EDE",
+              }}
+            />
+
+            {/* Diamond at end */}
+            <Box
+              sx={{
+                width: 5,
+                height: 5,
+                backgroundColor: "#415EDE",
+                transform: "rotate(45deg)",
+                ml: 1,
+                flexShrink: 0,
+              }}
+            />
+          </Box>
 
           {/* ============ Latest Bookings ============ */}
           <DetailSection title="Últimas reservas:">
@@ -1174,6 +1313,46 @@ const RoomDetailSidebar: React.FC<RoomDetailSidebarProps> = ({
               </Typography>
             )}
           </DetailSection>
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            {/* Diamond at first */}
+            <Box
+              sx={{
+                width: 5,
+                height: 5,
+                backgroundColor: "#415EDE",
+                transform: "rotate(45deg)",
+                mr: 1,
+                flexShrink: 0,
+              }}
+            />
+
+            {/* Dotted Line */}
+            <Box
+              sx={{
+                flex: 1,
+                borderTop: "1px dashed #415EDE",
+              }}
+            />
+
+            {/* Diamond at end */}
+            <Box
+              sx={{
+                width: 5,
+                height: 5,
+                backgroundColor: "#415EDE",
+                transform: "rotate(45deg)",
+                ml: 1,
+                flexShrink: 0,
+              }}
+            />
+          </Box>
 
           {/* ============ Contractor Change History ============ */}
           {isSentryAdmin && companyHistory && companyHistory.length > 0 && (

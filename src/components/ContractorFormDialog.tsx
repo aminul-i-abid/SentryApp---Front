@@ -1,11 +1,7 @@
-import CloseIcon from "@mui/icons-material/Close";
+import FormDialog from "@/components/ui/FormDialog";
 import {
   Box,
-  Button,
-  CircularProgress,
-  Drawer,
   FormControl,
-  IconButton,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -139,72 +135,18 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
     (isSubmitDisabled ? isSubmitDisabled(formData) : false);
 
   return (
-    <Drawer
-      anchor="right"
+    <FormDialog
       open={open}
       onClose={onClose}
-      slotProps={{
-        backdrop: {
-          sx: {
-            backgroundColor: "rgba(0, 0, 0, 0.15)",
-            backdropFilter: "blur(6px)",
-            WebkitBackdropFilter: "blur(6px)",
-          },
-        },
-      }}
-      PaperProps={{
-        sx: (t) => ({
-          width: { xs: "100%", sm: 520, md: 560 },
-          maxWidth: "100%",
-          borderRadius: 0,
-          p: 0,
-          backgroundColor: t.palette.mode === "dark" ? "#1e1e1e" : "#fff",
-          boxShadow: "-8px 0 30px rgba(0,0,0,0.12)",
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-        }),
-      }}
+      title={title}
+      submitLabel={submitLabel}
+      cancelLabel="Cancelar"
+      loading={isLoading}
+      submitDisabled={disabled}
+      onSubmit={handleSubmit}
+      variant="drawer"
     >
-      {/* ---- Header ---- */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 4,
-          pt: 3.5,
-          pb: 1,
-        }}
-      >
-        <Typography variant="h5" fontWeight={700}>
-          {title}
-        </Typography>
-        <IconButton
-          onClick={onClose}
-          size="small"
-          sx={(t) => ({
-            border: `1px solid ${t.palette.mode === "dark" ? "#444" : "#E5E7EB"}`,
-            width: 36,
-            height: 36,
-          })}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </Box>
-
-      {/* ---- Form body ---- */}
-      <Box
-        sx={{
-          px: 4,
-          py: 3,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2.5,
-          flex: 1,
-          overflowY: "auto",
-        }}
-      >
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
         {/* Row 1: Company Name | Company Tax ID */}
         <Box sx={{ display: "flex", gap: 2 }}>
           <Box sx={{ flex: 1 }}>
@@ -354,57 +296,8 @@ const ContractorFormDialog: React.FC<ContractorFormDialogProps> = ({
 
         {/* ---- Additional content (children) ---- */}
         {children}
-
-        {/* ---- Footer (moved up so buttons sit right under inputs) ---- */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            gap: 2,
-            mt: 1,
-          }}
-        >
-          <Button
-            onClick={onClose}
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              color: "text.primary",
-              px: 3,
-              "&:hover": { backgroundColor: "transparent" },
-            }}
-          >
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            disabled={disabled}
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              borderRadius: "12px",
-              backgroundColor: "#415EDE",
-              px: 3,
-              py: 1,
-              color: "#fff",
-              "&:hover": { backgroundColor: "#3347b8" },
-              "&.Mui-disabled": {
-                backgroundColor: "#a0b0f0",
-                color: "#fff",
-              },
-            }}
-          >
-            {isLoading ? (
-              <CircularProgress size={22} color="inherit" />
-            ) : (
-              submitLabel
-            )}
-          </Button>
-        </Box>
       </Box>
-    </Drawer>
+    </FormDialog>
   );
 };
 

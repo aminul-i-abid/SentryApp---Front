@@ -1,7 +1,5 @@
 ﻿import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import TuneIcon from "@mui/icons-material/Tune";
 import {
@@ -25,6 +23,7 @@ import {
 import React, { useEffect, useMemo, useState } from "react";
 
 import { ConfirmationModal } from "@/components/ConfirmationModal";
+import FormDialog from "@/components/ui/FormDialog";
 import type { ActionMenuItem } from "@/components/ui/RowActionMenu";
 import RowActionMenu from "@/components/ui/RowActionMenu";
 import type { TableColumnDef } from "@/components/ui/StyledTable";
@@ -394,7 +393,7 @@ const AllRoomsTable: React.FC<AllRoomsTableProps> = ({ contractors }) => {
           {
             key: "active",
             label: "Información activa",
-            icon: <InfoOutlinedIcon fontSize="small" />,
+            icon: <img src="./assets/icons/info.png" alt="" />,
             toggle: true,
             checked: !room.disabled,
             onClick: () => handleDisabledChange(room, !room.disabled),
@@ -402,7 +401,7 @@ const AllRoomsTable: React.FC<AllRoomsTableProps> = ({ contractors }) => {
           {
             key: "edit",
             label: "Editar información",
-            icon: <EditIcon fontSize="small" />,
+            icon: <img src="./assets/icons/edit-black.png" alt="" />,
             onClick: () => handleRowClick(room),
           },
           {
@@ -420,9 +419,8 @@ const AllRoomsTable: React.FC<AllRoomsTableProps> = ({ contractors }) => {
           {
             key: "delete",
             label: "Eliminar",
-            icon: <DeleteOutlineIcon fontSize="small" />,
+            icon: <img src="./assets/icons/delete.png" alt="" />,
             color: "error.main",
-            dividerAbove: true,
             onClick: () => {
               setSelectedRoom(room);
               setIsDeleteModalOpen(true);
@@ -714,19 +712,16 @@ const AllRoomsTable: React.FC<AllRoomsTableProps> = ({ contractors }) => {
           <IconButton
             onClick={handleFilterClick}
             sx={{
-              border: "1.5px solid #E2E8F0",
               borderRadius: "10px",
-              p: "6px",
-              color: "#64748B",
-              ...(hasActiveFilters && {
-                bgcolor: "#EEF2FF",
+              p: "7px",
+              bgcolor: hasActiveFilters ? "#415EDE" : "#EEF2FF",
+              color: hasActiveFilters ? "#fff" : "#415EDE",
+              border: `1.5px solid ${hasActiveFilters ? "#415EDE" : "#C7D2FE"}`,
+              transition: "all 0.18s ease",
+              "&:hover": {
+                bgcolor: hasActiveFilters ? "#3347b8" : "#E0E7FF",
                 borderColor: "#415EDE",
-                color: "#415EDE",
-                "&:hover": { bgcolor: "#E0E7FF" },
-              }),
-              ...(!hasActiveFilters && {
-                "&:hover": { bgcolor: "#F8FAFC", borderColor: "#CBD5E1" },
-              }),
+              },
             }}
           >
             <TuneIcon sx={{ fontSize: 20 }} />
@@ -745,10 +740,11 @@ const AllRoomsTable: React.FC<AllRoomsTableProps> = ({ contractors }) => {
         slotProps={{
           paper: {
             sx: {
-              borderRadius: "14px",
-              boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
-              border: "1px solid #eaeaea",
-              mt: 1,
+              borderRadius: "16px",
+              boxShadow:
+                "0 16px 48px rgba(65,94,222,0.10), 0 2px 8px rgba(0,0,0,0.06)",
+              border: "1px solid #E6EEF9",
+              mt: 1.5,
             },
           },
         }}
@@ -811,104 +807,92 @@ const AllRoomsTable: React.FC<AllRoomsTableProps> = ({ contractors }) => {
       />
 
       {/* Bulk Edit Modal */}
-      <Modal open={isBulkEditModalOpen} onClose={handleBulkEditClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" component="h2" mb={2}>
-            Editar habitaciones seleccionadas
+      <FormDialog
+        open={isBulkEditModalOpen}
+        onClose={handleBulkEditClose}
+        title="Editar habitaciones seleccionadas"
+        submitLabel="Guardar cambios"
+        cancelLabel="Cancelar"
+        onSubmit={handleBulkEditSave}
+        submitDisabled={!bulkEditContractor && !bulkEditBeds && !bulkEditTag}
+        maxWidth="xs"
+      >
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 2 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary", mr: 0.5 }}>
+            Editando {selected.length} habitación(es):
           </Typography>
-          <Typography variant="body2" mb={3}>
-            Estï¿½s editando {selected.length} habitaciï¿½n(es):
-            {selectedRooms.map((room) => (
-              <Chip
-                key={room.id}
-                label={room.roomNumber}
-                size="small"
-                sx={{ ml: 0.5, mb: 0.5 }}
-              />
-            ))}
-          </Typography>
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="company-edit-label">Contratista</InputLabel>
-            <Select
-              labelId="company-edit-label"
-              label="Contratista"
-              value={bulkEditContractor}
-              onChange={(e) => setBulkEditContractor(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>No cambiar</em>
-              </MenuItem>
-              {contractors.map((c) => (
-                <MenuItem key={c.id} value={c.id.toString()}>
-                  {c.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="beds-edit-label">Camas</InputLabel>
-            <Select
-              labelId="beds-edit-label"
-              label="Camas"
-              value={bulkEditBeds}
-              onChange={(e) => setBulkEditBeds(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>No cambiar</em>
-              </MenuItem>
-              {[1, 2, 3].map((bed) => (
-                <MenuItem key={bed} value={bed.toString()}>
-                  {bed}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="tag-edit-label">Estándar</InputLabel>
-            <Select
-              labelId="tag-edit-label"
-              label="Estándar"
-              value={bulkEditTag}
-              onChange={(e) => setBulkEditTag(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>No cambiar</em>
-              </MenuItem>
-              {Object.entries(tagRoleMap).map(([key, value]) => (
-                <MenuItem key={key} value={key}>
-                  {value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Stack direction="row" spacing={2} sx={{ "& > *": { flex: 1 } }}>
-            <Button onClick={handleBulkEditClose} variant="outlined" fullWidth>
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleBulkEditSave}
-              variant="contained"
-              color="primary"
-              fullWidth
-              disabled={!bulkEditContractor && !bulkEditBeds && !bulkEditTag}
-            >
-              Guardar cambios
-            </Button>
-          </Stack>
+          {selectedRooms.map((room) => (
+            <Chip
+              key={room.id}
+              label={room.roomNumber}
+              size="small"
+              sx={{
+                bgcolor: "#EEF2FF",
+                color: "#415EDE",
+                fontWeight: 600,
+                border: "1px solid #C7D2FE",
+              }}
+            />
+          ))}
         </Box>
-      </Modal>
+
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel id="company-edit-label">Contratista</InputLabel>
+          <Select
+            labelId="company-edit-label"
+            label="Contratista"
+            value={bulkEditContractor}
+            onChange={(e) => setBulkEditContractor(e.target.value)}
+          >
+            <MenuItem value="">
+              <em>No cambiar</em>
+            </MenuItem>
+            {contractors.map((c) => (
+              <MenuItem key={c.id} value={c.id.toString()}>
+                {c.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel id="beds-edit-label">Camas</InputLabel>
+          <Select
+            labelId="beds-edit-label"
+            label="Camas"
+            value={bulkEditBeds}
+            onChange={(e) => setBulkEditBeds(e.target.value)}
+          >
+            <MenuItem value="">
+              <em>No cambiar</em>
+            </MenuItem>
+            {[1, 2, 3].map((bed) => (
+              <MenuItem key={bed} value={bed.toString()}>
+                {bed}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth>
+          <InputLabel id="tag-edit-label">Estándar</InputLabel>
+          <Select
+            labelId="tag-edit-label"
+            label="Estándar"
+            value={bulkEditTag}
+            onChange={(e) => setBulkEditTag(e.target.value)}
+          >
+            <MenuItem value="">
+              <em>No cambiar</em>
+            </MenuItem>
+            {Object.entries(tagRoleMap).map(([key, value]) => (
+              <MenuItem key={key} value={key}>
+                {value}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </FormDialog>
 
       {/* Disable/Enable Modal */}
       <Modal open={isDisableModalOpen} onClose={handleDisableCancel}>

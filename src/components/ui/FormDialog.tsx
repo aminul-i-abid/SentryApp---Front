@@ -90,7 +90,7 @@ const DialogInner: React.FC<{
           height: 36,
         })}
       >
-        <CloseIcon fontSize="small" />
+        <CloseIcon fontSize="small" sx={{ color: "red" }} />
       </IconButton>
     </Box>
 
@@ -109,6 +109,31 @@ const DialogInner: React.FC<{
         backgroundColor: "#F7F7F7",
         m: 2,
         borderRadius: 2,
+        // ── Global input styles for all children ──
+        "&& .MuiInputBase-root": {
+          backgroundColor: "#fff",
+        },
+        "&& .MuiOutlinedInput-root": {
+          backgroundColor: "#fff",
+          "&:hover": { backgroundColor: "#fff" },
+          "&.Mui-focused": { backgroundColor: "#fff" },
+        },
+        "&& .MuiFilledInput-root": {
+          backgroundColor: "#fff",
+          "&:hover": { backgroundColor: "#fff" },
+          "&.Mui-focused": { backgroundColor: "#fff" },
+        },
+        "&& .MuiSelect-select": {
+          backgroundColor: "#fff",
+        },
+        "&& .MuiInputBase-input": {
+          "&::placeholder": { color: "#9CA3AF", opacity: 1 },
+          "&::-webkit-input-placeholder": { color: "#9CA3AF", opacity: 1 },
+          "&::-moz-placeholder": { color: "#9CA3AF", opacity: 1 },
+        },
+        "&& .MuiNativeSelect-select": {
+          backgroundColor: "#fff",
+        },
       }}
     >
       {children}
@@ -118,7 +143,7 @@ const DialogInner: React.FC<{
           sx={{
             display: "flex",
             justifyContent: "flex-end",
-            gap: 1,
+            gap: 2,
             mt: 3,
           }}
         >
@@ -129,6 +154,9 @@ const DialogInner: React.FC<{
               fontWeight: 600,
               color: "text.primary",
               px: 3,
+              py: 2.5,
+              borderRadius: "30px",
+              backgroundColor: "white",
               "&:hover": { backgroundColor: "transparent" },
             }}
           >
@@ -141,10 +169,10 @@ const DialogInner: React.FC<{
             sx={{
               textTransform: "none",
               fontWeight: 600,
-              borderRadius: "12px",
+              borderRadius: "30px",
               backgroundColor: "#415EDE",
               px: 3,
-              py: 1,
+              py: 2.5,
               color: "#fff",
               "&:hover": { backgroundColor: "#3347b8" },
               "&.Mui-disabled": {

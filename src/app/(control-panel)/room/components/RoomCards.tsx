@@ -1,4 +1,5 @@
 import { ConfirmationModal } from "@/components/ConfirmationModal";
+import FormDialog from "@/components/ui/FormDialog";
 import type { ActionMenuItem } from "@/components/ui/RowActionMenu";
 import RowActionMenu from "@/components/ui/RowActionMenu";
 import type { TableColumnDef } from "@/components/ui/StyledTable";
@@ -11,13 +12,13 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import HistoryIcon from "@mui/icons-material/History";
 import InfoIcon from "@mui/icons-material/Info";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   alpha,
   Box,
@@ -28,7 +29,6 @@ import {
   InputLabel,
   MenuItem,
   Modal,
-  OutlinedInput,
   Popover,
   Select,
   SelectChangeEvent,
@@ -638,25 +638,22 @@ function RoomCards({
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: 0.5,
+              gap: 0.75,
               cursor: "pointer",
               "&:hover": { opacity: 0.7 },
             }}
           >
-            <Typography
-              variant="body2"
-              fontWeight={600}
-              sx={{
-                color: room.disabled ? "#ef4444" : "#22c55e",
-              }}
-            >
+            <Typography variant="body2" fontWeight={500}>
               {room.disabled ? "Off" : "On"}
             </Typography>
-            <FiberManualRecordIcon
-              sx={{
-                fontSize: 14,
-                color: room.disabled ? "#ef4444" : "#22c55e",
-              }}
+            <img
+              src={
+                room.disabled
+                  ? "./assets/icons/off.png"
+                  : "./assets/icons/on.png"
+              }
+              alt={room.disabled ? "Off" : "On"}
+              style={{ width: 20, height: 20, objectFit: "contain" }}
             />
           </Box>
         ),
@@ -760,74 +757,192 @@ function RoomCards({
         open={filterOpen}
         anchorEl={externalFilterAnchorEl}
         onClose={handleFilterClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 1.5,
+              borderRadius: "16px",
+              boxShadow: "0 8px 32px rgba(65, 94, 222, 0.12)",
+              border: "1px solid #E6EEF9",
+              overflow: "hidden",
+            },
+          },
         }}
       >
-        <Box sx={{ p: 2, width: 300 }}>
-          <TextField
-            fullWidth
-            label="Search room"
-            placeholder="Search by room, contractor or floor..."
-            value={searchText}
-            onChange={handleSearchTextChange}
-            sx={{ mb: 2 }}
-            variant="outlined"
-          />
-
-          <FormControl sx={{ width: "100%" }}>
-            <InputLabel id="company-filter-label">
-              Filter by Contractor
-            </InputLabel>
-            <Select
-              labelId="company-filter-label"
-              id="company-filter"
-              multiple
-              value={selectedCompanies}
-              onChange={handleCompanyFilterChange}
-              input={
-                <OutlinedInput
-                  id="select-multiple-companies"
-                  label="Filter by Contractor"
-                />
-              }
-              renderValue={(selected) => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={value} />
-                  ))}
-                </Box>
-              )}
-            >
-              {companies.map((company) => (
-                <MenuItem key={company} value={company}>
-                  {company}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <Stack
-            direction="row"
-            spacing={2}
-            sx={{ mt: 2, justifyContent: "flex-end" }}
+        <Box sx={{ width: 300, maxHeight: "80vh", overflowY: "auto" }}>
+          {/* Header */}
+          <Box
+            sx={{
+              px: 2.5,
+              pt: 2,
+              pb: 1.5,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              borderBottom: "1px solid #F0F0F0",
+            }}
           >
-            <Button onClick={handleClearFilters} variant="outlined">
-              Clear
+            <Box
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: "8px",
+                bgcolor: "#EEF2FF",
+                border: "1px solid #C7D2FE",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <SearchIcon sx={{ fontSize: 16, color: "#415EDE" }} />
+            </Box>
+            <Typography
+              variant="subtitle2"
+              fontWeight={700}
+              sx={{ color: "#1E293B" }}
+            >
+              Filtros
+            </Typography>
+          </Box>
+
+          {/* Body */}
+          <Box
+            sx={{
+              px: 2.5,
+              py: 2,
+              display: "flex",
+              flexDirection: "column",
+              gap: 1.5,
+            }}
+          >
+            <TextField
+              fullWidth
+              placeholder="Buscar habitación..."
+              value={searchText}
+              onChange={handleSearchTextChange}
+              size="small"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <Box
+                      component="span"
+                      sx={{ display: "flex", mr: 0.5, color: "#9CA3AF" }}
+                    >
+                      <SearchIcon sx={{ fontSize: 18 }} />
+                    </Box>
+                  ),
+                },
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "10px",
+                  backgroundColor: "#F3F4F6",
+                  "&.Mui-focused": { backgroundColor: "#fff" },
+                  "& fieldset": { borderColor: "#E5E7EB" },
+                  "&:hover fieldset": { borderColor: "#C7D2FE" },
+                  "&.Mui-focused fieldset": { borderColor: "#415EDE" },
+                },
+              }}
+            />
+
+            <FormControl size="small" fullWidth>
+              <Select
+                multiple
+                displayEmpty
+                value={selectedCompanies}
+                onChange={handleCompanyFilterChange}
+                renderValue={(selected) =>
+                  selected.length === 0 ? (
+                    <Typography sx={{ color: "#9CA3AF", fontSize: "0.875rem" }}>
+                      Filtrar por Contratista
+                    </Typography>
+                  ) : (
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip
+                          key={value}
+                          label={value}
+                          size="small"
+                          sx={{
+                            borderRadius: "6px",
+                            backgroundColor: "#EEF2FF",
+                            color: "#415EDE",
+                            fontWeight: 500,
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  )
+                }
+                sx={{
+                  borderRadius: "10px",
+                  backgroundColor: "#F3F4F6",
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#E5E7EB",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#C7D2FE",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#415EDE",
+                  },
+                  "&.Mui-focused": { backgroundColor: "#fff" },
+                }}
+              >
+                {companies.map((company) => (
+                  <MenuItem key={company} value={company}>
+                    {company}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* Footer */}
+          <Box
+            sx={{
+              px: 2.5,
+              py: 1.5,
+              borderTop: "1px solid #F0F0F0",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              onClick={handleClearFilters}
+              size="small"
+              sx={{
+                borderRadius: "8px",
+                color: "#415EDE",
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "0.8rem",
+                px: 1.5,
+                "&:hover": { bgcolor: "#EEF2FF" },
+              }}
+            >
+              Limpiar filtros
             </Button>
             <Button
               onClick={handleApplyFilters}
+              size="small"
               variant="contained"
-              color="primary"
+              sx={{
+                borderRadius: "20px",
+                backgroundColor: "#415EDE",
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "0.8rem",
+                px: 2,
+                "&:hover": { backgroundColor: "#3347b8" },
+              }}
             >
-              Search
+              Buscar
             </Button>
-          </Stack>
+          </Box>
         </Box>
       </Popover>
 
@@ -867,112 +982,95 @@ function RoomCards({
       />
 
       {/* Bulk Edit Modal */}
-      <Modal open={isBulkEditModalOpen} onClose={handleBulkEditClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" component="h2" mb={2}>
-            Editar habitaciones seleccionadas
+      <FormDialog
+        open={isBulkEditModalOpen}
+        onClose={handleBulkEditClose}
+        title="Editar habitaciones seleccionadas"
+        submitLabel="Guardar cambios"
+        cancelLabel="Cancelar"
+        onSubmit={handleBulkEditSave}
+        submitDisabled={!bulkEditContractor && !bulkEditBeds && !bulkEditTag}
+        maxWidth="xs"
+      >
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 2 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary", mr: 0.5 }}>
+            Editando {selected.length} habitación(es):
           </Typography>
-
-          <Typography variant="body2" mb={3}>
-            Estás editando {selected.length} habitación(es):
-            {selectedRooms.map((room) => (
-              <Chip
-                key={room.id}
-                label={room.roomNumber}
-                size="small"
-                sx={{ ml: 0.5, mb: 0.5 }}
-              />
-            ))}
-          </Typography>
-
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="company-edit-label">Contratista</InputLabel>
-            <Select
-              labelId="company-edit-label"
-              id="company-edit"
-              label="Contratista"
-              value={bulkEditContractor}
-              onChange={(e) => setBulkEditContractor(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>No cambiar</em>
-              </MenuItem>
-              {contractors.map((contractor) => (
-                <MenuItem key={contractor.id} value={contractor.id.toString()}>
-                  {contractor.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="beds-edit-label">Camas</InputLabel>
-            <Select
-              labelId="beds-edit-label"
-              id="beds-edit"
-              label="Camas"
-              value={bulkEditBeds}
-              onChange={(e) => setBulkEditBeds(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>No cambiar</em>
-              </MenuItem>
-              {[1, 2, 3].map((bed) => (
-                <MenuItem key={bed} value={bed.toString()}>
-                  {bed}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="tag-edit-label">Estándar</InputLabel>
-            <Select
-              labelId="tag-edit-label"
-              id="tag-edit"
-              label="Etiqueta"
-              value={bulkEditTag}
-              onChange={(e) => setBulkEditTag(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>No cambiar</em>
-              </MenuItem>
-              {Object.entries(tagRoleMap).map(([key, value]) => (
-                <MenuItem key={key} value={key}>
-                  {value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <Stack direction="row" spacing={2} sx={{ "& > *": { flex: 1 } }}>
-            <Button onClick={handleBulkEditClose} variant="outlined" fullWidth>
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleBulkEditSave}
-              variant="contained"
-              color="primary"
-              fullWidth
-              disabled={!bulkEditContractor && !bulkEditBeds && !bulkEditTag}
-            >
-              Guardar cambios
-            </Button>
-          </Stack>
+          {selectedRooms.map((room) => (
+            <Chip
+              key={room.id}
+              label={room.roomNumber}
+              size="small"
+              sx={{
+                bgcolor: "#EEF2FF",
+                color: "#415EDE",
+                fontWeight: 600,
+                border: "1px solid #C7D2FE",
+              }}
+            />
+          ))}
         </Box>
-      </Modal>
+
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel id="company-edit-label">Contratista</InputLabel>
+          <Select
+            labelId="company-edit-label"
+            id="company-edit"
+            label="Contratista"
+            value={bulkEditContractor}
+            onChange={(e) => setBulkEditContractor(e.target.value)}
+          >
+            <MenuItem value="">
+              <em>No cambiar</em>
+            </MenuItem>
+            {contractors.map((contractor) => (
+              <MenuItem key={contractor.id} value={contractor.id.toString()}>
+                {contractor.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel id="beds-edit-label">Camas</InputLabel>
+          <Select
+            labelId="beds-edit-label"
+            id="beds-edit"
+            label="Camas"
+            value={bulkEditBeds}
+            onChange={(e) => setBulkEditBeds(e.target.value)}
+          >
+            <MenuItem value="">
+              <em>No cambiar</em>
+            </MenuItem>
+            {[1, 2, 3].map((bed) => (
+              <MenuItem key={bed} value={bed.toString()}>
+                {bed}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth>
+          <InputLabel id="tag-edit-label">Estándar</InputLabel>
+          <Select
+            labelId="tag-edit-label"
+            id="tag-edit"
+            label="Estándar"
+            value={bulkEditTag}
+            onChange={(e) => setBulkEditTag(e.target.value)}
+          >
+            <MenuItem value="">
+              <em>No cambiar</em>
+            </MenuItem>
+            {Object.entries(tagRoleMap).map(([key, value]) => (
+              <MenuItem key={key} value={key}>
+                {value}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </FormDialog>
 
       {/* Disable/Enable Room Modal */}
       <Modal open={isDisableModalOpen} onClose={handleDisableCancel}>

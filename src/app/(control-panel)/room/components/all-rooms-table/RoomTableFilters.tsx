@@ -4,12 +4,10 @@ import {
   Box,
   Button,
   Chip,
-  Divider,
   FormControlLabel,
   InputAdornment,
   Radio,
   RadioGroup,
-  Stack,
   TextField,
   Typography,
 } from "@mui/material";
@@ -47,11 +45,35 @@ const RoomTableFilters: React.FC<RoomTableFiltersProps> = ({
   onClearFilters,
 }) => {
   return (
-    <Box sx={{ width: 340, maxHeight: "80vh", overflowY: "auto" }}>
+    <Box sx={{ width: 320, maxHeight: "80vh", overflowY: "auto" }}>
       {/* Header */}
-      <Box sx={{ px: 2.5, pt: 2.5, pb: 1.5 }}>
+      <Box
+        sx={{
+          px: 2.5,
+          pt: 2,
+          pb: 1.5,
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          borderBottom: "1px solid #F0F0F0",
+        }}
+      >
+        <Box
+          sx={{
+            width: 30,
+            height: 30,
+            borderRadius: "8px",
+            bgcolor: "#EEF2FF",
+            border: "1px solid #C7D2FE",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <SearchIcon sx={{ fontSize: 16, color: "#415EDE" }} />
+        </Box>
         <Typography
-          variant="subtitle1"
+          variant="subtitle2"
           fontWeight={700}
           sx={{ color: "#1E293B" }}
         >
@@ -59,9 +81,15 @@ const RoomTableFilters: React.FC<RoomTableFiltersProps> = ({
         </Typography>
       </Box>
 
-      <Divider />
-
-      <Box sx={{ px: 2.5, py: 2 }}>
+      <Box
+        sx={{
+          px: 2.5,
+          py: 2,
+          display: "flex",
+          flexDirection: "column",
+          gap: 1.5,
+        }}
+      >
         {/* Search */}
         <TextField
           fullWidth
@@ -79,13 +107,13 @@ const RoomTableFilters: React.FC<RoomTableFiltersProps> = ({
             },
           }}
           sx={{
-            mb: 2,
             "& .MuiOutlinedInput-root": {
               borderRadius: "10px",
-              backgroundColor: "#F9FAFB",
-              "&.Mui-focused": {
-                backgroundColor: "#fff",
-              },
+              backgroundColor: "#F3F4F6",
+              "&.Mui-focused": { backgroundColor: "#fff" },
+              "& fieldset": { borderColor: "#E5E7EB" },
+              "&:hover fieldset": { borderColor: "#C7D2FE" },
+              "&.Mui-focused fieldset": { borderColor: "#415EDE" },
             },
           }}
         />
@@ -102,6 +130,14 @@ const RoomTableFilters: React.FC<RoomTableFiltersProps> = ({
               {...params}
               placeholder="Filtrar por Contratista"
               size="small"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#F3F4F6",
+                  "& fieldset": { borderColor: "#E5E7EB" },
+                  "&:hover fieldset": { borderColor: "#C7D2FE" },
+                  "&.Mui-focused fieldset": { borderColor: "#415EDE" },
+                },
+              }}
             />
           )}
           renderTags={(value, getTagProps) =>
@@ -122,7 +158,6 @@ const RoomTableFilters: React.FC<RoomTableFiltersProps> = ({
             ))
           }
           sx={{
-            mb: 2,
             "& .MuiOutlinedInput-root": { borderRadius: "10px" },
           }}
           disableCloseOnSelect
@@ -141,6 +176,14 @@ const RoomTableFilters: React.FC<RoomTableFiltersProps> = ({
               {...params}
               placeholder="Filtrar por Pabellón"
               size="small"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#F3F4F6",
+                  "& fieldset": { borderColor: "#E5E7EB" },
+                  "&:hover fieldset": { borderColor: "#C7D2FE" },
+                  "&.Mui-focused fieldset": { borderColor: "#415EDE" },
+                },
+              }}
             />
           )}
           renderTags={(value, getTagProps) =>
@@ -161,7 +204,6 @@ const RoomTableFilters: React.FC<RoomTableFiltersProps> = ({
             ))
           }
           sx={{
-            mb: 2,
             "& .MuiOutlinedInput-root": { borderRadius: "10px" },
           }}
           disableCloseOnSelect
@@ -169,78 +211,95 @@ const RoomTableFilters: React.FC<RoomTableFiltersProps> = ({
         />
 
         {/* Battery filter */}
-        <Typography
-          variant="body2"
-          fontWeight={600}
-          sx={{ color: "#475569", mb: 1 }}
+        <Box
+          sx={{
+            bgcolor: "#F8FAFF",
+            border: "1px solid #E6EEF9",
+            borderRadius: "12px",
+            px: 1.5,
+            py: 1.25,
+          }}
         >
-          Filtro de Batería
-        </Typography>
+          <Typography
+            variant="body2"
+            fontWeight={700}
+            sx={{
+              color: "#415EDE",
+              mb: 0.75,
+              fontSize: "0.8rem",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Filtro de Batería
+          </Typography>
 
-        <RadioGroup
-          value={batteryFilter}
-          onChange={(e) => onBatteryFilterChange(e.target.value)}
-          sx={{ gap: 0.25, ml: 0.5 }}
-        >
-          {[
-            { value: "all", label: "Todas las habitaciones" },
-            { value: "with-battery", label: "Con nivel de batería" },
-            { value: "without-battery", label: "Sin nivel de batería" },
-            { value: "low", label: "Batería baja (< 35%)" },
-            { value: "medium", label: "Batería media (35% - 65%)" },
-            { value: "high", label: "Batería alta (> 65%)" },
-          ].map((opt) => (
-            <FormControlLabel
-              key={opt.value}
-              value={opt.value}
-              control={
-                <Radio
-                  size="small"
-                  sx={{
-                    color: "#CBD5E1",
-                    "&.Mui-checked": { color: accentColor },
-                    p: "4px",
-                  }}
-                />
-              }
-              label={
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#374151", fontSize: "0.8125rem" }}
-                >
-                  {opt.label}
-                </Typography>
-              }
-              sx={{ mx: 0, "& .MuiFormControlLabel-label": { ml: 0.5 } }}
-            />
-          ))}
-        </RadioGroup>
+          <RadioGroup
+            value={batteryFilter}
+            onChange={(e) => onBatteryFilterChange(e.target.value)}
+            sx={{ gap: 0.25, ml: 0.5 }}
+          >
+            {[
+              { value: "all", label: "Todas las habitaciones" },
+              { value: "with-battery", label: "Con nivel de batería" },
+              { value: "without-battery", label: "Sin nivel de batería" },
+              { value: "low", label: "Batería baja (< 35%)" },
+              { value: "medium", label: "Batería media (35% - 65%)" },
+              { value: "high", label: "Batería alta (> 65%)" },
+            ].map((opt) => (
+              <FormControlLabel
+                key={opt.value}
+                value={opt.value}
+                control={
+                  <Radio
+                    size="small"
+                    sx={{
+                      color: "#CBD5E1",
+                      "&.Mui-checked": { color: accentColor },
+                      p: "4px",
+                    }}
+                  />
+                }
+                label={
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "#374151", fontSize: "0.8125rem" }}
+                  >
+                    {opt.label}
+                  </Typography>
+                }
+                sx={{ mx: 0, "& .MuiFormControlLabel-label": { ml: 0.5 } }}
+              />
+            ))}
+          </RadioGroup>
+        </Box>
       </Box>
 
-      <Divider />
-
       {/* Actions */}
-      <Stack
-        direction="row"
-        spacing={1.5}
-        sx={{ px: 2.5, py: 1.5, justifyContent: "flex-end" }}
+      <Box
+        sx={{
+          px: 2.5,
+          py: 1.5,
+          borderTop: "1px solid #F0F0F0",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
       >
         <Button
           onClick={onClearFilters}
-          variant="outlined"
           size="small"
           sx={{
             borderRadius: "8px",
-            borderColor: "#E2E8F0",
-            color: "#64748B",
+            color: "#415EDE",
             textTransform: "none",
             fontWeight: 600,
-            "&:hover": { borderColor: "#CBD5E1", backgroundColor: "#F8FAFC" },
+            fontSize: "0.8rem",
+            px: 1.5,
+            "&:hover": { bgcolor: "#EEF2FF" },
           }}
         >
           Limpiar filtros
         </Button>
-      </Stack>
+      </Box>
     </Box>
   );
 };
