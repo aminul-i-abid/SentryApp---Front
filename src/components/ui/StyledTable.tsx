@@ -35,7 +35,7 @@ interface PaginationConfig {
   onPageChange: (event: unknown, newPage: number) => void;
 }
 
-interface StyledTableProps<T> {
+export interface StyledTableProps<T> {
   columns: TableColumnDef<T>[];
   data: T[];
   getRowId: (row: T) => string;

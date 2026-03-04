@@ -1,13 +1,9 @@
-import React from 'react';
-import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, TablePagination, Typography
-} from '@mui/material';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import tagRoleMap from '@/app/(control-panel)/tag/enum/RoleTag';
-import RoomDetailSidebar from '@/app/(control-panel)/room/components/RoomDetailSidebar';
+import RoomDetailSidebar from "@/app/(control-panel)/room/components/RoomDetailSidebar";
+import tagRoleMap from "@/app/(control-panel)/tag/enum/RoleTag";
+import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
+import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import { Box, Button, Typography } from "@mui/material";
+import React from "react";
 
 interface Room {
   id: number;
@@ -30,119 +26,118 @@ interface ListConstructorsCampsProps {
   onBackToBlocks?: () => void;
 }
 
-function ListConstructorsCamps({ blocks, showBackToBlocksButton = false, onBackToBlocks }: ListConstructorsCampsProps) {
-  console.log('Blocks:', blocks);
-  // Aplanar todas las habitaciones con referencia a su bloque
-  const allRooms = blocks.flatMap(block =>
-    block.rooms.map(room => ({ ...room, blockName: block.name }))
+function ListConstructorsCamps({
+  blocks,
+  showBackToBlocksButton = false,
+  onBackToBlocks,
+}: ListConstructorsCampsProps) {
+  // Flatten all rooms with their block name
+  const allRooms = blocks.flatMap((block) =>
+    block.rooms.map((room) => ({ ...room, blockName: block.name })),
   );
 
-  // Estado para paginación
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const rowsPerPage = 10;
 
-  // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  const [selectedRoomForSidebar, setSelectedRoomForSidebar] = React.useState<Room | null>(null);
+  const [selectedRoomForSidebar, setSelectedRoomForSidebar] =
+    React.useState<Room | null>(null);
 
-  // Calcular habitaciones a mostrar en la página actual
-  const paginatedRooms = allRooms.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
-  // Handle row click to open sidebar
-  const handleRowClick = (room: Room) => {
-    setSelectedRoomForSidebar(room);
-    setIsSidebarOpen(true);
-  };
-
-  // Handle sidebar close
   const handleSidebarClose = () => {
     setIsSidebarOpen(false);
     setSelectedRoomForSidebar(null);
   };
 
-  // Handle sidebar refresh
-  const handleSidebarRefresh = () => {
-    // You can add refresh logic here if needed
-    // For now, just close the sidebar
-    handleSidebarClose();
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  const columns: TableColumnDef<any>[] = [
+    {
+      id: "roomNumber",
+      label: "Habitación",
+      render: (row) => (
+        <Box display="flex" alignItems="center" gap={0.5}>
+          {row.roomNumber}
+          {row.doorLockId && (
+            <MeetingRoomIcon
+              sx={{ fontSize: 16, color: "primary.main", verticalAlign: "top" }}
+            />
+          )}
+        </Box>
+      ),
+    },
+    {
+      id: "beds",
+      label: "Total de camas",
+      render: (row) => row.beds,
+    },
+    {
+      id: "blockName",
+      label: "Pabellón",
+      render: (row) => row.blockName,
+    },
+    {
+      id: "tag",
+      label: "Estándar",
+      render: (row) =>
+        tagRoleMap[row.tag as keyof typeof tagRoleMap] || "Sin Estándar",
+    },
+  ];
+
+  const pagedRooms = allRooms.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage,
+  );
 
   return (
     <>
-      <div className="flex justify-between mb-5 gap-2">
-        <Typography variant="h5" fontWeight={600} color="black">Habitaciones</Typography>
+      <div className="flex justify-between items-center mb-5 gap-2">
+        <Typography variant="h5" fontWeight={600}>
+          Habitaciones
+        </Typography>
         {showBackToBlocksButton && (
-          <button onClick={onBackToBlocks} style={{ background: '#e0e0e0', border: 'none', borderRadius: 4, padding: '6px 12px', cursor: 'pointer', fontWeight: 500 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={onBackToBlocks}
+            sx={{
+              borderRadius: "8px",
+              textTransform: "none",
+              fontWeight: 600,
+              borderColor: "#415EDE",
+              color: "#415EDE",
+              "&:hover": { borderColor: "#4338ca", color: "#4338ca" },
+            }}
+          >
             Volver a Pabellones
-          </button>
+          </Button>
         )}
       </div>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Habitación</TableCell>
-              <TableCell>Total de camas</TableCell>
-              <TableCell>Pabellón</TableCell>
-              <TableCell>Estándar</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedRooms.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} align="center">
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0' }}>
-                    <span style={{ color: '#888' }}>No se encontraron datos</span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              paginatedRooms.map((room) => (
-                <TableRow
-                  key={room.id}
-                  hover
-                  onClick={() => handleRowClick(room)}
-                  sx={{ cursor: 'pointer' }}
-                >
-                  <TableCell>{room.roomNumber}{room.doorLockId ? <MeetingRoomIcon sx={{ fontSize: 16, color: 'primary.main', verticalAlign: 'top', ml: 0.5 }} /> : null}</TableCell>
-                  <TableCell>{room.beds}</TableCell>
-                  <TableCell>{room.blockName}</TableCell>
-                  <TableCell>{tagRoleMap[room.tag] || 'Sin Estándar'}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-        <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: 8 }}>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={allRooms.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Filas por página:"
-            labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
-          />
-        </div>
-      </TableContainer>
 
-      {/* Room Detail Sidebar */}
+      <StyledTable<any>
+        columns={columns}
+        data={pagedRooms}
+        getRowId={(row) => String(row.id)}
+        emptyMessage="No se encontraron datos"
+        minWidth={400}
+        onRowClick={(row) => {
+          setSelectedRoomForSidebar(row);
+          setIsSidebarOpen(true);
+        }}
+        pagination={{
+          count: Math.ceil(allRooms.length / rowsPerPage),
+          page,
+          rowsPerPage,
+          onPageChange: handleChangePage,
+        }}
+      />
+
       <RoomDetailSidebar
         open={isSidebarOpen}
         onClose={handleSidebarClose}
         roomId={selectedRoomForSidebar?.id || null}
-        onRefreshData={handleSidebarRefresh}
+        onRefreshData={handleSidebarClose}
       />
     </>
   );
