@@ -507,13 +507,17 @@ const Calendar: React.FC = () => {
               </div>
               <button
                 onClick={openFilter}
-                className={`bg-white flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 font-medium cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 font-medium cursor-pointer ${
                   isFilterApplied()
                     ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    : "bg-white text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                <img src="./assets/icons/filter-horizontal.png" alt="" />
+                <img
+                  src="./assets/icons/filter-horizontal.png"
+                  alt=""
+                  className={isFilterApplied() ? "brightness-0 invert" : ""}
+                />
                 Filter
               </button>
             </div>
@@ -672,11 +676,7 @@ const Calendar: React.FC = () => {
                                       <td
                                         key={`${room.roomNumber}-avail-${laneIndex}-${segment.startIndex + cellIdx}`}
                                         className="border border-[#E5E7EB] p-3 bg-white"
-                                      >
-                                        <span className="text-sm text-gray-400">
-                                          No Data...
-                                        </span>
-                                      </td>
+                                      />
                                     ),
                                   )}
                                 </React.Fragment>

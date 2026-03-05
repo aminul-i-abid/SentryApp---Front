@@ -26,7 +26,7 @@ const DisabledRoomCard: React.FC<DisabledRoomCardProps> = ({ room }) => {
       <Box
         sx={{
           width: 56,
-          height: 56,
+          alignSelf: "stretch",
           borderRadius: 2,
           bgcolor: "#e8eaf6",
           display: "flex",
