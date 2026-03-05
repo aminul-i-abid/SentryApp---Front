@@ -3,7 +3,7 @@ import TopbarHeader from "@/components/TopbarHeader";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import AddIcon from "@mui/icons-material/Add";
 import TuneIcon from "@mui/icons-material/Tune";
-import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -25,7 +25,9 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
     borderStyle: "solid",
     borderColor: theme.palette.divider,
   },
-  "& .FusePageSimple-content": {},
+  "& .FusePageSimple-content": {
+    backgroundColor: theme.palette.common.white,
+  },
   "& .container": {
     maxWidth: "100% !important",
     padding: "0 !important",
@@ -201,13 +203,19 @@ function CampsBlockRoom() {
             <Typography variant="h5" fontWeight={700} sx={{ mb: 3 }}>
               Detalles del campamento:
             </Typography>
-            <Grid container spacing={3}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", lg: "40% 58%" },
+                gap: 3,
+              }}
+            >
               {/* Left Column - Block Details */}
-              <Grid item xs={12} md={4}>
+              <div className="bg-[#f7f7f7] rounded-lg p-4">
                 <DetailBlock block={block} fetchData={fetchData} />
-              </Grid>
+              </div>
               {/* Right Column - Room List */}
-              <Grid item xs={12} md={8}>
+              <div className="rounded-lg bg-[#f7f7f7] min-w-0 p-4">
                 <Box
                   sx={{
                     display: "flex",
@@ -288,8 +296,8 @@ function CampsBlockRoom() {
                   externalFilterAnchorEl={filterAnchorEl}
                   onExternalFilterClose={() => setFilterAnchorEl(null)}
                 />
-              </Grid>
-            </Grid>
+              </div>
+            </Box>
           </div>
         }
       />

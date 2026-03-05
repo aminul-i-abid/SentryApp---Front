@@ -69,28 +69,28 @@ function DetailBlock({ block, fetchData }: DetailBlockProps) {
   return (
     <>
       {/* Back and Edit buttons */}
-      <div className="flex justify-between mb-3 gap-2">
+      <div className="flex justify-between mb-4 gap-2">
         <IconButton
           sx={{
-            bgcolor: "#f1f5f9",
+            bgcolor: "#fff",
             width: 36,
             height: 36,
             "&:hover": { bgcolor: "#e2e8f0" },
           }}
           onClick={handleBackClick}
         >
-          <ArrowBackIcon sx={{ color: "#4f46e5", fontSize: 20 }} />
+          <ArrowBackIcon sx={{ color: "#000", fontSize: 20 }} />
         </IconButton>
         <IconButton
           sx={{
-            bgcolor: "#f1f5f9",
+            bgcolor: "#fff",
             width: 36,
             height: 36,
             "&:hover": { bgcolor: "#e2e8f0" },
           }}
           onClick={handleEditClick}
         >
-          <EditIcon sx={{ color: "#4f46e5", fontSize: 18 }} />
+          <EditIcon sx={{ color: "#000", fontSize: 18 }} />
         </IconButton>
       </div>
 
@@ -110,16 +110,68 @@ function DetailBlock({ block, fetchData }: DetailBlockProps) {
 
       {/* Pavilion name divider */}
       <Box sx={{ display: "flex", alignItems: "center", my: 3 }}>
-        <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          {/* Dotted Line */}
+          <Box
+            sx={{
+              flex: 1,
+              borderTop: "2px dashed #415EDE",
+            }}
+          />
+
+          {/* Diamond at end */}
+          <Box
+            sx={{
+              width: 5,
+              height: 5,
+              backgroundColor: "#415EDE",
+              transform: "rotate(45deg)",
+              ml: 1,
+              flexShrink: 0,
+            }}
+          />
+        </Box>
         <Typography
-          variant="body2"
-          color="text.secondary"
-          fontWeight={500}
+          variant="h6"
+          color="black"
+          fontWeight={700}
           sx={{ mx: 2, whiteSpace: "nowrap" }}
         >
           Pavilion name: {block.name}
         </Typography>
-        <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          {/* Diamond at start */}
+          <Box
+            sx={{
+              width: 5,
+              height: 5,
+              backgroundColor: "#415EDE",
+              transform: "rotate(45deg)",
+              mr: 1,
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Dotted Line */}
+          <Box
+            sx={{
+              flex: 1,
+              borderTop: "2px dashed #415EDE",
+            }}
+          />
+        </Box>
       </Box>
 
       {/* Floors and Rooms stats */}
@@ -172,19 +224,66 @@ function DetailBlock({ block, fetchData }: DetailBlockProps) {
       >
         <Box
           sx={{
+            display: "flex",
+            alignItems: "center",
             flex: 1,
-            borderTop: "2px dashed #818cf8",
           }}
-        />
+        >
+          {/* Dotted Line */}
+          <Box
+            sx={{
+              flex: 1,
+              borderTop: "2px dashed #415EDE",
+            }}
+          />
+
+          {/* Diamond at end */}
+          <Box
+            sx={{
+              width: 5,
+              height: 5,
+              backgroundColor: "#415EDE",
+              transform: "rotate(45deg)",
+              ml: 1,
+              flexShrink: 0,
+            }}
+          />
+        </Box>
         <Typography
-          variant="body2"
-          color="text.secondary"
-          fontWeight={500}
+          variant="h6"
+          color="black"
+          fontWeight={700}
           sx={{ mx: 2, whiteSpace: "nowrap" }}
         >
           Habitaciones por estándar
         </Typography>
-        <Box sx={{ flex: 1, borderTop: "2px dashed #818cf8" }} />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          {/* Diamond at start */}
+          <Box
+            sx={{
+              width: 5,
+              height: 5,
+              backgroundColor: "#415EDE",
+              transform: "rotate(45deg)",
+              mr: 1,
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Dotted Line */}
+          <Box
+            sx={{
+              flex: 1,
+              borderTop: "2px dashed #415EDE",
+            }}
+          />
+        </Box>
       </Box>
 
       {/* Tag standard cards */}

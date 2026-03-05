@@ -1,4 +1,5 @@
 import { RoomResponse } from "@/app/(control-panel)/room/models/RoomResponse";
+import TopbarHeader from "@/components/TopbarHeader";
 import useAuth from "@fuse/core/FuseAuthProvider/useAuth";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import { Box, CircularProgress, Typography } from "@mui/material";
@@ -200,69 +201,73 @@ const ContractorCamp = () => {
 
   return (
     <Root
-      header={
-        <div className="p-6 flex items-center justify-between bg-white">
-          <h2 className="text-2xl font-bold">
-            Detalles contratista - {contractorName}
-          </h2>
-        </div>
-      }
+      header={<TopbarHeader />}
       content={
-        <Box
-          className="p-4 mt-8"
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", lg: "40% 58%" },
-            gap: 3,
-          }}
-        >
-          {/* Columna Izquierda */}
-          <div className="pb-5 bg-[#f7f7f7] rounded-lg p-4">
-            <DetailCamp
-              camp={camp}
-              fetchData={fetchCampData}
-              sectorContractor={true}
-              contractorName={contractorName}
-              tagSummaryOrdered={tagSummaryOrdered}
-            />
+        <div>
+          <div className="p-6 flex items-center justify-between bg-white">
+            <h2 className="text-3xl font-bold">
+              Detalles contratista - {contractorName}
+            </h2>
           </div>
+          <Box
+            className="p-4"
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", lg: "40% 58%" },
+              gap: 3,
+            }}
+          >
+            {/* Columna Izquierda */}
+            <div className="pb-5 bg-[#f7f7f7] rounded-lg p-4">
+              <DetailCamp
+                camp={camp}
+                fetchData={fetchCampData}
+                sectorContractor={true}
+                contractorName={contractorName}
+                tagSummaryOrdered={tagSummaryOrdered}
+              />
+            </div>
 
-          {/* Columna Derecha */}
-          <div className="rounded-lg bg-[#f7f7f7] min-w-0 p-4">
-            {selectedBlockId === null ? (
-              <>
-                <Typography
-                  variant="h5"
-                  fontWeight={600}
-                  color="black"
-                  sx={{ mb: 2 }}
-                >
-                  Pabellones
-                </Typography>
-                <Box
-                  sx={{
-                    maxHeight: "calc(100vh - 220px)",
-                    overflowY: "auto",
-                    overflowX: "hidden",
-                    pr: 0.5,
-                  }}
-                >
-                  <BlockCards blocks={blocks} onBlockClick={handleBlockClick} />
-                </Box>
-              </>
-            ) : (
-              <>
-                <ListConstructorsCamps
-                  blocks={blocks.filter(
-                    (block) => block.id === selectedBlockId,
-                  )}
-                  showBackToBlocksButton={true}
-                  onBackToBlocks={handleBackToBlocks}
-                />
-              </>
-            )}
-          </div>
-        </Box>
+            {/* Columna Derecha */}
+            <div className="rounded-lg bg-[#f7f7f7] min-w-0 p-4">
+              {selectedBlockId === null ? (
+                <>
+                  <Typography
+                    variant="h5"
+                    fontWeight={600}
+                    color="black"
+                    sx={{ mb: 2 }}
+                  >
+                    Pabellones
+                  </Typography>
+                  <Box
+                    sx={{
+                      maxHeight: "calc(100vh - 220px)",
+                      overflowY: "auto",
+                      overflowX: "hidden",
+                      pr: 0.5,
+                    }}
+                  >
+                    <BlockCards
+                      blocks={blocks}
+                      onBlockClick={handleBlockClick}
+                    />
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <ListConstructorsCamps
+                    blocks={blocks.filter(
+                      (block) => block.id === selectedBlockId,
+                    )}
+                    showBackToBlocksButton={true}
+                    onBackToBlocks={handleBackToBlocks}
+                  />
+                </>
+              )}
+            </div>
+          </Box>
+        </div>
       }
     />
   );
