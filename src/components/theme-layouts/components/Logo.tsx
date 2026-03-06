@@ -37,13 +37,7 @@ function Logo() {
         />
         <div className="logo-text flex flex-col flex-auto gap-0.5 transition-all duration-200 overflow-hidden">
           <Typography className="text-[15px] tracking-tight font-semibold leading-none whitespace-nowrap">
-            Entrada
-          </Typography>
-          <Typography
-            className="text-[11px] font-normal leading-none whitespace-nowrap"
-            color="text.secondary"
-          >
-            Bienes raíces
+            entryApp
           </Typography>
         </div>
       </div>

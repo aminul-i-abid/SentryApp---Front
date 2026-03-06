@@ -209,13 +209,13 @@ const Calendar: React.FC = () => {
   const generateWeekDays = (): DayData[] => {
     const days: DayData[] = [];
     const dayNames = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
+      "Domingo",
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
     ];
 
     const start = new Date(selectedDates.start);
@@ -518,7 +518,7 @@ const Calendar: React.FC = () => {
                   alt=""
                   className={isFilterApplied() ? "brightness-0 invert" : ""}
                 />
-                Filter
+                Filtro
               </button>
             </div>
             <div className="rounded-lg shadow-sm overflow-hidden">
@@ -531,7 +531,7 @@ const Calendar: React.FC = () => {
                   <thead>
                     <tr>
                       <th className="border border-[#E5E7EB] p-3 text-left font-semibold min-w-[180px] w-[180px] sticky left-0 z-20 bg-white shadow-sm">
-                        <span className="text-blue-600">Room No:</span>
+                        <span className="text-blue-600">Habitación</span>
                       </th>
                       {weekDays.map((day) => {
                         const today = isSameDate(day.date, new Date());
@@ -705,7 +705,7 @@ const Calendar: React.FC = () => {
         {/* Row 1: Date pickers */}
         <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
           <TextField
-            label="Start date"
+            label="Fecha de inicio"
             type="date"
             size="small"
             fullWidth
@@ -714,7 +714,7 @@ const Calendar: React.FC = () => {
             InputLabelProps={{ shrink: true }}
           />
           <TextField
-            label="End date"
+            label="Fecha de fin"
             type="date"
             size="small"
             fullWidth
@@ -727,7 +727,7 @@ const Calendar: React.FC = () => {
         {/* Row 2: Three filters */}
         <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
           <FormControl size="small" fullWidth>
-            <InputLabel>Filter by contractor</InputLabel>
+            <InputLabel>Filtrar por contratista</InputLabel>
             <Select
               label="Filter by contractor"
               value={
@@ -744,7 +744,7 @@ const Calendar: React.FC = () => {
                 }
               }}
             >
-              <MenuItem value="">All Contractor</MenuItem>
+              <MenuItem value="">Todos los contratistas</MenuItem>
               {contractors.map((c) => (
                 <MenuItem key={c.id} value={String(c.id)}>
                   {c.name}
@@ -754,7 +754,7 @@ const Calendar: React.FC = () => {
           </FormControl>
 
           <FormControl size="small" fullWidth>
-            <InputLabel>Filter by pavilion</InputLabel>
+            <InputLabel>Filtrar por pabellón</InputLabel>
             <Select
               label="Filter by pavilion"
               value={tempSelectedBlock ? String(tempSelectedBlock.id) : ""}
@@ -769,7 +769,7 @@ const Calendar: React.FC = () => {
                 }
               }}
             >
-              <MenuItem value="">Select pavilion</MenuItem>
+              <MenuItem value="">Seleccionar pabellón...</MenuItem>
               {blocks.map((b) => (
                 <MenuItem key={b.id} value={String(b.id)}>
                   {b.name}
@@ -780,9 +780,9 @@ const Calendar: React.FC = () => {
           </FormControl>
 
           <FormControl size="small" fullWidth>
-            <InputLabel>Room status</InputLabel>
+            <InputLabel>Estado de habitación</InputLabel>
             <Select
-              label="Room status"
+              label="Estado de habitación"
               value={
                 tempSelectedOccupied === null
                   ? ""
@@ -798,9 +798,9 @@ const Calendar: React.FC = () => {
                 }
               }}
             >
-              <MenuItem value="">All Status</MenuItem>
-              <MenuItem value="false">Available</MenuItem>
-              <MenuItem value="true">Occupied</MenuItem>
+              <MenuItem value="">Todos los estados</MenuItem>
+              <MenuItem value="false">Disponible</MenuItem>
+              <MenuItem value="true">Ocupado</MenuItem>
             </Select>
           </FormControl>
         </Box>

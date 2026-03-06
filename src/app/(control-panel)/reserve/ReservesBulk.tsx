@@ -455,6 +455,7 @@ function ReservesBulk() {
   ) => {
     const index = sortedReserves.findIndex((r) => String(r.id) === rowId);
     if (index === -1) return;
+    if (sortedReserves[index].status !== StatusReservation.ACTIVE) return;
     const newSelected = new Set(selectedRows);
     if (newSelected.has(index)) {
       newSelected.delete(index);
@@ -748,6 +749,7 @@ function ReservesBulk() {
               selected={selectedIds}
               onSelectAll={handleStyledSelectAll}
               onSelectRow={handleStyledSelectRow}
+              isRowSelectable={(row) => row.status === StatusReservation.ACTIVE}
               order={order}
               orderBy={orderBy}
               onSort={handleRequestSort}

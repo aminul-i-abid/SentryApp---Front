@@ -187,7 +187,7 @@ const AuditoryFilters = ({
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b" }}>
-          Filters
+          Filtros
         </Typography>
 
         <FormControl
@@ -201,13 +201,13 @@ const AuditoryFilters = ({
             },
           }}
         >
-          <InputLabel id="table-select-label">Audit Table</InputLabel>
+          <InputLabel id="table-select-label">Tabla de auditoría</InputLabel>
           <Select
             labelId="table-select-label"
             id="table-select"
             value={selectedTable}
             onChange={onTableChange}
-            label="Audit Table"
+            label="Tabla de auditoría"
             MenuProps={{
               PaperProps: {
                 sx: {
@@ -220,7 +220,7 @@ const AuditoryFilters = ({
             }}
           >
             <MenuItem value="">
-              <em>Select a table</em>
+              <em>Seleccionar tabla</em>
             </MenuItem>
             {AUDITORY_TABLE_OPTIONS.filter(
               (option) => !option.requiresTTLock || hasTTLock,
@@ -245,7 +245,7 @@ const AuditoryFilters = ({
         >
           {/* Start date */}
           <DatePicker
-            label="Start date"
+            label="Fecha inicio"
             value={filters.fechaDesde ? parseISO(filters.fechaDesde) : null}
             onChange={(date: Date | null) => {
               if (date && isValid(date)) {
@@ -277,7 +277,7 @@ const AuditoryFilters = ({
 
           {/* End date */}
           <DatePicker
-            label="End date"
+            label="Fecha fin"
             value={filters.fechaHasta ? parseISO(filters.fechaHasta) : null}
             onChange={(date: Date | null) => {
               if (date && isValid(date)) {
@@ -328,8 +328,8 @@ const AuditoryFilters = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Pavilion"
-                  placeholder="Search..."
+                  label="Pabellón"
+                  placeholder="Buscar..."
                   size="small"
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -383,8 +383,8 @@ const AuditoryFilters = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Room"
-                  placeholder="Search..."
+                  label="Habitación"
+                  placeholder="Buscar..."
                   size="small"
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -431,8 +431,8 @@ const AuditoryFilters = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Contractor"
-                  placeholder="Search..."
+                  label="Contratista"
+                  placeholder="Buscar..."
                   size="small"
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -443,7 +443,7 @@ const AuditoryFilters = ({
                 />
               )}
               renderTags={(selected) =>
-                selected.length > 0 ? [`${selected.length} selected`] : []
+                selected.length > 0 ? [`${selected.length} seleccionados`] : []
               }
               componentsProps={{
                 paper: {
@@ -480,8 +480,8 @@ const AuditoryFilters = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Camp"
-                  placeholder="Search..."
+                  label="Campamento"
+                  placeholder="Buscar..."
                   size="small"
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -529,8 +529,8 @@ const AuditoryFilters = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Block"
-                  placeholder="Search..."
+                  label="Bloque"
+                  placeholder="Buscar..."
                   size="small"
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -567,7 +567,7 @@ const AuditoryFilters = ({
                 },
               }}
             >
-              <InputLabel>Access Status</InputLabel>
+              <InputLabel>Estado de acceso</InputLabel>
               <Select
                 name="success"
                 value={
@@ -582,7 +582,7 @@ const AuditoryFilters = ({
                     value === "" ? null : Number(value),
                   );
                 }}
-                label="Access Status"
+                label="Estado de acceso"
                 MenuProps={{
                   PaperProps: {
                     sx: {
@@ -594,10 +594,10 @@ const AuditoryFilters = ({
                 }}
               >
                 <MenuItem value="">
-                  <em>All</em>
+                  <em>Todos</em>
                 </MenuItem>
-                <MenuItem value="1">Successful</MenuItem>
-                <MenuItem value="0">Failed</MenuItem>
+                <MenuItem value="1">Exitoso</MenuItem>
+                <MenuItem value="0">Fallido</MenuItem>
               </Select>
             </FormControl>
           )}
@@ -616,7 +616,7 @@ const AuditoryFilters = ({
                 fontWeight: 600,
               }}
             >
-              Download Audit
+              Descargar auditoría
             </Button>
           )}
 
@@ -626,7 +626,7 @@ const AuditoryFilters = ({
             onClick={handleResetFilters}
             className="flex items-center gap-1.5 text-red-500 font-medium border border-[#EAEAEA] rounded-full px-4 py-2 hover:bg-red-50 transition-colors cursor-pointer whitespace-nowrap bg-[#F7F7F7]"
           >
-            Reset Filtering
+            Limpiar filtros
             <svg
               className="w-4 h-4"
               fill="none"

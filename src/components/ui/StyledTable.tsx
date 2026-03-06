@@ -50,6 +50,7 @@ export interface StyledTableProps<T> {
   selected?: string[];
   onSelectAll?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectRow?: (event: React.MouseEvent<unknown>, id: string) => void;
+  isRowSelectable?: (row: T) => boolean;
 
   /* sorting */
   order?: "asc" | "desc";
@@ -88,6 +89,7 @@ export default function StyledTable<T>({
   selected = [],
   onSelectAll,
   onSelectRow,
+  isRowSelectable,
   order,
   orderBy,
   onSort,
@@ -107,6 +109,8 @@ export default function StyledTable<T>({
 
   /* ---- helpers ---- */
   const isSelected = (id: string) => selected.indexOf(id) !== -1;
+  const selectableData = isRowSelectable ? data.filter(isRowSelectable) : data;
+  const selectableCount = selectableData.length;
 
   /* ---- derive visible data (pagination done externally or here) ---- */
   const visibleData = data;
@@ -175,10 +179,11 @@ export default function StyledTable<T>({
                   <TableCell padding="checkbox" sx={{ width: 50 }}>
                     <Checkbox
                       indeterminate={
-                        selected.length > 0 && selected.length < data.length
+                        selected.length > 0 && selected.length < selectableCount
                       }
                       checked={
-                        data.length > 0 && selected.length === data.length
+                        selectableCount > 0 &&
+                        selected.length === selectableCount
                       }
                       onChange={onSelectAll}
                       sx={{
@@ -318,11 +323,16 @@ export default function StyledTable<T>({
                           padding="checkbox"
                           onClick={(e) => {
                             e.stopPropagation();
+                            if (isRowSelectable && !isRowSelectable(row))
+                              return;
                             onSelectRow?.(e, rowId);
                           }}
                         >
                           <Checkbox
                             checked={rowSelected}
+                            disabled={
+                              isRowSelectable ? !isRowSelectable(row) : false
+                            }
                             sx={{
                               color: "#415EDE",
                               "&.Mui-checked": { color: "#415EDE" },

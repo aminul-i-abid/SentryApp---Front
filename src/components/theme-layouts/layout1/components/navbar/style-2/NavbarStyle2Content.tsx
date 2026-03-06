@@ -1,3 +1,4 @@
+import useFuseLayoutSettings from "@fuse/core/FuseLayout/useFuseLayoutSettings";
 import FuseScrollbars from "@fuse/core/FuseScrollbars";
 import { styled } from "@mui/material/styles";
 import clsx from "clsx";
@@ -46,6 +47,8 @@ type NavbarStyle2ContentProps = {
  */
 function NavbarStyle2Content(props: NavbarStyle2ContentProps) {
   const { className = "" } = props;
+  const { config } = useFuseLayoutSettings();
+  const folded = config?.navbar?.folded;
 
   return (
     <Root
@@ -67,9 +70,9 @@ function NavbarStyle2Content(props: NavbarStyle2ContentProps) {
               sx={{ borderRadius: "50% !important" }}
             >
               <img
-                src="/assets/icons/arrow-left-double.png"
-                alt="collapse"
-                className="w-4 h-4 opacity-50"
+                src={"/assets/icons/arrow-left-double.png"}
+                alt={folded ? "expand" : "collapse"}
+                className={`w-4 h-4 opacity-50 ${folded ? "rotate-180" : ""}`}
               />
             </NavbarPinToggleButton>
           </div>

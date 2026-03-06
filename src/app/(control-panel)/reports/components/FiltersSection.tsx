@@ -1,14 +1,14 @@
 import { CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
 import {
-    Box,
-    Checkbox,
-    FormControl,
-    FormControlLabel,
-    InputLabel,
-    MenuItem,
-    OutlinedInput,
-    Select,
-    Typography,
+  Box,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
@@ -57,7 +57,7 @@ const FiltersSection: React.FC<FiltersSectionProps> = ({
         variant="h5"
         sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
       >
-        Filters
+        Filtros
       </Typography>
 
       {/* Row: Start date, End date, Contractors, Active, Reset */}
@@ -72,7 +72,7 @@ const FiltersSection: React.FC<FiltersSectionProps> = ({
         >
           {/* Start date */}
           <DatePicker
-            label="Start date"
+            label="Fecha inicio"
             value={filters.fechaDesde ? parseISO(filters.fechaDesde) : null}
             onChange={(date: Date | null) => {
               if (date && isValid(date)) {
@@ -104,7 +104,7 @@ const FiltersSection: React.FC<FiltersSectionProps> = ({
 
           {/* End date */}
           <DatePicker
-            label="End date"
+            label="Fecha fin"
             value={filters.fechaHasta ? parseISO(filters.fechaHasta) : null}
             onChange={(date: Date | null) => {
               if (date && isValid(date)) {
@@ -146,19 +146,19 @@ const FiltersSection: React.FC<FiltersSectionProps> = ({
                 },
               }}
             >
-              <InputLabel>Contractors</InputLabel>
+              <InputLabel>Contratistas</InputLabel>
               <Select
                 multiple
                 value={filters.contratistas}
                 onChange={(e) => onFilterChange("contratistas", e.target.value)}
-                input={<OutlinedInput label="Contractors" />}
+                input={<OutlinedInput label="Contratistas" />}
                 renderValue={(selected) => {
                   if (selected.length === 0) return null;
                   if (selected.length === 1) {
                     const c = contractors.find((ct) => ct.id === selected[0]);
-                    return c?.name || `Contractor ${selected[0]}`;
+                    return c?.name || `Contratista ${selected[0]}`;
                   }
-                  return `${selected.length} selected`;
+                  return `${selected.length} seleccionados`;
                 }}
                 disabled={isLoadingContractors}
                 MenuProps={{
@@ -196,7 +196,7 @@ const FiltersSection: React.FC<FiltersSectionProps> = ({
                 }}
               />
             }
-            label="Active reservations"
+            label="Reservas activas"
             sx={{ margin: 0 }}
           />
 
@@ -206,7 +206,7 @@ const FiltersSection: React.FC<FiltersSectionProps> = ({
             onClick={onResetFilters}
             className="flex items-center gap-1.5 text-red-500 font-medium border border-[#EAEAEA] rounded-full px-4 py-2 hover:bg-red-50 transition-colors cursor-pointer whitespace-nowrap bg-[#F7F7F7]"
           >
-            Reset Filtering
+            Limpiar filtros
             <svg
               className="w-4 h-4"
               fill="none"

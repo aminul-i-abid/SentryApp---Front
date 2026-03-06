@@ -498,228 +498,225 @@ function Dashboard() {
               )}
             </div>
 
-            {/* === 2-column layout: left stats+chart | right occupancy+blocks === */}
-            <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
-              {/* ---- LEFT COLUMN: stat cards + chart ---- */}
-              <div className="space-y-6">
-                {/* Stat cards row */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
-                  <StatCard
-                    icon="/assets/icons/Frame.png"
-                    value={String(dashboardData?.totalCamps || 0).padStart(
-                      2,
-                      "0",
-                    )}
-                    label="Campamentos"
-                    iconBgColor="bg-blue-50"
-                    iconColor="text-blue-600"
-                  />
-                  {isAdmin && (
-                    <StatCard
-                      icon="/assets/icons/Frame (1).png"
-                      value={dashboardData?.totalCompanies || 0}
-                      label="Contratistas"
-                      iconBgColor="bg-orange-50"
-                      iconColor="text-orange-500"
-                    />
+            {/* === Single-column layout === */}
+            <div className="space-y-6">
+              {/* Stat cards row */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
+                <StatCard
+                  icon="/assets/icons/Frame.png"
+                  value={String(dashboardData?.totalCamps || 0).padStart(
+                    2,
+                    "0",
                   )}
+                  label="Campamentos"
+                  iconBgColor="bg-blue-50"
+                  iconColor="text-blue-600"
+                />
+                {isAdmin && (
                   <StatCard
-                    icon="/assets/icons/Frame (2).png"
-                    value={dashboardData?.totalRooms || 0}
-                    label="Habitaciones"
-                    iconBgColor="bg-red-100"
-                    iconColor="text-emerald-500"
+                    icon="/assets/icons/Frame (1).png"
+                    value={dashboardData?.totalCompanies || 0}
+                    label="Contratistas"
+                    iconBgColor="bg-orange-50"
+                    iconColor="text-orange-500"
                   />
-                  <StatCard
-                    icon="/assets/icons/Frame (3).png"
-                    value={dashboardData?.totalReservations || 0}
-                    label="Reservas"
-                    iconBgColor="bg-red-50"
-                    iconColor="text-red-500"
-                  />
-                  <StatCard
-                    icon="/assets/icons/Frame (4).png"
-                    value={accessibleRooms}
-                    label="Hab. accesibles"
-                    iconBgColor="bg-purple-50"
-                    iconColor="text-purple-500"
-                  />
-                  <StatCard
-                    icon="/assets/icons/Frame (5).png"
-                    value={lostBeds}
-                    label="Pérdida / Est."
-                    iconBgColor="bg-slate-100"
-                    iconColor="text-slate-500"
-                  />
-                </div>
-
-                {/* Chart card */}
-                <div className="bg-[#F7F7F7] dark:bg-white/[0.06] p-1.5 rounded-2xl">
-                  <CardContainer title="Ocupación de camas – Próximos días">
-                    <ChartLine
-                      labels={chartData.labels}
-                      series={[
-                        {
-                          label: "Campamentos totales",
-                          data: chartData.totalSeries,
-                          color: "#2563EB",
-                        },
-                        {
-                          label: "Camas Ocupadas",
-                          data: chartData.occupiedSeries,
-                          color: "#10B981",
-                        },
-                      ]}
-                      height={340}
-                      yLabel="Camas"
-                    />
-                  </CardContainer>
-                </div>
-              </div>
-
-              {/* ---- RIGHT COLUMN: occupancy + badges + blocks ---- */}
-              <div className="space-y-4">
-                {/* Occupancy panel */}
-                <div className="bg-[#F7F7F7] dark:bg-white/[0.06] p-1.5 rounded-xl space-y-3">
-                  {/* Title + progress bar + percentage */}
-                  <div className="rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm px-6 py-5">
-                    <h3 className="text-2xl font-semibold text-slate-800 dark:text-white mb-4">
-                      Ocupación de camas
-                    </h3>
-                    <ProgressBar
-                      value={occupancyMain.occupied}
-                      max={occupancyMain.total}
-                      label={
-                        occupancyMain.occupied +
-                        " / " +
-                        occupancyMain.total +
-                        " camas"
-                      }
-                    />
-                  </div>
-                  {/* Tag badges */}
-                  <div className="grid grid-cols-3 gap-3">
-                    {standardOccupancy.map((item) => (
-                      <OccupancyBadge
-                        key={item.tag}
-                        label={item.label}
-                        percentage={item.percentage}
-                        occupied={item.occupied}
-                        total={item.total}
-                        colorClass="text-[#415EDE]"
-                        bgClass="bg-white"
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Disabled Rooms + Beds Lost per Standard row */}
-                <div className="bg-[#f7f7f7] rounded-xl p-1.5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Disabled Rooms */}
-                    <button
-                      type="button"
-                      onClick={() => setIsSidebarOpen(true)}
-                      className="rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm px-5 py-4 text-left hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-5 h-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={1.8}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 104 0V7a2 2 0 00-2-2zm0 10a2 2 0 00-2 2v3a2 2 0 104 0v-3a2 2 0 00-2-2z"
-                            />
-                          </svg>
-                        </div>
-                        <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
-                          Habitaciones Deshabilitadas
-                        </span>
-                      </div>
-                      <p className="text-3xl font-bold text-slate-800 dark:text-white">
-                        {disabledRoomsCount}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        {disabledBedsCount} camas
-                      </p>
-                    </button>
-
-                    {/* Beds Lost per Standard */}
-                    <button
-                      type="button"
-                      onClick={() => setIsLostBedsSidebarOpen(true)}
-                      className="rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm px-5 py-4 text-left hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-500 group-hover:bg-amber-100 transition-colors">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-5 h-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={1.8}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                            />
-                          </svg>
-                        </div>
-                        <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
-                          Camas Perdidas por Estándar
-                        </span>
-                      </div>
-                      <p className="text-3xl font-bold text-slate-800 dark:text-white">
-                        {lostBeds}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Por cambio de categoría
-                      </p>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Block occupancy grid */}
-                {blockOccupancy.length > 0 && (
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 bg-[#F7F7F7] dark:bg-white/[0.06] p-2 rounded-xl">
-                      {blockOccupancy
-                        .slice(0, isBlockExpanded ? blockOccupancy.length : 48)
-                        .map((block) => (
-                          <BlockCard
-                            key={block.blockId}
-                            name={block.blockName}
-                            percentage={block.occupancyPercentageToday}
-                            occupied={block.occupiedBedsToday}
-                            total={block.totalBeds}
-                            onClick={() => {
-                              setSelectedBlockId(block.blockId);
-                              setIsBlockOccupancySidebarOpen(true);
-                            }}
-                          />
-                        ))}
-                    </div>
-                    {blockOccupancy.length > 48 && (
-                      <button
-                        type="button"
-                        onClick={() => setIsBlockExpanded(!isBlockExpanded)}
-                        className="w-full text-center text-sm text-slate-400 hover:text-blue-500 transition py-2 cursor-pointer"
-                      >
-                        {isBlockExpanded ? "MENOS ↑" : "MÁS... ↓"}
-                      </button>
-                    )}
-                  </div>
                 )}
+                <StatCard
+                  icon="/assets/icons/Frame (2).png"
+                  value={dashboardData?.totalRooms || 0}
+                  label="Habitaciones"
+                  iconBgColor="bg-red-100"
+                  iconColor="text-emerald-500"
+                />
+                <StatCard
+                  icon="/assets/icons/Frame (3).png"
+                  value={dashboardData?.totalReservations || 0}
+                  label="Reservas"
+                  iconBgColor="bg-red-50"
+                  iconColor="text-red-500"
+                />
+                <StatCard
+                  icon="/assets/icons/Frame (4).png"
+                  value={accessibleRooms}
+                  label="Hab. accesibles"
+                  iconBgColor="bg-purple-50"
+                  iconColor="text-purple-500"
+                />
+                <StatCard
+                  icon="/assets/icons/Frame (5).png"
+                  value={lostBeds}
+                  label="Pérdida / Est."
+                  iconBgColor="bg-slate-100"
+                  iconColor="text-slate-500"
+                />
               </div>
+
+              {/* Bed occupancy by standard */}
+              <div className="bg-[#F7F7F7] dark:bg-white/[0.06] p-1.5 rounded-xl space-y-3">
+                {/* Title + progress bar */}
+                <div className="rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm px-6 py-5">
+                  <h3 className="text-2xl font-semibold text-slate-800 dark:text-white mb-4">
+                    Ocupación de camas
+                  </h3>
+                  <ProgressBar
+                    value={occupancyMain.occupied}
+                    max={occupancyMain.total}
+                    label={
+                      occupancyMain.occupied +
+                      " / " +
+                      occupancyMain.total +
+                      " camas"
+                    }
+                  />
+                </div>
+                {/* Tag badges */}
+                <div className="grid grid-cols-3 gap-3">
+                  {standardOccupancy.map((item) => (
+                    <OccupancyBadge
+                      key={item.tag}
+                      label={item.label}
+                      percentage={item.percentage}
+                      occupied={item.occupied}
+                      total={item.total}
+                      colorClass="text-[#415EDE]"
+                      bgClass="bg-white"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Disabled Rooms + Beds Lost per Standard row */}
+              <div className="bg-[#f7f7f7] rounded-xl p-1.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Disabled Rooms */}
+                  <button
+                    type="button"
+                    onClick={() => setIsSidebarOpen(true)}
+                    className="rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm px-5 py-4 text-left hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={1.8}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 104 0V7a2 2 0 00-2-2zm0 10a2 2 0 00-2 2v3a2 2 0 104 0v-3a2 2 0 00-2-2z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                        Habitaciones Deshabilitadas
+                      </span>
+                    </div>
+                    <p className="text-3xl font-bold text-slate-800 dark:text-white">
+                      {disabledRoomsCount}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {disabledBedsCount} camas
+                    </p>
+                  </button>
+
+                  {/* Beds Lost per Standard */}
+                  <button
+                    type="button"
+                    onClick={() => setIsLostBedsSidebarOpen(true)}
+                    className="rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-100 dark:border-white/10 shadow-sm px-5 py-4 text-left hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-500 group-hover:bg-amber-100 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={1.8}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                        Camas Perdidas por Estándar
+                      </span>
+                    </div>
+                    <p className="text-3xl font-bold text-slate-800 dark:text-white">
+                      {lostBeds}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Por cambio de categoría
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Bed occupancy chart */}
+              <div className="bg-[#F7F7F7] dark:bg-white/[0.06] p-1.5 rounded-2xl">
+                <CardContainer title="Ocupación de camas – Próximos días">
+                  <ChartLine
+                    labels={chartData.labels}
+                    series={[
+                      {
+                        label: "Campamentos totales",
+                        data: chartData.totalSeries,
+                        color: "#2563EB",
+                      },
+                      {
+                        label: "Camas Ocupadas",
+                        data: chartData.occupiedSeries,
+                        color: "#10B981",
+                      },
+                    ]}
+                    height={340}
+                    yLabel="Camas"
+                  />
+                </CardContainer>
+              </div>
+
+              {/* Block occupancy distribution */}
+              {blockOccupancy.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-semibold text-slate-800 dark:text-white">
+                    Ocupación del bloque
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 bg-[#F7F7F7] dark:bg-white/[0.06] p-2 rounded-xl">
+                    {blockOccupancy
+                      .slice(0, isBlockExpanded ? blockOccupancy.length : 48)
+                      .map((block) => (
+                        <BlockCard
+                          key={block.blockId}
+                          name={block.blockName}
+                          percentage={block.occupancyPercentageToday}
+                          occupied={block.occupiedBedsToday}
+                          total={block.totalBeds}
+                          onClick={() => {
+                            setSelectedBlockId(block.blockId);
+                            setIsBlockOccupancySidebarOpen(true);
+                          }}
+                        />
+                      ))}
+                  </div>
+                  {blockOccupancy.length > 48 && (
+                    <button
+                      type="button"
+                      onClick={() => setIsBlockExpanded(!isBlockExpanded)}
+                      className="w-full text-center text-sm text-slate-400 hover:text-blue-500 transition py-2 cursor-pointer"
+                    >
+                      {isBlockExpanded ? "MENOS ↑" : "MÁS... ↓"}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         }

@@ -359,6 +359,7 @@ function Guests() {
   ) => {
     const index = guests.findIndex((g) => getRowId(g) === rowId);
     if (index === -1) return;
+    if (guests[index].status !== 0) return;
     const newSelected = new Set(selectedRows);
     if (newSelected.has(index)) {
       newSelected.delete(index);
@@ -519,39 +520,46 @@ function Guests() {
       {
         id: "guid",
         label: "ID Reserva",
+        width: "130px",
         render: (row) => row.guid,
       },
       {
         id: "guest",
         label: "Huésped",
+        width: "250px",
         render: (row) =>
           `${row.guest?.firstName ?? ""} ${row.guest?.lastName ?? ""}`,
       },
       {
         id: "roomNumber",
         label: "Habitación",
+        width: "110px",
         render: (row) => row.roomNumber,
       },
       {
         id: "companyName",
         label: "Compañía",
+        width: "160px",
         render: (row) => row.companyName,
       },
       {
         id: "checkIn",
         label: "Check In",
+        width: "110px",
         render: (row) =>
           row.checkIn ? formatDate(new Date(row.checkIn)) : "-",
       },
       {
         id: "checkOut",
         label: "Check Out",
+        width: "110px",
         render: (row) =>
           row.checkOut ? formatDate(new Date(row.checkOut)) : "-",
       },
       {
         id: "status",
         label: "Estado",
+        width: "100px",
         render: (row) => getStatusText(row.status),
       },
     ];
@@ -560,6 +568,7 @@ function Guests() {
       cols.push({
         id: "pin",
         label: "PIN",
+        width: "120px",
         render: (row) => {
           if (row.guest?.doorPassword) return row.guest.doorPassword;
 
@@ -943,6 +952,7 @@ function Guests() {
               selected={selectedIds}
               onSelectAll={handleStyledSelectAll}
               onSelectRow={handleStyledSelectRow}
+              isRowSelectable={(row) => row.status === 0}
               onRowClick={(row) => {
                 setSelectedReserveId(row.id);
                 setModalOpen(true);
