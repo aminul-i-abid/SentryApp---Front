@@ -3,6 +3,8 @@ import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { TimePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import React from "react";
 
 interface AddBlockFormProps {
@@ -62,96 +64,98 @@ const AddBlockForm: React.FC<AddBlockFormProps> = ({ formData, onChange }) => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2.5,
-        mt: 1,
-      }}
-    >
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <Typography sx={labelSx}>Nombre</Typography>
-          <TextField
-            value={formData.name}
-            onChange={handleNameChange}
-            fullWidth
-            size="small"
-            placeholder="Ingrese nombre"
-            sx={inputSx}
-          />
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2.5,
+          mt: 1,
+        }}
+      >
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Typography sx={labelSx}>Nombre</Typography>
+            <TextField
+              value={formData.name}
+              onChange={handleNameChange}
+              fullWidth
+              size="small"
+              placeholder="Ingrese nombre"
+              sx={inputSx}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Typography sx={labelSx}>Pisos</Typography>
+            <TextField
+              value={formData.floors}
+              onChange={handleFloorsChange}
+              fullWidth
+              size="small"
+              type="number"
+              placeholder="Ingrese pisos"
+              sx={inputSx}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <Typography sx={labelSx}>Pisos</Typography>
-          <TextField
-            value={formData.floors}
-            onChange={handleFloorsChange}
-            fullWidth
-            size="small"
-            type="number"
-            placeholder="Ingrese pisos"
-            sx={inputSx}
-          />
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Typography sx={labelSx}>Prefijo</Typography>
+            <TextField
+              value={formData.prefix}
+              onChange={handlePrefixChange}
+              fullWidth
+              size="small"
+              placeholder="Ingrese prefijo"
+              sx={inputSx}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Typography sx={labelSx}>Sufijo</Typography>
+            <TextField
+              value={formData.suffix}
+              onChange={handleSuffixChange}
+              fullWidth
+              size="small"
+              placeholder="Ingrese sufijo"
+              sx={inputSx}
+            />
+          </Grid>
         </Grid>
-      </Grid>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <Typography sx={labelSx}>Prefijo</Typography>
-          <TextField
-            value={formData.prefix}
-            onChange={handlePrefixChange}
-            fullWidth
-            size="small"
-            placeholder="Ingrese prefijo"
-            sx={inputSx}
-          />
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Typography sx={labelSx}>Hora de entrada</Typography>
+            <TimePicker
+              value={formData.checkInTime}
+              onChange={handleCheckInTimeChange}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  size: "small",
+                  placeholder: "Seleccionar hora",
+                  sx: inputSx,
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Typography sx={labelSx}>Hora de salida</Typography>
+            <TimePicker
+              value={formData.checkOutTime}
+              onChange={handleCheckOutTimeChange}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  size: "small",
+                  placeholder: "Seleccionar hora",
+                  sx: inputSx,
+                },
+              }}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <Typography sx={labelSx}>Sufijo</Typography>
-          <TextField
-            value={formData.suffix}
-            onChange={handleSuffixChange}
-            fullWidth
-            size="small"
-            placeholder="Ingrese sufijo"
-            sx={inputSx}
-          />
-        </Grid>
-      </Grid>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <Typography sx={labelSx}>Hora de entrada</Typography>
-          <TimePicker
-            value={formData.checkInTime}
-            onChange={handleCheckInTimeChange}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                size: "small",
-                placeholder: "Seleccionar hora",
-                sx: inputSx,
-              },
-            }}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <Typography sx={labelSx}>Hora de salida</Typography>
-          <TimePicker
-            value={formData.checkOutTime}
-            onChange={handleCheckOutTimeChange}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                size: "small",
-                placeholder: "Seleccionar hora",
-                sx: inputSx,
-              },
-            }}
-          />
-        </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </LocalizationProvider>
   );
 };
 
