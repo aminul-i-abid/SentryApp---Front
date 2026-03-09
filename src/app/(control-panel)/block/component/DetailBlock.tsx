@@ -143,7 +143,7 @@ function DetailBlock({ block, fetchData }: DetailBlockProps) {
           fontWeight={700}
           sx={{ mx: 2, whiteSpace: "nowrap" }}
         >
-          Pavilion name: {block.name}
+          Nombre del pabellón: {block.name}
         </Typography>
         <Box
           sx={{

@@ -329,7 +329,7 @@ function Activities() {
                 menuItems={[
                   {
                     key: "book",
-                    label: t("table.book") || "Reservar",
+                    label: t("Actividad del libro") || "Reservar",
                     icon: <BookmarkAddIcon fontSize="small" />,
                     onClick: () => handleBook(row.id),
                     hidden: !row.isActive,
