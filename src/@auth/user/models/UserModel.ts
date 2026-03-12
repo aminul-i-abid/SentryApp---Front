@@ -5,7 +5,7 @@ import { User } from '@auth/user';
 /**
  * Creates a new user object with the specified data.
  */
-function UserModel(data?: PartialDeep<User>): User {
+export function UserModel(data?: PartialDeep<User>): User {
 	data = data || {};
 
 	return _.defaults(data, {
@@ -19,7 +19,8 @@ function UserModel(data?: PartialDeep<User>): User {
 		loginRedirectUrl: '/',
 		modules: {
 			activities: false,
-			ttlock: false
+			ttlock: false,
+			stock: false
 		}
 	}) as User;
 }

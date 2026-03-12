@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sentry Front Architecture"
+  short_description: "Guia de arquitectura y estructura de Sentry Front"
+  default_prompt: "Explica la arquitectura del proyecto y como agregar un nuevo modulo."

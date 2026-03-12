@@ -16,6 +16,7 @@ const locale = {
   ACTIVITIES_LIST: "TÜM ETKİNLİKLER",
   MY_RESERVATIONS: "REZERVASYONLARIM",
   MANAGE_RESERVATIONS: "REZERVASYONLARI YÖNET",
+	SUPPLIER_LOTS: 'Tedarikci Lotlari'
 };
 
 export default locale;

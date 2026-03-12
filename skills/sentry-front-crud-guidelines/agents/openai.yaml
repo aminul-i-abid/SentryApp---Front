@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sentry Front CRUD"
+  short_description: "Lineamientos para modulos CRUD en Sentry Front"
+  default_prompt: "Crear un modulo CRUD en Sentry-Front siguiendo los lineamientos del proyecto para estructura y estilo."

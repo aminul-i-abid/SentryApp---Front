@@ -69,11 +69,20 @@ button:focus-visible {
 
 /* Forzar el z-index del contenedor de notistack para que esté sobre el modal */
 #notistack-snackbar-container, 
-.SnackbarContainer-root,
+.SnackbarContainer-root {
+  z-index: 99999999 !important;
+  position: fixed !important;
+}
+
 .MuiSnackbar-root,
 .MuiSnackbar-anchorOriginBottomRight {
   z-index: 13500 !important;
-  position: relative;
+}
+
+/* Clase específica para el contenedor global definido en App.tsx */
+.global-snackbar-container {
+    z-index: 999913500 !important;
+    position: fixed !important;
 }
 
 /* Estilos para el ancho del Snackbar */

@@ -63,58 +63,53 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
     user: null,
   });
 
-  /**
-   * Watch for changes in the auth state
-   * and pass them to the FuseAuthProvider
-   */
-  useEffect(() => {
-    if (onAuthStateChanged) {
-      onAuthStateChanged(authState);
-    }
-  }, [authState, onAuthStateChanged]);
+	/**
+	 * Watch for changes in the auth state
+	 * and pass them to the FuseAuthProvider
+	 */
+	useEffect(() => {
+		if (onAuthStateChanged) {
+			onAuthStateChanged(authState);
+		}
+	}, [authState, onAuthStateChanged]);
 
-  /**
-   * Listen for module status changes from API interceptor
-   */
-  useEffect(() => {
-    const handleModuleDisabled = (event: CustomEvent) => {
-      const { module, enabled } = event.detail;
-      console.log(`📡 Event received: ${module} = ${enabled}`);
 
-      if (authState.user) {
-        const updatedUser = {
-          ...authState.user,
-          modules: {
-            ...authState.user.modules,
-            [module]: enabled,
-          },
-        };
+	/**
+	 * Listen for module status changes from API interceptor
+	 */
+	useEffect(() => {
+		const handleModuleDisabled = (event: CustomEvent) => {
+			const { module, enabled } = event.detail;
+			console.log(`📡 Event received: ${module} = ${enabled}`);
+			
+			if (authState.user) {
+				const updatedUser = {
+					...authState.user,
+					modules: {
+						...authState.user.modules,
+						[module]: enabled
+					}
+				};
+				
+				// Update localStorage
+				localStorage.setItem('user_data', JSON.stringify(updatedUser));
+				
+				// Update auth state
+				setAuthState(prev => ({
+					...prev,
+					user: updatedUser
+				}));
+				
+				console.log(`✅ User modules updated: ${module} = ${enabled}`);
+			}
+		};
 
-        // Update localStorage
-        localStorage.setItem("user_data", JSON.stringify(updatedUser));
+		window.addEventListener('APP_MODULE_STATUS_CHANGED' as any, handleModuleDisabled as EventListener);
 
-        // Update auth state
-        setAuthState((prev) => ({
-          ...prev,
-          user: updatedUser,
-        }));
-
-        console.log(`✅ User modules updated: ${module} = ${enabled}`);
-      }
-    };
-
-    window.addEventListener(
-      "APP_MODULE_STATUS_CHANGED" as any,
-      handleModuleDisabled as EventListener,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "APP_MODULE_STATUS_CHANGED" as any,
-        handleModuleDisabled as EventListener,
-      );
-    };
-  }, [authState.user]);
+		return () => {
+			window.removeEventListener('APP_MODULE_STATUS_CHANGED' as any, handleModuleDisabled as EventListener);
+		};
+	}, [authState.user]);
 
   /**
    * Attempt to auto login with the stored token
@@ -169,14 +164,14 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
     attemptAutoLogin();
   }, [tokenStorageValue]); // Solo dependemos del tokenStorageValue
 
-  /**
-   * Sign in
-   */
-  const signIn: JwtAuthContextType["signIn"] = useCallback(
-    async (credentials) => {
-      const response = await authSignIn(credentials);
-      const responseData = await response.json();
-      console.log("signIn responseData:", responseData);
+	/**
+	 * Sign in
+	 */
+	const signIn: JwtAuthContextType['signIn'] = useCallback(
+		async (credentials) => {
+			const response = await authSignIn(credentials);
+			const responseData = await response.json();
+			// console.log("signIn responseData:", responseData);
 
       if (responseData.succeeded) {
         if (responseData.data.user.firstLogin == true) {
@@ -205,40 +200,52 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 
           const hasRequiredRole = selectedRole !== null;
 
-          if (!hasRequiredRole) {
-            throw new Error("User does not have required roles");
-          }
+					if (!hasRequiredRole) {
+						throw new Error('User does not have required roles');
+					}
+					
+					// Extract modules from response
+				const modulesFromAPI = responseData.data.modules || {};
+				// console.log("Modules from API:", modulesFromAPI);
 
-          // Extract modules from response
-          const modulesFromAPI = responseData.data.modules || {};
-          console.log("Modules from API:", modulesFromAPI);
+				// Normalize module keys (fix tTlock -> ttlock)
+				const modules: Record<string, boolean> = {};
+				for (const [key, value] of Object.entries(modulesFromAPI)) {
+					if (key === 'tTlock') {
+						modules['ttlock'] = value as boolean;
+					} else {
+						modules[key] = value as boolean;
+					}
+				}
+				// console.log("Normalized modules:", modules);
+					// Create a user object with required properties
+					const user: User = {
+						id: String(responseData.data.user.id ?? ''),
+						role: selectedRole,
+						displayName: responseData.data.user.userName,
+						email: responseData.data.user.email,
+						companyId: String(responseData.data.user.companyId ?? ''),
+						photoURL: '',
+						shortcuts: [],
+						settings: {},
+						loginRedirectUrl: '/',
+						modules: modules
+					};
 
-          // Normalize module keys (fix tTlock -> ttlock)
-          const modules: Record<string, boolean> = {};
-          for (const [key, value] of Object.entries(modulesFromAPI)) {
-            if (key === "tTlock") {
-              modules["ttlock"] = value as boolean;
-            } else {
-              modules[key] = value as boolean;
-            }
-          }
-          console.log("Normalized modules:", modules);
-          // Create a user object with required properties
-          const user: User = {
-            id: "",
-            role: selectedRole,
-            displayName: responseData.data.user.userName,
-            email: responseData.data.user.email,
-            companyId: responseData.data.user.companyId,
-            photoURL: "",
-            shortcuts: [],
-            settings: {},
-            loginRedirectUrl: "/",
-            modules: modules,
-          };
-
-          // Guardar los datos del usuario en localStorage
-          localStorage.setItem("user_data", JSON.stringify(user));
+					// Zendesk login with JWT
+					try {
+						const token = await authGetZendeskJwt({
+							externalId: String(responseData.data.user.id ?? ''),
+							name: String(responseData.data.user.userName ?? ''),
+							email: String(responseData.data.user.email ?? '')
+						});
+						if (token) {
+							await zendeskAuthenticateWithJwt(token);
+						}
+					} catch {}
+					
+					// Guardar los datos del usuario en localStorage
+					localStorage.setItem('user_data', JSON.stringify(user));
 
           setAuthState({
             authStatus: "authenticated",
@@ -386,9 +393,9 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
     useCallback(async () => {
       const response = await authRefreshToken();
 
-      if (response.status !== 200) {
-        console.error(`Failed to refresh access token: ${response.status}`);
-      }
+		if (response.status !== 200) {
+			console.error(`Failed to refresh access token: ${response.status}`);
+		}
 
       return response;
     }, []);

@@ -84,6 +84,7 @@ function RoomBlock() {
     return (
         <>
             <Root
+                scroll="content"
                 header={
                     <div className="p-6 flex items-center justify-between">
                         <h2 className="text-2xl font-bold">Lista de Habitaciones</h2>

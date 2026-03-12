@@ -1,0 +1,78 @@
+
+> fuse-react-app@14.0.0 dev
+> vite
+
+
+  [32m[1mVITE[22m v6.0.3[39m  [2mready in [0m[1m475[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m1:03:39 p. m.[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Cannot convert undefined or null to object
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/perfect-scrollbar/css/perfect-scrollbar.css[39m
+[2m1:03:39 p. m.[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Cannot convert undefined or null to object
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/perfect-scrollbar/css/perfect-scrollbar.css[39m
+[2m1:03:39 p. m.[22m [31m[1m[vite][22m[39m [31mInternal server error: Cannot convert undefined or null to object[39m
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/src/styles/index.css[39m
+      at B.generate (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:5598)
+      at async TransformPluginContext.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:3291)
+      at async EnvironmentPluginContainer.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:47001:18)
+      at async loadAndTransform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:40852:27)
+      at async viteTransformMiddleware (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:42296:24)
+[2m1:03:39 p. m.[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Cannot convert undefined or null to object
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/src/styles/index.css[39m
+[2m1:03:39 p. m.[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Cannot convert undefined or null to object
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/perfect-scrollbar/css/perfect-scrollbar.css[39m
+[2m1:03:39 p. m.[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Cannot convert undefined or null to object
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/src/styles/index.css[39m
+[2m1:05:14 p. m.[22m [31m[1m[vite][22m[39m [31mInternal server error: Cannot convert undefined or null to object[39m
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/src/styles/index.css[39m
+      at B.generate (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:5598)
+      at async TransformPluginContext.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:3291)
+      at async EnvironmentPluginContainer.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:47001:18)
+      at async loadAndTransform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:40852:27)
+      at async viteTransformMiddleware (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:42296:24)
+[2m1:07:14 p. m.[22m [31m[1m[vite][22m[39m [31mInternal server error: Cannot convert undefined or null to object[39m
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/src/styles/index.css[39m
+      at B.generate (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:5598)
+      at async TransformPluginContext.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:3291)
+      at async EnvironmentPluginContainer.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:47001:18)
+      at async loadAndTransform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:40852:27)
+      at async viteTransformMiddleware (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:42296:24)
+[2m1:17:14 p. m.[22m [31m[1m[vite][22m[39m [31mInternal server error: Cannot convert undefined or null to object[39m
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/src/styles/index.css[39m
+      at B.generate (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:5598)
+      at async TransformPluginContext.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:3291)
+      at async EnvironmentPluginContainer.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:47001:18)
+      at async loadAndTransform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:40852:27)
+      at async viteTransformMiddleware (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:42296:24)
+[2m1:18:38 p. m.[22m [31m[1m[vite][22m[39m [31mInternal server error: Cannot convert undefined or null to object[39m
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/src/styles/index.css[39m
+      at B.generate (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:5598)
+      at async TransformPluginContext.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:3291)
+      at async EnvironmentPluginContainer.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:47001:18)
+      at async loadAndTransform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:40852:27)
+      at async viteTransformMiddleware (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:42296:24)
+[2m1:18:42 p. m.[22m [31m[1m[vite][22m[39m [31mInternal server error: Cannot convert undefined or null to object[39m
+  Plugin: [35m@tailwindcss/vite:generate:serve[39m
+  File: [36mE:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/src/styles/index.css[39m
+      at B.generate (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:5598)
+      at async TransformPluginContext.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/@tailwindcss/vite/dist/index.mjs:1:3291)
+      at async EnvironmentPluginContainer.transform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:47001:18)
+      at async loadAndTransform (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:40852:27)
+      at async viteTransformMiddleware (file:///E:/Getsoftware/SentryApp/Desarrollo/Full_App/sentryapp-front/node_modules/vite/dist/node/chunks/dep-yUJfKD1i.js:42296:24)
+[2m1:20:19 p. m.[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/app/(control-panel)/housekeeping/HousekeepingRoute.tsx[22m
+[2m1:20:25 p. m.[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/app/(control-panel)/housekeeping/HousekeepingRoute.tsx[22m
+[2m1:24:27 p. m.[22m [36m[1m[vite][22m[39m [32mvite.config.ts changed, restarting server...[39m
+[2m1:24:27 p. m.[22m [36m[1m[vite][22m[39m server restarted.
+[2m1:28:42 p. m.[22m [36m[1m[vite][22m[39m [32mvite.config.ts changed, restarting server...[39m
+[2m1:28:43 p. m.[22m [36m[1m[vite][22m[39m server restarted.

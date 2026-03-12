@@ -130,15 +130,9 @@ const ResendModal: React.FC<ResendModalProps> = ({ open, onClose, onSuccess, gue
             const hostname = url.hostname
             const port = url.port
             const tenant = port ? `${hostname}:${port}` : hostname
-            const response = await import("../reserveService").then((mod) => mod.resetUserPassword(email.trim(), tenant))
+            const response = await import("../reserveService").then((mod) => mod.resetUserPassword(email.trim(), tenant, guest?.rutVatId))
             if (response.succeeded) {
                 enqueueSnackbar("Usuario reseteado y correo enviado exitosamente", { variant: "success" })
-                if (guest) {
-                    const updateResult = await import("../reserveService").then((mod) => mod.updateUserInfo(guest.rutVatId, { Email: email.trim() }))
-                    if (!updateResult.succeeded) {
-                        enqueueSnackbar("No se pudo actualizar el correo del usuario", { variant: "warning" })
-                    }
-                }
             } else {
                 const errorMessage = response.message && response.message.length > 0 ? response.message.join(", ") : "Error al resetear usuario"
                 enqueueSnackbar(errorMessage, { variant: "error" })

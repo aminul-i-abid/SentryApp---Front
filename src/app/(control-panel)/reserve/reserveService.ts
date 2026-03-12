@@ -310,14 +310,14 @@ export const getCalendarData = async (startDate: string, endDate: string, blockI
     }
 };
 
-export const resetUserPassword = async (email: string, tenant: string): Promise<ApiResponse<any>> => {
+export const resetUserPassword = async (email: string, tenant: string, rut?: string): Promise<ApiResponse<any>> => {
     try {
         const response = await apiFetch('/Users/send-new-password-email', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email, tenant })
+            body: JSON.stringify({ email, tenant, ...(rut ? { rut } : {}) })
         });
         const data = await response.json();
         return data;
@@ -391,6 +391,7 @@ export const resendMessaging = async (request: ResendMessagingRequest): Promise<
 };
 
 export const resetPinTtlock = async (reservationGuestId: number): Promise<ApiResponse<any>> => {
+
     try {
         const response = await apiFetch(`${endpoint}/ChangePasswordTtlock/${reservationGuestId}`, {
             method: 'POST'

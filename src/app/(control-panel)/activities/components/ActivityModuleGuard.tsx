@@ -31,11 +31,11 @@ export default function ActivityModuleGuard({ children }: ActivityModuleGuardPro
     
     const hasActivitiesModule = user?.modules?.activities === true;
     
-    console.log('🔍 ActivityModuleGuard check:', {
-        hasAccess: hasActivitiesModule,
-        userModules: user?.modules,
-        userId: user?.uid
-    });
+    // console.log('🔍 ActivityModuleGuard check:', {
+    //     hasAccess: hasActivitiesModule,
+    //     userModules: user?.modules,
+    //     userId: user?.uid
+    // });
 
     /**
      * Silent background revalidation when user doesn't have access

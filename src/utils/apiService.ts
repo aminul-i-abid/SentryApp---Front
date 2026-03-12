@@ -31,12 +31,22 @@ serviceInstance.interceptors.response.use(
 		if (response.data && !response.data.succeeded && response.data.errors) {
 			const errors = response.data.errors;
 			
-			// Check for ACTIVITY_MODULE_DISABLED error
-			if (errors.includes('ACTIVITY_MODULE_DISABLED')) {
+			// Check for ACTIVITY_MODULE_DISABLED error - only if errors is an array
+			if (Array.isArray(errors) && errors.includes('ACTIVITY_MODULE_DISABLED')) {
 				console.log('🔒 Activity module disabled - emitting event');
 				window.dispatchEvent(
 					new CustomEvent('APP_MODULE_STATUS_CHANGED', {
 						detail: { module: 'activities', enabled: false }
+					})
+				);
+			}
+			
+			// Check for STOCK_MODULE_DISABLED error - only if errors is an array
+			if (Array.isArray(errors) && errors.includes('STOCK_MODULE_DISABLED')) {
+				console.log('🔒 Stock module disabled - emitting event');
+				window.dispatchEvent(
+					new CustomEvent('APP_MODULE_STATUS_CHANGED', {
+						detail: { module: 'stock', enabled: false }
 					})
 				);
 			}
@@ -48,6 +58,28 @@ serviceInstance.interceptors.response.use(
 			window.dispatchEvent(
 				new CustomEvent('APP_MODULE_STATUS_CHANGED', {
 					detail: { module: 'activities', enabled: true }
+				})
+			);
+		}
+		
+		// Handle successful stock fetches - ensure module is enabled
+		if (response.data?.succeeded && (
+			response.config?.url?.includes('/stocks') ||
+			response.config?.url?.includes('/transfers') ||
+			response.config?.url?.includes('/items') ||
+			response.config?.url?.includes('/itemunitofmeasure') ||
+			response.config?.url?.includes('/lots') ||
+			response.config?.url?.includes('/suppliers') ||
+			response.config?.url?.includes('/warehouses') ||
+			response.config?.url?.includes('/locations') ||
+			response.config?.url?.includes('/movementreasons') ||
+			response.config?.url?.includes('/movements') ||
+			response.config?.url?.includes('/supplierlots')
+		)) {
+			console.log('✅ Stock module data loaded successfully - emitting event');
+			window.dispatchEvent(
+				new CustomEvent('APP_MODULE_STATUS_CHANGED', {
+					detail: { module: 'stock', enabled: true }
 				})
 			);
 		}

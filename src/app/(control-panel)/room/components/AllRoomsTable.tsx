@@ -554,7 +554,7 @@ const AllRoomsTable: React.FC<AllRoomsTableProps> = ({ contractors }) => {
 
       if (result.succeeded) {
         enqueueSnackbar(
-          `Habitaciï¿½n ${pendingDisabledState ? "deshabilitada" : "habilitada"} correctamente`,
+          `Habitación ${pendingDisabledState ? "deshabilitada" : "habilitada"} correctamente`,
           {
             variant: "success",
           },

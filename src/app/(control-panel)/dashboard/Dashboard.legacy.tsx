@@ -620,6 +620,7 @@ function DashboardLegacy() {
 
     return (
         <Root
+            scroll="content"
             header={
                 <div className="p-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">

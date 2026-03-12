@@ -47,7 +47,7 @@ const defaultTheme = {
  * The defaultSettings object defines the default settings for the Fuse application.
  */
 export const defaultSettings = {
-	customScrollbars: true,
+	customScrollbars: false,
 	direction: 'ltr',
 	layout: {},
 	theme: {

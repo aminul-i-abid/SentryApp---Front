@@ -27,12 +27,52 @@ export enum Routes {
   USER_MANUAL = '/user-manual',
   PROBLEMS = '/problems',
   NOTIFICATIONS = '/notifications',
+  ITEM_UNIT_OF_MEASURE = '/item-unit-of-measure',
+  ITEMS = '/items',
+  LOTS = '/lots',
+  SUPPLIER_LOTS = '/supplier-lots',
+  SUPPLIERS = '/suppliers',
+  WAREHOUSES = '/warehouses',
+  LOCATIONS = '/locations',
+  MOVEMENT_REASONS = '/movement-reasons',
+  STOCKS = '/stocks',
+  STOCKS_BY_ARTICLE = '/stocks/by-article',
+  STOCKS_BY_WAREHOUSE = '/stocks/by-warehouse',
+  MOVEMENTS = '/movements',
+  RECEIVING = '/receiving',
+  TRANSFERS = '/transfers',
+  CONSUMPTION = '/consumption',
+  SCRAP = '/scrap',
+  POSITIVE_ADJUSTMENTS = '/positive-adjustments',
+  NEGATIVE_ADJUSTMENTS = '/negative-adjustments',
   
   // Activities Module (Premium)
   ACTIVITIES = '/activities',
   ACTIVITIES_DETAIL = '/activities/:id',
   ACTIVITIES_BOOKING = '/activities/:id/book',
-  ACTIVITIES_RESERVATIONS = '/activities/my-reservations'
+  ACTIVITIES_RESERVATIONS = '/activities/my-reservations',
+
+  // Housekeeping Module
+  HOUSEKEEPING = '/housekeeping',
+  HOUSEKEEPING_ASSIGNMENT = '/housekeeping/assignment',
+  HOUSEKEEPING_TASKS = '/housekeeping/tasks',
+  HOUSEKEEPING_MY_TASKS = '/housekeeping/my-tasks',
+  HOUSEKEEPING_TEMPLATES = '/housekeeping/templates',
+  HOUSEKEEPING_RULES = '/housekeeping/rules',
+  HOUSEKEEPING_CATEGORIES = '/housekeeping/categories',
+  HOUSEKEEPING_TAREAS = '/housekeeping/tareas',
+  HOUSEKEEPING_DASHBOARD = '/housekeeping/dashboard',
+  HOUSEKEEPING_DASHBOARD_HOME = '/housekeeping/dashboard/home',
+  HOUSEKEEPING_DASHBOARD_VARIANCE = '/housekeeping/dashboard/variance',
+  HOUSEKEEPING_DASHBOARD_MAINTENANCE = '/housekeeping/dashboard/maintenance',
+  HOUSEKEEPING_DASHBOARD_DISCREPANCIES = '/housekeeping/dashboard/discrepancies',
+  HOUSEKEEPING_ASSIGNMENTS = '/housekeeping/assignments',
+
+  // Maintenance Module
+  MAINTENANCE = '/maintenance',
+  MAINTENANCE_ALERTS = '/maintenance/alerts',
+  MAINTENANCE_ALERT_DETAIL = '/maintenance/alerts/:id',
+  MAINTENANCE_CATEGORIES = '/maintenance/categories'
 }
 
 /**

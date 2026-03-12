@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sentry Front UI Patterns"
+  short_description: "Patrones UI y lineamientos visuales en Sentry Front"
+  default_prompt: "Aplicar patrones UI de Sentry-Front en una nueva pantalla."

@@ -18,5 +18,7 @@ export type User = FuseAuthUser & {
 	modules?: {
 		activities?: boolean;
 		ttlock?: boolean;
+		housekeeping?: boolean;
+		stock?: boolean;
 	};
 };
