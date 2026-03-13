@@ -287,9 +287,27 @@ const BlockFloorSelector: React.FC<BlockFloorSelectorProps> = ({
           value={filterBlock}
           onChange={(_e, newValue) => setFilterBlock(newValue)}
           renderInput={(params) => (
-            <TextField {...params} label="Filtrar por pabellón" size="small" />
+            <TextField
+              {...params}
+              label="Filtrar por pabellón"
+              size="small"
+              sx={{
+                bgcolor: 'white',
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'white',
+                },
+              }}
+            />
           )}
-          sx={{ minWidth: 220 }}
+          slotProps={{
+            paper: {
+              sx: {
+                bgcolor: 'white',
+                border: '6px solid #f3f4f6',
+              },
+            },
+          }}
+          sx={{ minWidth: 220, bgcolor: 'white' }}
           disabled={disabled}
           clearOnEscape
         />

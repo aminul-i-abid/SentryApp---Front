@@ -265,6 +265,10 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
                   onClick={() => setOpenTareasDialog(true)}
                   disabled={disabled}
                   size="large"
+                  sx={{
+                    backgroundColor: "#415EDE",
+                    color: "white"
+                  }}
                 >
                   Agregar desde Tareas
                 </Button>
@@ -279,9 +283,12 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
               onClose={() => setOpenTareasDialog(false)}
               maxWidth="sm"
               fullWidth
+              PaperProps={{
+                sx: { backgroundColor: 'white' }
+              }}
             >
-              <DialogTitle>Seleccionar Tarea</DialogTitle>
-              <DialogContent sx={{ p: 0 }}>
+              <DialogTitle sx={{ backgroundColor: 'white' }}>Seleccionar Tarea</DialogTitle>
+              <DialogContent sx={{ p: 0, backgroundColor: 'white' }}>
                 {tareas.length === 0 ? (
                   <Box sx={{ p: 3, textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">
@@ -308,7 +315,7 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
                   </List>
                 )}
               </DialogContent>
-              <DialogActions>
+              <DialogActions sx={{ backgroundColor: 'white' }}>
                 <Button onClick={() => setOpenTareasDialog(false)}>
                   Cancelar
                 </Button>
@@ -469,6 +476,10 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
               onClick={() => setOpenTareasDialog(true)}
               disabled={disabled}
               size="large"
+              sx={{
+                backgroundColor: "#415EDE",
+                color: "white"
+              }}
             >
               Agregar desde Tareas
             </Button>
@@ -482,9 +493,12 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
             onClose={() => setOpenTareasDialog(false)}
             maxWidth="sm"
             fullWidth
+            PaperProps={{
+              sx: { backgroundColor: 'white' }
+            }}
           >
-            <DialogTitle>Seleccionar Tarea</DialogTitle>
-            <DialogContent sx={{ p: 0 }}>
+            <DialogTitle sx={{ backgroundColor: 'white' }}>Seleccionar Tarea</DialogTitle>
+            <DialogContent sx={{ p: 0, backgroundColor: 'white' }}>
               {tareas.length === 0 ? (
                 <Box sx={{ p: 3, textAlign: 'center' }}>
                   <Typography variant="body2" color="text.secondary">
@@ -511,7 +525,7 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
                 </List>
               )}
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ backgroundColor: 'white' }}>
               <Button onClick={() => setOpenTareasDialog(false)}>
                 Cancelar
               </Button>

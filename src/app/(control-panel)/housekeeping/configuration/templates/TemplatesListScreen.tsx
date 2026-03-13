@@ -55,7 +55,7 @@ import {
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
 } from '@mui/icons-material';
-import { MaterialReactTable, type MRT_ColumnDef } from 'material-react-table';
+import StyledTable, { type TableColumnDef } from '@/components/ui/StyledTable';
 import { useSnackbar } from 'notistack';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchTemplates, deleteTemplate, createTemplate, updateTemplate } from '@/store/housekeeping';
@@ -308,35 +308,39 @@ const TemplatesListScreen: React.FC = () => {
   };
 
   // Table columns
-  const columns = useMemo<MRT_ColumnDef<ChecklistTemplate>[]>(
+  const columns = useMemo<TableColumnDef<ChecklistTemplate>[]>(
     () => [
       {
-        accessorKey: 'name',
-        header: 'Nombre',
-        size: 250,
-        Cell: ({ row }) => (
+        id: 'name',
+        label: 'Nombre',
+        sortable: true,
+        width: '250px',
+        render: (row) => (
           <Box>
             <Typography variant="body2" fontWeight={500}>
-              {row.original.name}
+              {row.name}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {(row.original.items ?? []).length} items
+              {(row.items ?? []).length} items
             </Typography>
           </Box>
         ),
       },
       {
-        accessorKey: 'categoryName',
-        header: 'Categoría',
-        size: 150,
+        id: 'categoryName',
+        label: 'Categoría',
+        sortable: true,
+        width: '150px',
+        render: (row) => <>{row.categoryName}</>,
       },
       {
-        accessorKey: 'priority',
-        header: 'Prioridad',
-        size: 100,
-        Cell: ({ cell }) => (
+        id: 'priority',
+        label: 'Prioridad',
+        sortable: true,
+        width: '100px',
+        render: (row) => (
           <Chip
-            label={cell.getValue<number>()}
+            label={row.priority}
             size="small"
             color="primary"
             variant="outlined"
@@ -344,84 +348,33 @@ const TemplatesListScreen: React.FC = () => {
         ),
       },
       {
-        accessorKey: 'isActive',
-        header: 'Estado',
-        size: 100,
-        Cell: ({ cell }) => (
+        id: 'isActive',
+        label: 'Estado',
+        sortable: true,
+        width: '100px',
+        render: (row) => (
           <Chip
-            label={cell.getValue<boolean>() ? 'Activo' : 'Inactivo'}
+            label={row.isActive ? 'Activo' : 'Inactivo'}
             size="small"
-            color={cell.getValue<boolean>() ? 'success' : 'default'}
+            color={row.isActive ? 'success' : 'default'}
           />
         ),
       },
       {
-        accessorKey: 'createdAt',
-        header: 'Creado',
-        size: 150,
-        Cell: ({ cell }) => new Date(cell.getValue<string>()).toLocaleDateString(),
-      },
-      {
-        id: 'actions',
-        header: 'Acciones',
-        size: 200,
-        Cell: ({ row }) => (
-          <Stack direction="row" spacing={0.5}>
-            <Tooltip title="Editar template">
-              <IconButton
-                size="small"
-                onClick={() => handleEdit(row.original.id)}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Duplicar template">
-              <IconButton
-                size="small"
-                onClick={() => handleDuplicate(row.original)}
-              >
-                <DuplicateIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={row.original.isActive ? 'Desactivar' : 'Activar'}>
-              <IconButton
-                size="small"
-                onClick={() => handleToggleActive(row.original.id, row.original.isActive)}
-              >
-                {row.original.isActive ? (
-                  <DeactivateIcon fontSize="small" color="warning" />
-                ) : (
-                  <ActivateIcon fontSize="small" color="success" />
-                )}
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Eliminar template">
-              <IconButton
-                size="small"
-                onClick={() => handleDeleteClick(row.original.id)}
-                color="error"
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={expandedRows.has(row.original.id) ? 'Ocultar items' : 'Ver items'}>
-              <IconButton
-                size="small"
-                onClick={() => handleToggleExpand(row.original.id)}
-              >
-                {expandedRows.has(row.original.id) ? (
-                  <ExpandLessIcon fontSize="small" />
-                ) : (
-                  <ExpandMoreIcon fontSize="small" />
-                )}
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        ),
+        id: 'createdAt',
+        label: 'Creado',
+        sortable: true,
+        width: '150px',
+        render: (row) => new Date(row.createdAt).toLocaleDateString(),
       },
     ],
-    [expandedRows]
+    []
   );
+
+  const paginatedData = useMemo(() => {
+    const start = state.page * state.pageSize;
+    return filteredTemplates.slice(start, start + state.pageSize);
+  }, [filteredTemplates, state.page, state.pageSize]);
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -443,7 +396,7 @@ const TemplatesListScreen: React.FC = () => {
       )}
 
       {/* Filters and Actions */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper sx={{ p: 3, mb: 3, backgroundColor: "white" }}>
         <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
           {/* Search */}
           <TextField
@@ -454,6 +407,7 @@ const TemplatesListScreen: React.FC = () => {
             sx={{ minWidth: 250 }}
             InputProps={{
               startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+              sx: { backgroundColor: "white" },
             }}
           />
 
@@ -464,6 +418,20 @@ const TemplatesListScreen: React.FC = () => {
               value={state.filters.categoryId || ''}
               onChange={handleCategoryChange}
               label="Categoría"
+              sx={{
+                backgroundColor: "white",
+                '& .MuiSelect-select': {
+                  backgroundColor: 'white',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  backgroundColor: 'transparent',
+                },
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: { backgroundColor: 'white !important' }
+                }
+              }}
             >
               <MenuItem value="">Todas</MenuItem>
               {categories.map((cat) => (
@@ -481,6 +449,20 @@ const TemplatesListScreen: React.FC = () => {
               value={state.filters.isActive === undefined ? '' : String(state.filters.isActive)}
               onChange={handleActiveStatusChange}
               label="Estado"
+              sx={{
+                backgroundColor: "white",
+                '& .MuiSelect-select': {
+                  backgroundColor: 'white',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  backgroundColor: 'transparent',
+                },
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: { backgroundColor: 'white !important' }
+                }
+              }}
             >
               <MenuItem value="">Todos</MenuItem>
               <MenuItem value="true">Activos</MenuItem>
@@ -495,7 +477,7 @@ const TemplatesListScreen: React.FC = () => {
             <>
               <Button
                 variant="outlined"
-                startIcon={<ActivateIcon />}
+                startIcon={<img src="/assets/icons/on.png" alt="Activate" />}
                 onClick={() => handleBulkAction('activate')}
                 size="small"
               >
@@ -503,7 +485,7 @@ const TemplatesListScreen: React.FC = () => {
               </Button>
               <Button
                 variant="outlined"
-                startIcon={<DeactivateIcon />}
+                startIcon={<img src="/assets/icons/off.png" alt="Deactivate" />}
                 onClick={() => handleBulkAction('deactivate')}
                 size="small"
               >
@@ -517,6 +499,7 @@ const TemplatesListScreen: React.FC = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleCreate}
+            sx={{ backgroundColor: '#415EDE', color: 'white' }}
           >
             Nuevo Template
           </Button>
@@ -524,77 +507,107 @@ const TemplatesListScreen: React.FC = () => {
       </Paper>
 
       {/* Table */}
-      <MaterialReactTable
+      <StyledTable
         columns={columns}
-        data={filteredTemplates}
-        enableRowSelection
-        enableSelectAll
+        data={paginatedData}
         getRowId={(row) => row.id}
-        onRowSelectionChange={(updater) => {
-          const newSelection = typeof updater === 'function'
-            ? updater(
-                state.selectedTemplates.reduce((acc, id) => ({ ...acc, [id]: true }), {})
-              )
-            : updater;
-
+        loading={loading || loadingCategories}
+        selectable
+        selected={state.selectedTemplates}
+        onSelectAll={(e) => {
+          if (e.target.checked) {
+            setState((prev) => ({ ...prev, selectedTemplates: filteredTemplates.map(t => t.id) }));
+          } else {
+            setState((prev) => ({ ...prev, selectedTemplates: [] }));
+          }
+        }}
+        onSelectRow={(_, id) => {
+          handleRowSelectionChange(id);
+        }}
+        order={state.sortOrder}
+        orderBy={state.sortBy}
+        onSort={(columnId) => {
           setState((prev) => ({
             ...prev,
-            selectedTemplates: Object.keys(newSelection).filter((id) => newSelection[id]),
+            sortBy: columnId as "name" | "priority" | "createdAt",
+            sortOrder: prev.sortBy === columnId && prev.sortOrder === 'asc' ? 'desc' : 'asc',
           }));
         }}
-        state={{
-          isLoading: loading || loadingCategories,
-          rowSelection: state.selectedTemplates.reduce((acc, id) => ({ ...acc, [id]: true }), {}),
-        }}
-        enablePagination
-        enableSorting
-        enableColumnFilters={false}
-        enableGlobalFilter={false}
-        enableDensityToggle={false}
-        initialState={{
-          density: 'compact',
-          pagination: { pageSize: state.pageSize, pageIndex: state.page },
-        }}
-        muiTableBodyRowProps={({ row }) => ({
-          sx: {
-            '& > td': {
-              backgroundColor: expandedRows.has(row.original.id) ? 'action.hover' : 'inherit',
-            },
-          },
-        })}
-        renderDetailPanel={({ row }) =>
-          expandedRows.has(row.original.id) ? (
-            <Box sx={{ p: 2, backgroundColor: 'background.default' }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Items del Template (mostrando primeros 5)
-              </Typography>
-              <List dense>
-                {(row.original.items ?? []).slice(0, 5).map((item, idx) => (
-                  <ListItem key={idx}>
-                    <ListItemText
-                      primary={item.description}
-                      secondary={
-                        <>
-                          {item.isMandatory && (
-                            <Chip label="Obligatorio" size="small" color="error" sx={{ mr: 1 }} />
-                          )}
-                          Orden: {item.order}
-                        </>
-                      }
-                    />
-                  </ListItem>
-                ))}
-                {(row.original.items ?? []).length > 5 && (
-                  <ListItem>
-                    <ListItemText
-                      secondary={`... y ${(row.original.items ?? []).length - 5} items más`}
-                    />
-                  </ListItem>
+        renderActions={(row) => (
+          <Stack direction="row" spacing={0.5} justifyContent="center">
+            <Tooltip title="Editar template">
+              <IconButton size="small" onClick={() => handleEdit(row.id)}>
+                <img src="./assets/icons/edit-black.png" alt="" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Duplicar template">
+              <IconButton size="small" onClick={() => handleDuplicate(row)}>
+                <DuplicateIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={row.isActive ? 'Desactivar' : 'Activar'}>
+              <IconButton size="small" onClick={() => handleToggleActive(row.id, row.isActive)}>
+                {row.isActive ? (
+                  <img src="./assets/icons/off.png" alt="" />
+                ) : (
+                  <img src="./assets/icons/on.png" alt="" />
                 )}
-              </List>
-            </Box>
-          ) : null
-        }
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Eliminar template">
+              <IconButton size="small" onClick={() => handleDeleteClick(row.id)} color="error">
+                <img src="./assets/icons/delete.png" alt="" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={expandedRows.has(row.id) ? 'Ocultar items' : 'Ver items'}>
+              <IconButton size="small" onClick={() => handleToggleExpand(row.id)}>
+                {expandedRows.has(row.id) ? (
+                  <ExpandLessIcon fontSize="small" />
+                ) : (
+                  <ExpandMoreIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        )}
+        isRowExpanded={(row) => expandedRows.has(row.id)}
+        renderDetailPanel={(row) => (
+          <Box sx={{ p: 2, backgroundColor: 'background.default', mx: 2, my: 1, borderRadius: 2 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Items del Template (mostrando primeros 5)
+            </Typography>
+            <List dense>
+              {(row.items ?? []).slice(0, 5).map((item, idx) => (
+                <ListItem key={idx}>
+                  <ListItemText
+                    primary={item.description}
+                    secondary={
+                      <>
+                        {item.isMandatory && (
+                          <Chip label="Obligatorio" size="small" color="error" sx={{ mr: 1 }} />
+                        )}
+                        Orden: {item.order}
+                      </>
+                    }
+                  />
+                </ListItem>
+              ))}
+              {(row.items ?? []).length > 5 && (
+                <ListItem>
+                  <ListItemText
+                    secondary={`... y ${(row.items ?? []).length - 5} items más`}
+                  />
+                </ListItem>
+              )}
+            </List>
+          </Box>
+        )}
+        pagination={{
+          count: filteredTemplates.length,
+          page: state.page,
+          rowsPerPage: state.pageSize,
+          onPageChange: (_, newPage) => setState((prev) => ({ ...prev, page: newPage })),
+        }}
       />
 
       {/* Delete Confirmation Dialog */}

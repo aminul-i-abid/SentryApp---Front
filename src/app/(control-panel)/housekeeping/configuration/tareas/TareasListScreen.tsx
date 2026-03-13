@@ -224,6 +224,10 @@ const TareaFormDialog: React.FC<TareaFormDialogProps> = ({
           variant="contained"
           disabled={isSaving}
           startIcon={isSaving ? <CircularProgress size={18} /> : undefined}
+          sx={{
+            backgroundColor: "#415EDE",
+            color: "white",
+          }}
         >
           {isSaving ? 'Guardando...' : 'Guardar'}
         </Button>
@@ -306,7 +310,7 @@ const TareasListScreen: React.FC = () => {
         }
         setFormDialogOpen(false);
         setSelectedTarea(null);
-        
+
         // Ensure the list is reloaded fully from the server
         if (campId) {
           dispatch(fetchTareas({ campId: String(campId) }));
@@ -420,6 +424,10 @@ const TareasListScreen: React.FC = () => {
           startIcon={<AddIcon />}
           onClick={handleCreate}
           disabled={loading}
+          sx={{
+            backgroundColor: "#415EDE",
+            color: "white"
+          }}
         >
           Nueva Tarea
         </Button>
@@ -437,8 +445,8 @@ const TareasListScreen: React.FC = () => {
         {loading && tareas.length === 0
           ? renderSkeletons()
           : tareas.length === 0
-          ? renderEmpty()
-          : tareas.map((tarea) => (
+            ? renderEmpty()
+            : tareas.map((tarea) => (
               <Grid item xs={12} sm={6} md={4} key={tarea.id}>
                 <Card
                   sx={{
@@ -514,7 +522,7 @@ const TareasListScreen: React.FC = () => {
                   <CardActions sx={{ pt: 0, px: 2, pb: 2, gap: 1 }}>
                     <Button
                       size="small"
-                      startIcon={<EditIcon />}
+                      startIcon={<img src="/assets/icons/edit-black.png" alt="Edit" />}
                       onClick={() => handleEdit(tarea)}
                       variant="outlined"
                       fullWidth
@@ -527,7 +535,7 @@ const TareasListScreen: React.FC = () => {
                         color="error"
                         onClick={() => handleDeleteOpen(tarea)}
                       >
-                        <DeleteIcon fontSize="small" />
+                        <img src="/assets/icons/delete.png" alt="Delete" />
                       </IconButton>
                     </Tooltip>
                   </CardActions>

@@ -44,6 +44,25 @@ import ConfirmAssignmentSummary from './components/ConfirmAssignmentSummary';
 
 const STEPS = ['Seleccionar Operarios', 'Nivel de Asignación', 'Objetivo', 'Confirmar'];
 
+// ─── Dummy data for demo ──────────────────────────────────────────────────────
+
+const DUMMY_OPERATORS: OperatorOption[] = [
+  { id: 'op-1', fullName: 'Carlos Rodríguez', rut: '12.345.678-9', email: 'carlos@camp.cl' },
+  { id: 'op-2', fullName: 'María González', rut: '14.567.890-1', email: 'maria@camp.cl' },
+  { id: 'op-3', fullName: 'Juan Pérez', rut: '16.789.012-3', email: 'juan@camp.cl' },
+];
+
+const DUMMY_ROOMS: RoomOption[] = [
+  { id: '101', number: '101', blockId: 'b1', blockName: 'Pabellón A', floor: 1, bedCount: 2 },
+  { id: '102', number: '102', blockId: 'b1', blockName: 'Pabellón A', floor: 1, bedCount: 3 },
+  { id: '103', number: '103', blockId: 'b1', blockName: 'Pabellón A', floor: 1, bedCount: 2 },
+  { id: '201', number: '201', blockId: 'b1', blockName: 'Pabellón A', floor: 2, bedCount: 2 },
+  { id: '202', number: '202', blockId: 'b1', blockName: 'Pabellón A', floor: 2, bedCount: 4 },
+  { id: '301', number: '301', blockId: 'b2', blockName: 'Pabellón B', floor: 1, bedCount: 4 },
+  { id: '302', number: '302', blockId: 'b2', blockName: 'Pabellón B', floor: 1, bedCount: 2 },
+  { id: '401', number: '401', blockId: 'b2', blockName: 'Pabellón B', floor: 2, bedCount: 3 },
+];
+
 // ─── Form state ───────────────────────────────────────────────────────────────
 
 interface AssignmentFormState {
@@ -56,12 +75,12 @@ interface AssignmentFormState {
 }
 
 const initialFormState: AssignmentFormState = {
-  selectedOperators: [],
-  selectedLevel: 'camp',
-  selectedBlockId: null,
-  selectedBlockName: '',
-  selectedBlockRoomCount: 0,
-  selectedRooms: [],
+  selectedOperators: DUMMY_OPERATORS,
+  selectedLevel: 'block',
+  selectedBlockId: 'b1',
+  selectedBlockName: 'Pabellón A',
+  selectedBlockRoomCount: 5,
+  selectedRooms: DUMMY_ROOMS,
 };
 
 // ─── Snackbar state ───────────────────────────────────────────────────────────
@@ -217,7 +236,7 @@ const TaskAssignmentScreen: React.FC = () => {
           px: 4,
           pt: 4,
           pb: 0,
-          bgcolor: 'background.paper',
+          bgcolor: 'white',
         }}
       >
         <Typography variant="h5" gutterBottom>
@@ -238,7 +257,7 @@ const TaskAssignmentScreen: React.FC = () => {
       </Box>
 
       {/* Step content */}
-      <Box sx={{ flex: 1, px: 4, py: 3 }}>
+      <Box sx={{ flex: 1, px: 4, py: 3, bgcolor: 'white' }}>
         {/* Step 0 — Seleccionar Operarios */}
         {activeStep === 0 && (
           <Box>
@@ -356,15 +375,13 @@ const TaskAssignmentScreen: React.FC = () => {
           zIndex: 10,
           px: 3,
           py: 2,
-          // Extra bottom padding on mobile so buttons are not covered by
-          // the floating help/chat widget that sits at the bottom-right corner.
           pb: { xs: 10, sm: 3 },
           borderTop: 1,
           borderColor: 'divider',
           display: 'flex',
           justifyContent: 'center',
           gap: 2,
-          bgcolor: 'background.paper',
+          bgcolor: 'white',
         }}
       >
         <Button
@@ -388,16 +405,30 @@ const TaskAssignmentScreen: React.FC = () => {
             variant="contained"
             disabled={!isStepValid(activeStep)}
             onClick={handleNext}
+            sx={{
+              bgcolor: '#415EDE',
+              color: 'white',
+              textTransform: 'none',
+              fontWeight: 600,
+              '&:hover': { bgcolor: '#354bb1' },
+              '&.Mui-disabled': { bgcolor: '#b0b0b0', color: '#fff' },
+            }}
           >
             Siguiente
           </Button>
         ) : (
           <Button
             variant="contained"
-            color="success"
             disabled={isSubmitting}
             onClick={() => void handleSubmit()}
             startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : undefined}
+            sx={{
+              bgcolor: '#415EDE',
+              color: 'white',
+              textTransform: 'none',
+              fontWeight: 600,
+              '&:hover': { bgcolor: '#354bb1' },
+            }}
           >
             {isSubmitting ? 'Guardando...' : 'Confirmar Asignación'}
           </Button>

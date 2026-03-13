@@ -199,6 +199,15 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
             value={filterBlockId}
             label="Pabellón"
             onChange={(e: SelectChangeEvent<string>) => setFilterBlockId(e.target.value)}
+            sx={{ bgcolor: 'white' }}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  bgcolor: 'white',
+                  border: '6px solid #f3f4f6',
+                },
+              },
+            }}
           >
             <MenuItem value="">
               <em>Todos los pabellones</em>
@@ -218,7 +227,7 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
           value={filterFloor}
           onChange={(e) => setFilterFloor(e.target.value)}
           disabled={disabled}
-          sx={{ width: 100 }}
+          sx={{ width: 100, bgcolor: 'white' }}
           inputProps={{ min: 0 }}
         />
 
@@ -228,7 +237,7 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
           value={filterSearch}
           onChange={(e) => setFilterSearch(e.target.value)}
           disabled={disabled}
-          sx={{ width: 160 }}
+          sx={{ width: 160, bgcolor: 'white' }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleSearch();

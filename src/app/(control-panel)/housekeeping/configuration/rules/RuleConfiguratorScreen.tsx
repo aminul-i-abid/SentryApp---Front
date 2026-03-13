@@ -469,6 +469,12 @@ const RuleConfiguratorScreen: React.FC = () => {
               startIcon={isSaving ? <CircularProgress size={20} /> : <SaveIcon />}
               onClick={handleSave}
               disabled={isSaving || isLoading}
+              sx={{
+                bgcolor: '#415EDE',
+                color: 'white',
+                textTransform: 'none',
+                fontWeight: 600,
+              }}
             >
               {isEditMode ? 'Guardar' : 'Crear'}
             </Button>
@@ -480,7 +486,7 @@ const RuleConfiguratorScreen: React.FC = () => {
       <Grid container spacing={3}>
         {/* Left Sidebar - Tabs */}
         <Grid item xs={12} md={3}>
-          <Paper sx={{ position: 'sticky', top: 80 }}>
+          <Paper sx={{ position: 'sticky', top: 80, backgroundColor: "white" }}>
             <Tabs
               orientation="vertical"
               value={activeTab}
@@ -517,7 +523,7 @@ const RuleConfiguratorScreen: React.FC = () => {
 
         {/* Main Content Area - Tab Panels */}
         <Grid item xs={12} md={9}>
-          <Paper>
+          <Paper sx={{ backgroundColor: "white" }}>
             {/* Basic Info Tab */}
             <TabPanel value={activeTab} index={0}>
               <RuleBasicInfo

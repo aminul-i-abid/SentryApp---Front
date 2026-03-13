@@ -423,6 +423,11 @@ const AssignmentListScreen: React.FC = () => {
         maxWidth="sm"
         fullWidth
         scroll="paper"
+        PaperProps={{
+          sx: {
+            backgroundColor: 'white',
+          },
+        }}
       >
         <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>

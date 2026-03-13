@@ -208,6 +208,9 @@ const RuleActions: React.FC<RuleActionsProps> = ({
                 variant="outlined"
                 color="inherit"
                 disabled={isSaving || isTesting}
+                sx={{
+                  color: "red"
+                }}
               >
                 Cancelar
               </Button>
@@ -279,6 +282,10 @@ const RuleActions: React.FC<RuleActionsProps> = ({
                   onClick={() => handleOpenConfirmDialog('save')}
                   disabled={isSaving || isTesting || !isValid}
                   color="success"
+                  sx={{
+                    backgroundColor: "#415EDE",
+                    color: "white"
+                  }}
                 >
                   Guardar y Activar
                 </Button>
@@ -290,7 +297,7 @@ const RuleActions: React.FC<RuleActionsProps> = ({
 
       {/* Validation Alert - if invalid and not during save */}
       {!isValid && !isSaving && (
-        <Alert severity="error" sx={{ mx: 3, mt: 2 }} onClose={() => {}} icon={<WarningIcon />}>
+        <Alert severity="error" sx={{ mx: 3, mt: 2 }} onClose={() => { }} icon={<WarningIcon />}>
           <Typography variant="body2">
             La regla tiene errores de validación. Por favor, revisa los campos señalados y
             corrígelos antes de guardar.

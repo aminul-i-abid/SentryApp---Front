@@ -201,6 +201,15 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({
                     color="success"
                     variant={hasUnsavedChanges ? 'contained' : 'outlined'}
                     aria-label="Guardar y activar plantilla"
+                    sx={{
+                      backgroundColor: "#415EDE",
+                      color: "white",
+                      "&.Mui-disabled": {
+                        backgroundColor: "#415EDE",
+                        color: "white",
+                        opacity: 0.6
+                      }
+                    }}
                   >
                     {isSaving ? 'Guardando...' : 'Guardar'}
                   </Button>
@@ -240,6 +249,9 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({
                     disabled={isSaving}
                     color="inherit"
                     aria-label="Cancelar"
+                    sx={{
+                      color: "red"
+                    }}
                   >
                     Cancelar
                   </Button>
@@ -317,7 +329,7 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({
           severity="warning"
           icon={<WarningIcon />}
           sx={{ mt: 2 }}
-          onClose={() => {}}
+          onClose={() => { }}
         >
           <Typography variant="body2">
             <strong>Cambios sin guardar</strong> — Se guardarán automáticamente en 2 segundos,

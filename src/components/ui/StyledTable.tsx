@@ -13,7 +13,7 @@ import {
   TableSortLabel,
   useTheme,
 } from "@mui/material";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -72,6 +72,10 @@ export interface StyledTableProps<T> {
 
   /* bulk toolbar rendered above the table when items are selected */
   bulkToolbar?: ReactNode;
+
+  /* detail panel for expandable rows */
+  renderDetailPanel?: (row: T) => ReactNode;
+  isRowExpanded?: (row: T) => boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -99,6 +103,8 @@ export default function StyledTable<T>({
   minWidth = 1200,
   pagination,
   bulkToolbar,
+  renderDetailPanel,
+  isRowExpanded,
 }: StyledTableProps<T>) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -293,69 +299,78 @@ export default function StyledTable<T>({
                   const rowSelected = isSelected(rowId);
 
                   return (
-                    <TableRow
-                      key={rowId}
-                      hover
-                      selected={rowSelected}
-                      onClick={() => onRowClick?.(row)}
-                      sx={{
-                        cursor: onRowClick ? "pointer" : "default",
-                        "& td": {
-                          backgroundColor: isDark ? "#2a2a2a" : "#F3F4F6",
-                          borderBottom: "none",
-                          py: "3px",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          "&:first-of-type": {
-                            borderTopLeftRadius: "12px",
-                            borderBottomLeftRadius: "12px",
+                    <React.Fragment key={rowId}>
+                      <TableRow
+                        hover
+                        selected={rowSelected}
+                        onClick={() => onRowClick?.(row)}
+                        sx={{
+                          cursor: onRowClick ? "pointer" : "default",
+                          "& td": {
+                            backgroundColor: isDark ? "#2a2a2a" : "#F3F4F6",
+                            borderBottom: "none",
+                            py: "3px",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            "&:first-of-type": {
+                              borderTopLeftRadius: "12px",
+                              borderBottomLeftRadius: "12px",
+                            },
+                            "&:last-of-type": {
+                              borderTopRightRadius: "12px",
+                              borderBottomRightRadius: "12px",
+                            },
                           },
-                          "&:last-of-type": {
-                            borderTopRightRadius: "12px",
-                            borderBottomRightRadius: "12px",
-                          },
-                        },
-                      }}
-                    >
-                      {selectable && (
-                        <TableCell
-                          padding="checkbox"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (isRowSelectable && !isRowSelectable(row))
-                              return;
-                            onSelectRow?.(e, rowId);
-                          }}
-                        >
-                          <Checkbox
-                            checked={rowSelected}
-                            disabled={
-                              isRowSelectable ? !isRowSelectable(row) : false
-                            }
-                            sx={{
-                              color: "#415EDE",
-                              "&.Mui-checked": { color: "#415EDE" },
+                        }}
+                      >
+                        {selectable && (
+                          <TableCell
+                            padding="checkbox"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isRowSelectable && !isRowSelectable(row))
+                                return;
+                              onSelectRow?.(e, rowId);
                             }}
-                          />
-                        </TableCell>
+                          >
+                            <Checkbox
+                              checked={rowSelected}
+                              disabled={
+                                isRowSelectable ? !isRowSelectable(row) : false
+                              }
+                              sx={{
+                                color: "#415EDE",
+                                "&.Mui-checked": { color: "#415EDE" },
+                              }}
+                            />
+                          </TableCell>
+                        )}
+  
+                        {columns.map((col) => (
+                          <TableCell key={col.id} align={col.align || "left"}>
+                            {col.render(row)}
+                          </TableCell>
+                        ))}
+  
+                        {hasActions && (
+                          <TableCell
+                            align="center"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {renderActions(row)}
+                          </TableCell>
+                        )}
+                      </TableRow>
+                      
+                      {isRowExpanded && isRowExpanded(row) && renderDetailPanel && (
+                        <TableRow key={`detail-${rowId}`}>
+                          <TableCell colSpan={totalColumns} style={{ padding: 0 }}>
+                            {renderDetailPanel(row)}
+                          </TableCell>
+                        </TableRow>
                       )}
-
-                      {columns.map((col) => (
-                        <TableCell key={col.id} align={col.align || "left"}>
-                          {col.render(row)}
-                        </TableCell>
-                      ))}
-
-                      {hasActions && (
-                        <TableCell
-                          align="center"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {renderActions(row)}
-                        </TableCell>
-                      )}
-                    </TableRow>
+                    </React.Fragment>
                   );
                 })
               )}

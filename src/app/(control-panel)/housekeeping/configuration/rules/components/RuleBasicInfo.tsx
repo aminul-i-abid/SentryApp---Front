@@ -88,7 +88,7 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, backgroundColor: "#f3f4f6", borderRadius: "12px" }}>
       <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
         Información Básica de la Regla
       </Typography>
@@ -107,6 +107,9 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
             inputProps={{ maxLength: 100 }}
             variant="outlined"
             size="small"
+            sx={{
+              '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
+            }}
           />
         </Grid>
 
@@ -127,6 +130,9 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
             inputProps={{ min: 1, max: 5, pattern: '[1-5]' }}
             variant="outlined"
             size="small"
+            sx={{
+              '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
+            }}
           />
         </Grid>
 
@@ -140,6 +146,20 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
               value={templateId}
               onChange={handleTemplateChange}
               label="Template de Checklist"
+              sx={{
+                backgroundColor: 'white',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  backgroundColor: 'transparent',
+                },
+                '& .MuiSelect-select': {
+                  backgroundColor: 'white',
+                }
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: { backgroundColor: 'white !important' }
+                }
+              }}
             >
               <MenuItem value="">
                 <em>Seleccionar un template...</em>
@@ -215,6 +235,20 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
               value={targetJobTag ?? ''}
               onChange={handleJobTagChange}
               label="Categoría de Habitación (TAG)"
+              sx={{
+                backgroundColor: 'white',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  backgroundColor: 'transparent',
+                },
+                '& .MuiSelect-select': {
+                  backgroundColor: 'white',
+                }
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: { backgroundColor: 'white !important' }
+                }
+              }}
             >
               <MenuItem value="">Todos (sin filtro)</MenuItem>
               <MenuItem value="CategoriaA">CategoriaA — Gerente</MenuItem>
@@ -254,7 +288,7 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
               border: '1px solid',
               borderColor: 'divider',
               borderRadius: 1,
-              backgroundColor: isActive ? 'success.lighter' : 'warning.lighter',
+              backgroundColor: "white",
             }}
           />
         </Grid>

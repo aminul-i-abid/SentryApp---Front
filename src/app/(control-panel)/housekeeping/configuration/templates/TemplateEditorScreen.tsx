@@ -485,7 +485,7 @@ const TemplateEditorScreen: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <Paper sx={{ minHeight: 600 }}>
+      <Paper sx={{ minHeight: 600, backgroundColor: "white" }}>
         {/* Tabs */}
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs

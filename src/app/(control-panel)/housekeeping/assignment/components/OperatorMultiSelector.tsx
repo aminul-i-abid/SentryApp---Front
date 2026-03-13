@@ -176,6 +176,12 @@ const OperatorMultiSelector: React.FC<OperatorMultiSelectorProps> = ({
             fullWidth
             error={Boolean(searchError)}
             helperText={searchError ?? undefined}
+            sx={{
+              bgcolor: 'white',
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+              },
+            }}
             InputProps={{
               ...params.InputProps,
               endAdornment: (
@@ -187,6 +193,14 @@ const OperatorMultiSelector: React.FC<OperatorMultiSelectorProps> = ({
             }}
           />
         )}
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: 'white',
+              border: '6px solid #f3f4f6',
+            },
+          },
+        }}
         renderOption={(props, option) => (
           <Box component="li" {...props} key={option.id}>
             <Avatar sx={{ width: 28, height: 28, mr: 1, fontSize: '0.75rem' }}>

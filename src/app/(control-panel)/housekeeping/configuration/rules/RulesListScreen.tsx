@@ -401,6 +401,12 @@ const RulesListScreen: React.FC = () => {
           startIcon={<AddIcon />}
           onClick={() => navigate('/housekeeping/rules/new')}
           size="large"
+          sx={{
+            bgcolor: '#415EDE',
+            color: 'white',
+            textTransform: 'none',
+            fontWeight: 600,
+          }}
         >
           Nueva Regla
         </Button>
@@ -414,7 +420,7 @@ const RulesListScreen: React.FC = () => {
       </Alert>
 
       {/* Filters */}
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <Paper sx={{ p: 3, mb: 3, bgcolor: 'white' }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={3}>
             <TextField
@@ -422,6 +428,9 @@ const RulesListScreen: React.FC = () => {
               label="Buscar por nombre"
               value={listState.filters.searchTerm}
               onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
+              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -439,6 +448,14 @@ const RulesListScreen: React.FC = () => {
                 value={listState.filters.templateId || ''}
                 onChange={(e) => handleFilterChange('templateId', e.target.value || undefined)}
                 label="Template"
+                sx={{ bgcolor: 'white' }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      bgcolor: 'white',
+                    },
+                  },
+                }}
               >
                 <MenuItem value="">Todos</MenuItem>
                 {templates.map((template) => (
@@ -457,6 +474,14 @@ const RulesListScreen: React.FC = () => {
                 value={listState.filters.triggerType || ''}
                 onChange={(e) => handleFilterChange('triggerType', e.target.value || undefined)}
                 label="Tipo de Trigger"
+                sx={{ bgcolor: 'white' }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      bgcolor: 'white',
+                    },
+                  },
+                }}
               >
                 <MenuItem value="">Todos</MenuItem>
                 <MenuItem value="interval">Intervalo</MenuItem>
@@ -474,6 +499,14 @@ const RulesListScreen: React.FC = () => {
                 value={listState.filters.isActive === undefined ? '' : String(listState.filters.isActive)}
                 onChange={(e) => handleFilterChange('isActive', e.target.value === '' ? undefined : e.target.value === 'true')}
                 label="Estado"
+                sx={{ bgcolor: 'white' }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      bgcolor: 'white',
+                    },
+                  },
+                }}
               >
                 <MenuItem value="">Todos</MenuItem>
                 <MenuItem value="true">Activa</MenuItem>
@@ -489,6 +522,14 @@ const RulesListScreen: React.FC = () => {
                 value={listState.filters.targetJobTag ?? ''}
                 onChange={(e) => handleFilterChange('targetJobTag', (e.target.value as JobTagValue) || undefined)}
                 label="Categoría"
+                sx={{ bgcolor: 'white' }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      bgcolor: 'white',
+                    },
+                  },
+                }}
               >
                 <MenuItem value="">Todos</MenuItem>
                 <MenuItem value="CategoriaA">Gerente</MenuItem>
@@ -510,6 +551,7 @@ const RulesListScreen: React.FC = () => {
                     isActive: undefined,
                     targetJobTag: undefined,
                   },
+                  page: 0,
                 }))}
               >
                 <FilterIcon />
@@ -521,7 +563,7 @@ const RulesListScreen: React.FC = () => {
 
       {/* Bulk Actions */}
       {listState.selectedRules.length > 0 && (
-        <Paper sx={{ p: 2, mb: 2, bgcolor: 'primary.50' }}>
+        <Paper sx={{ p: 2, mb: 2, bgcolor: 'white' }}>
           <Stack direction="row" spacing={2} alignItems="center">
             <Typography variant="body2">
               {listState.selectedRules.length} seleccionada{listState.selectedRules.length !== 1 ? 's' : ''}
@@ -568,7 +610,7 @@ const RulesListScreen: React.FC = () => {
           <Grid container spacing={2}>
             {paginatedRules.map((rule) => (
               <Grid item xs={12} key={rule.id}>
-                <Card>
+                <Card sx={{ bgcolor: 'white' }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                       <Checkbox
@@ -654,10 +696,16 @@ const RulesListScreen: React.FC = () => {
                         anchorEl={anchorEl[rule.id]}
                         open={Boolean(anchorEl[rule.id])}
                         onClose={() => handleMenuClose(rule.id)}
+                        PaperProps={{
+                          sx: {
+                            bgcolor: 'white',
+                            border: '6px solid #f3f4f6',
+                          },
+                        }}
                       >
                         <MenuItem onClick={() => handleEdit(rule.id)}>
                           <ListItemIcon>
-                            <EditIcon fontSize="small" />
+                            <img src="./assets/icons/edit-black.png" alt="" />
                           </ListItemIcon>
                           <ListItemText>Editar</ListItemText>
                         </MenuItem>
@@ -689,7 +737,7 @@ const RulesListScreen: React.FC = () => {
 
                         <MenuItem onClick={() => handleDeleteClick(rule)}>
                           <ListItemIcon>
-                            <DeleteIcon fontSize="small" color="error" />
+                            <img src="./assets/icons/delete.png" alt="" />
                           </ListItemIcon>
                           <ListItemText>Eliminar</ListItemText>
                         </MenuItem>

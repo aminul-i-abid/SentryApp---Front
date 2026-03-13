@@ -86,6 +86,9 @@ const TemplateBasicInfo: React.FC<TemplateBasicInfoProps> = ({
             variant="outlined"
             size="medium"
             aria-label="Nombre de la plantilla"
+            sx={{
+              '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
+            }}
             inputProps={{
               maxLength: 100,
               'aria-describedby': 'name-helper',
@@ -110,6 +113,9 @@ const TemplateBasicInfo: React.FC<TemplateBasicInfoProps> = ({
             disabled={disabled}
             variant="outlined"
             size="medium"
+            sx={{
+              '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
+            }}
             inputProps={{
               min: 1,
               max: 10,
@@ -131,6 +137,7 @@ const TemplateBasicInfo: React.FC<TemplateBasicInfoProps> = ({
               border: '1px solid',
               borderColor: 'divider',
               borderRadius: '4px',
+              backgroundColor: 'white',
             }}
           >
             <FormControlLabel

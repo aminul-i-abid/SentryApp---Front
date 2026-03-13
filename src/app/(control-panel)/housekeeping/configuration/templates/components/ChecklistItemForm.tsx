@@ -218,6 +218,9 @@ const ChecklistItemForm = React.memo<ChecklistItemFormProps>(
                 'aria-describedby': `description-${index}-helper`,
               }}
               aria-label={`Descripción del ítem ${index + 1}`}
+              sx={{
+                '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
+              }}
             />
           </Grid>
 
@@ -233,6 +236,20 @@ const ChecklistItemForm = React.memo<ChecklistItemFormProps>(
                   onItemChange('inputType', e.target.value as any)
                 }
                 aria-label={`Tipo de entrada del ítem ${index + 1}`}
+                sx={{
+                  backgroundColor: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    backgroundColor: 'transparent',
+                  },
+                  '& .MuiSelect-select': {
+                    backgroundColor: 'white',
+                  }
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: { backgroundColor: 'white !important' }
+                  }
+                }}
               >
                 <MenuItem value="checkbox">
                   <Box display="flex" alignItems="center" gap={1}>
@@ -272,6 +289,11 @@ const ChecklistItemForm = React.memo<ChecklistItemFormProps>(
                     }
                     disabled={disabled}
                     aria-label={`Ítem obligatorio ${index + 1}`}
+                    sx={{
+                      "& .MuiSvgIcon-root": {
+                        color: "#415EDE"
+                      }
+                    }}
                   />
                 }
                 label={
@@ -324,7 +346,7 @@ const ChecklistItemForm = React.memo<ChecklistItemFormProps>(
                     aria-label={`Eliminar ítem ${index + 1}`}
                     color="error"
                   >
-                    <DeleteIcon />
+                    <img src="./assets/icons/delete.png" />
                   </IconButton>
                 </span>
               </Tooltip>
