@@ -232,18 +232,7 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 						modules: modules
 					};
 
-					// Zendesk login with JWT
-					try {
-						const token = await authGetZendeskJwt({
-							externalId: String(responseData.data.user.id ?? ''),
-							name: String(responseData.data.user.userName ?? ''),
-							email: String(responseData.data.user.email ?? '')
-						});
-						if (token) {
-							await zendeskAuthenticateWithJwt(token);
-						}
-					} catch {}
-					
+
 					// Guardar los datos del usuario en localStorage
 					localStorage.setItem('user_data', JSON.stringify(user));
 
