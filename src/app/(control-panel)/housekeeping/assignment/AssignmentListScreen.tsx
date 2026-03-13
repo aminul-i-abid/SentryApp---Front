@@ -32,6 +32,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import StyledTable, { TableColumnDef } from '@/components/ui/StyledTable';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -270,8 +271,21 @@ const AssignmentListScreen: React.FC = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleNavigateToCreate}
+            sx={{
+              backgroundColor: "#415EDE",
+              color: "#fff",
+              borderRadius: "24px",
+              textTransform: "none",
+              fontWeight: 600,
+              fontSize: "0.95rem",
+              px: 3,
+              py: 1.5,
+              "&:hover": {
+                backgroundColor: "#4338ca",
+              },
+            }}
           >
-            Nueva Asignación
+            New Assignment
           </Button>
         </Box>
       </Box>
@@ -303,93 +317,103 @@ const AssignmentListScreen: React.FC = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleNavigateToCreate}
+            sx={{
+              backgroundColor: "#415EDE",
+              color: "#fff",
+              borderRadius: "24px",
+              textTransform: "none",
+              fontWeight: 600,
+              fontSize: "0.95rem",
+              px: 3,
+              py: 1.5,
+              "&:hover": {
+                backgroundColor: "#4338ca",
+              },
+            }}
           >
-            Crear Primera Asignación
+            New Assignment
           </Button>
         </Paper>
       )}
 
       {/* Table */}
       {!isLoading && assignmentGroups.length > 0 && (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nivel</TableCell>
-                <TableCell>Alcance</TableCell>
-                <TableCell>Operarios</TableCell>
-                <TableCell>Fecha de creación</TableCell>
-                <TableCell align="center">Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {assignmentGroups.map((group) => (
-                <TableRow key={group.id} hover>
-                  {/* Level chip */}
-                  <TableCell>
+        <StyledTable
+          loading={isLoading}
+          data={assignmentGroups}
+          getRowId={(row) => row.id}
+          columns={[
+            {
+              id: 'level',
+              label: 'Level',
+              render: (row) => (
+                <Chip
+                  label={LEVEL_LABELS[row.level]}
+                  color={LEVEL_COLORS[row.level]}
+                  size="small"
+                />
+              ),
+            },
+            {
+              id: 'scope',
+              label: 'Reach',
+              render: (row) => renderScope(row),
+            },
+            {
+              id: 'operators',
+              label: 'Workers',
+              render: (row) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {row.operatorNames.slice(0, 3).map((name) => (
+                    <Chip key={name} label={name} size="small" variant="outlined" />
+                  ))}
+                  {row.operatorNames.length > 3 && (
                     <Chip
-                      label={LEVEL_LABELS[group.level]}
-                      color={LEVEL_COLORS[group.level]}
+                      label={`+${row.operatorNames.length - 3} más`}
                       size="small"
                     />
-                  </TableCell>
-
-                  {/* Merged scope: target + room count */}
-                  <TableCell>{renderScope(group)}</TableCell>
-
-                  {/* Operator name chips */}
-                  <TableCell>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {group.operatorNames.slice(0, 3).map((name) => (
-                        <Chip key={name} label={name} size="small" variant="outlined" />
-                      ))}
-                      {group.operatorNames.length > 3 && (
-                        <Chip
-                          label={`+${group.operatorNames.length - 3} más`}
-                          size="small"
-                        />
-                      )}
-                      {group.operatorNames.length === 0 && (
-                        <Typography variant="body2" color="text.secondary">
-                          Sin operarios
-                        </Typography>
-                      )}
-                    </Box>
-                  </TableCell>
-
-                  {/* Created date */}
-                  <TableCell>
-                    <Typography variant="body2">
-                      {format(new Date(group.createdAt), 'dd/MM/yyyy')}
+                  )}
+                  {row.operatorNames.length === 0 && (
+                    <Typography variant="body2" color="text.secondary">
+                      Sin operarios
                     </Typography>
-                  </TableCell>
-
-                  {/* Actions */}
-                  <TableCell align="center">
-                    <Tooltip title="Ver detalle">
-                      <IconButton
-                        size="small"
-                        onClick={() => void handleViewDetail(group)}
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Eliminar asignación">
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleDeleteClick(group)}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                  )}
+                </Box>
+              ),
+            },
+            {
+              id: 'createdAt',
+              label: 'Creation date',
+              render: (row) => (
+                <Typography variant="body2">
+                  {format(new Date(row.createdAt), 'dd/MM/yyyy')}
+                </Typography>
+              ),
+            },
+          ]}
+          actionsLabel="Actions"
+          renderActions={(row) => (
+            <>
+              <Tooltip title="Ver detalle">
+                <IconButton
+                  size="small"
+                  onClick={() => void handleViewDetail(row)}
+                >
+                  <VisibilityIcon fontSize="small" sx={{ color: '#415EDE' }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Eliminar asignación">
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleDeleteClick(row)}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+        />
       )}
 
       {/* ─── Detail dialog ─────────────────────────────────────────────────────── */}
