@@ -143,7 +143,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   };
 
   return (
-    <Card>
+    <Card sx={{ backgroundColor: "white" }}>
       <CardContent>
         <Box
           sx={{
@@ -239,6 +239,10 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                   textField: {
                     fullWidth: true,
                     size: 'small',
+                    sx: {
+                      backgroundColor: 'white',
+                      '& .MuiInputBase-root': { backgroundColor: 'white' },
+                    },
                     InputProps: {
                       startAdornment: (
                         <CalendarTodayIcon
@@ -251,6 +255,22 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                       ),
                     },
                   },
+                  popper: {
+                    sx: {
+                      '& .MuiPaper-root': { backgroundColor: 'white !important' }
+                    }
+                  },
+                  desktopPaper: {
+                    sx: { backgroundColor: 'white !important' }
+                  },
+                  mobilePaper: {
+                    sx: { backgroundColor: 'white !important' }
+                  },
+                  dialog: {
+                    sx: {
+                      '& .MuiPaper-root': { backgroundColor: 'white !important' }
+                    }
+                  }
                 }}
               />
 
@@ -279,7 +299,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                 }}
               /> */}
               <FormControl fullWidth size="small">
-                <InputLabel id="camp-select-label">Campamento</InputLabel>
+                <InputLabel id="camp-select-label" sx={{ backgroundColor: 'white', pr: 1 }}>Campamento</InputLabel>
                 <Select
                   labelId="camp-select-label"
                   id="camp-select"
@@ -287,6 +307,20 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                   label="Campamento"
                   onChange={handleCampChange}
                   disabled={loading}
+                  sx={{
+                    backgroundColor: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      backgroundColor: 'transparent',
+                    },
+                    '& .MuiSelect-select': {
+                      backgroundColor: 'white',
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: { backgroundColor: 'white !important' }
+                    }
+                  }}
                   startAdornment={
                     <BusinessIcon
                       sx={{
@@ -331,11 +365,10 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
               backgroundColor: filters.autoRefresh
                 ? alpha(theme.palette.primary.main, 0.05)
                 : alpha(theme.palette.grey[500], 0.05),
-              border: `1px solid ${
-                filters.autoRefresh
-                  ? alpha(theme.palette.primary.main, 0.2)
-                  : theme.palette.divider
-              }`,
+              border: `1px solid ${filters.autoRefresh
+                ? alpha(theme.palette.primary.main, 0.2)
+                : theme.palette.divider
+                }`,
               transition: 'all 0.3s ease-in-out',
             }}
           >

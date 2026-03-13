@@ -106,7 +106,9 @@ const RoomStatusBreakdownCard: React.FC<RoomStatusBreakdownCardProps> = ({
 
   return (
     <Card>
-      <CardContent>
+      <CardContent sx={{
+        backgroundColor: "white"
+      }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
           <Box>

@@ -27,6 +27,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import useUser from '@auth/useUser';
 import { getCamps, getCampsByCompanyId } from '@/app/(control-panel)/camps/campsService';
@@ -70,6 +71,26 @@ const HIDDEN_KPI_TITLES: string[] = [
 
 /** Total number of KPI cards defined in useDashboardData */
 const TOTAL_KPI_COUNT = 6;
+
+const Root = styled(FusePageSimple)(({ theme }) => ({
+  '& .FusePageSimple-header': {
+    backgroundColor: theme.palette.background.paper,
+    borderBottomWidth: 1,
+    borderStyle: 'solid',
+    borderColor: theme.palette.divider,
+  },
+  '& .FusePageSimple-content': {},
+  '& .FusePageSimple-content > .container': {
+    maxWidth: '100% !important',
+    padding: '0 !important',
+    width: '100%',
+  },
+  '& .FusePageSimple-header > .container': {
+    maxWidth: '100% !important',
+    padding: '0 !important',
+    width: '100%',
+  },
+}));
 
 /**
  * DashboardHome Component
@@ -315,7 +336,7 @@ const DashboardHome: React.FC = () => {
    */
   if (loadingCamps) {
     return (
-      <FusePageSimple
+      <Root
         content={
           <Box sx={{ py: 4, px: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
@@ -334,7 +355,7 @@ const DashboardHome: React.FC = () => {
 
   if (camps.length === 0 && !loadingCamps) {
     return (
-      <FusePageSimple
+      <Root
         content={
           <Box sx={{ py: 4, px: 3, maxWidth: 1200, mx: 'auto' }}>
             <Alert severity="warning">
@@ -370,7 +391,7 @@ const DashboardHome: React.FC = () => {
 
   if (!campId) {
     return (
-      <FusePageSimple
+      <Root
         content={
           <Box sx={{ py: 4, px: 3, maxWidth: 1200, mx: 'auto' }}>
             <Alert severity="info">
@@ -389,7 +410,7 @@ const DashboardHome: React.FC = () => {
   const hasError = dashboardError || realTimeError;
 
   return (
-    <FusePageSimple
+    <Root
       header={
         <Box
           sx={{
