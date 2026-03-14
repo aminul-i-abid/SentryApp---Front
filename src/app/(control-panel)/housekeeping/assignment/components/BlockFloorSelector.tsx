@@ -294,7 +294,17 @@ const BlockFloorSelector: React.FC<BlockFloorSelectorProps> = ({
               sx={{
                 bgcolor: 'white',
                 '& .MuiOutlinedInput-root': {
-                  bgcolor: 'white',
+                  backgroundColor: 'white',
+                  '&:hover fieldset': {
+                    borderColor: '#415EDE',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#415EDE',
+                    borderWidth: '2px',
+                  }
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#415EDE',
                 },
               }}
             />
