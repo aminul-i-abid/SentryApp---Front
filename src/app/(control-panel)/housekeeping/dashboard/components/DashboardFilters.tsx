@@ -362,9 +362,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
               alignItems: 'center',
               p: 1.5,
               borderRadius: 1,
-              backgroundColor: filters.autoRefresh
-                ? alpha(theme.palette.primary.main, 0.05)
-                : alpha(theme.palette.grey[500], 0.05),
+              backgroundColor: 'white',
               border: `1px solid ${filters.autoRefresh
                 ? alpha(theme.palette.primary.main, 0.2)
                 : theme.palette.divider
@@ -413,7 +411,8 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                 gap: 1,
                 p: 1,
                 borderRadius: 1,
-                backgroundColor: alpha(theme.palette.info.main, 0.05),
+                backgroundColor: 'white',
+                border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`, // Adding a light border for contrast on white
               }}
             >
               <Box

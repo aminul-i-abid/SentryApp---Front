@@ -88,6 +88,7 @@ const KPICard: React.FC<KPICardProps> = ({
       <Card
         sx={{
           height: '100%',
+          backgroundColor: 'white',
           transition: 'all 0.3s ease-in-out',
         }}
       >
@@ -108,6 +109,7 @@ const KPICard: React.FC<KPICardProps> = ({
       onClick={onClick}
       sx={{
         height: '100%',
+        backgroundColor: 'white',
         cursor: onClick ? 'pointer' : 'default',
         transition: 'all 0.3s ease-in-out',
         '&:hover': onClick
