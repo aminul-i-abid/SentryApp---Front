@@ -41,6 +41,16 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
         borderStyle: "solid",
         borderColor: theme.palette.divider,
     },
+    "& .FusePageSimple-content > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
+    },
+    "& .FusePageSimple-header > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
+    },
 }));
 
 interface AddedProduct extends CreateReceivingDto {
@@ -154,7 +164,7 @@ function Receiving() {
     const handleSupplierLotChange = (supplierLotId: number) => {
         const selectedLot = supplierLots.find(lot => lot.id === supplierLotId);
         setSelectedSupplierLot(selectedLot || null);
-        
+
         if (selectedLot) {
             setFormData(prev => ({
                 ...prev,
@@ -225,7 +235,7 @@ function Receiving() {
             try {
                 const { tempId, itemName, supplierName, supplierLotName, warehouseName, locationName, ...productData } = product;
                 const response = await createReceiving(productData);
-                
+
                 if (response.succeeded) {
                     successCount++;
                 } else {
@@ -342,6 +352,7 @@ function Receiving() {
                                 {
                                     id: 'quantity',
                                     label: t('receiving.table.quantity'),
+                                    align: 'center',
                                     render: (row) => row.quantity
                                 },
                                 {
@@ -362,21 +373,21 @@ function Receiving() {
                                         '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.08)' }
                                     }}
                                 >
-                                    <DeleteIcon fontSize="small" />
+                                    <Box component="img" src="./assets/icons/delete.png" sx={{ width: 20, height: 20 }} alt="" />
                                 </IconButton>
                             )}
                             minWidth={1000}
                         />
                         {addedProducts.length > 0 && (
-                            <Box 
-                                p={3} 
-                                display="flex" 
-                                justifyContent="flex-end" 
-                                sx={{ 
-                                    bgcolor: 'white', 
-                                    borderRadius: '0 0 16px 16px', 
-                                    border: '1px solid #E2E8F0', 
-                                    borderTop: 'none' 
+                            <Box
+                                p={3}
+                                display="flex"
+                                justifyContent="flex-end"
+                                sx={{
+                                    bgcolor: 'white',
+                                    borderRadius: '0 0 16px 16px',
+                                    border: '1px solid #E2E8F0',
+                                    borderTop: 'none'
                                 }}
                             >
                                 <Button
@@ -404,15 +415,16 @@ function Receiving() {
                     </Box>
 
                     {/* Add Product Modal */}
-                    <Dialog 
-                        open={createModalOpen} 
-                        onClose={handleCloseCreateModal} 
-                        maxWidth="sm" 
+                    <Dialog
+                        open={createModalOpen}
+                        onClose={handleCloseCreateModal}
+                        maxWidth="sm"
                         fullWidth
                         PaperProps={{
                             sx: {
                                 borderRadius: '24px',
-                                p: 1
+                                p: 1,
+                                backgroundColor: 'white'
                             }
                         }}
                     >
@@ -597,8 +609,8 @@ function Receiving() {
                             </Box>
                         </DialogContent>
                         <DialogActions sx={{ p: 3, gap: 1 }}>
-                            <Button 
-                                onClick={handleCloseCreateModal} 
+                            <Button
+                                onClick={handleCloseCreateModal}
                                 disabled={creating}
                                 sx={{
                                     borderRadius: '12px',

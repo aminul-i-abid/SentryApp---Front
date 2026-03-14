@@ -28,6 +28,16 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
         borderColor: theme.palette.divider
     },
     '& .FusePageSimple-content': {},
+    "& .FusePageSimple-content > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
+    },
+    "& .FusePageSimple-header > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
+    },
 }));
 
 function StocksByWarehouse() {
@@ -146,147 +156,147 @@ function StocksByWarehouse() {
                 content={
                     <div className="p-6">
                         <Box
-                                sx={{
-                                    bgcolor: 'white',
-                                    borderRadius: '16px',
-                                    p: 3,
-                                    mb: 3,
-                                    border: '1px solid #E2E8F0',
-                                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-                                }}
-                            >
-                                <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="center">
-                                    <Autocomplete
-                                        sx={{ 
-                                            minWidth: 300,
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                bgcolor: 'white',
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#415EDE',
-                                                    borderWidth: '2px',
-                                                },
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#415EDE',
-                                                }
+                            sx={{
+                                bgcolor: 'white',
+                                borderRadius: '16px',
+                                p: 3,
+                                mb: 3,
+                                border: '1px solid #E2E8F0',
+                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                            }}
+                        >
+                            <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="center">
+                                <Autocomplete
+                                    sx={{
+                                        minWidth: 300,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: 2,
+                                            bgcolor: 'white',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                            }
+                                        }
+                                    }}
+                                    options={warehouseOptions}
+                                    getOptionLabel={(option) => option.description}
+                                    value={selectedWarehouse}
+                                    onChange={(event, newValue) => {
+                                        setSelectedWarehouse(newValue);
+                                        setPage(0);
+                                    }}
+                                    inputValue={warehouseInputValue}
+                                    onInputChange={(event, newInputValue) => {
+                                        setWarehouseInputValue(newInputValue);
+                                    }}
+                                    loading={warehouseLoading}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label={t('byWarehouse.filterByWarehouse')}
+                                            size="small"
+                                        />
+                                    )}
+                                />
+
+                                <Box display="flex" gap={1} alignItems="center" sx={{ flex: 1, maxWidth: 400 }}>
+                                    <Box
+                                        component="input"
+                                        type="text"
+                                        placeholder={t('search')}
+                                        value={searchTerm}
+                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
+                                        onKeyDown={handleSearchKeyDown}
+                                        sx={{
+                                            width: '100%',
+                                            height: 40,
+                                            px: 2,
+                                            borderRadius: 2,
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: 'white',
+                                            fontSize: '0.9375rem',
+                                            outline: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
                                             }
                                         }}
-                                        options={warehouseOptions}
-                                        getOptionLabel={(option) => option.description}
-                                        value={selectedWarehouse}
-                                        onChange={(event, newValue) => {
-                                            setSelectedWarehouse(newValue);
-                                            setPage(0);
-                                        }}
-                                        inputValue={warehouseInputValue}
-                                        onInputChange={(event, newInputValue) => {
-                                            setWarehouseInputValue(newInputValue);
-                                        }}
-                                        loading={warehouseLoading}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label={t('byWarehouse.filterByWarehouse')}
-                                                size="small"
-                                            />
-                                        )}
                                     />
-
-                                    <Box display="flex" gap={1} alignItems="center" sx={{ flex: 1, maxWidth: 400 }}>
-                                        <Box
-                                            component="input"
-                                            type="text"
-                                            placeholder={t('search')}
-                                            value={searchTerm}
-                                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
-                                            onKeyDown={handleSearchKeyDown}
-                                            sx={{
-                                                width: '100%',
-                                                height: 40,
-                                                px: 2,
-                                                borderRadius: 2,
-                                                border: '1px solid #E2E8F0',
-                                                bgcolor: 'white',
-                                                fontSize: '0.9375rem',
-                                                outline: 'none',
-                                                transition: 'all 0.2s',
-                                                '&:focus': {
-                                                    borderColor: '#415EDE',
-                                                    boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
-                                                }
-                                            }}
-                                        />
-                                        <IconButton
-                                            color="primary"
-                                            onClick={handleSearchClick}
-                                            sx={{
-                                                bgcolor: 'white',
-                                                border: '1px solid #E2E8F0',
-                                                borderRadius: 2,
-                                                height: 40,
-                                                width: 40,
-                                                '&:hover': {
-                                                    borderColor: '#415EDE',
-                                                    bgcolor: 'rgba(65, 94, 222, 0.04)'
-                                                }
-                                            }}
-                                        >
-                                            <SearchIcon sx={{ fontSize: 20 }} />
-                                        </IconButton>
-                                    </Box>
-                                </Box>
-                            </Box>
-
-                            <StyledTable<StockByWarehouse>
-                                columns={[
-                                    {
-                                        id: 'warehouse',
-                                        label: t('byWarehouse.warehouse'),
-                                        render: (row) => (
-                                            <Typography fontWeight={600} sx={{ color: '#334155' }}>
-                                                {row.warehouseDescription}
-                                            </Typography>
-                                        )
-                                    },
-                                    {
-                                        id: 'totalQuantity',
-                                        label: t('byWarehouse.totalQuantity'),
-                                        align: 'center',
-                                        render: (row) => (
-                                            <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                <Typography sx={{ color: '#334155' }}>
-                                                    {row.totalQuantity}
-                                                </Typography>
-                                            </Box>
-                                        )
-                                    }
-                                ]}
-                                data={stocks}
-                                getRowId={(row) => String(row.warehouseId)}
-                                loading={loading}
-                                loadingMessage="Cargando stock..."
-                                emptyMessage={t('byWarehouse.noData')}
-                                onRowClick={(row) => handleRowClick(row.warehouseId)}
-                                renderActions={(row) => (
                                     <IconButton
-                                        size="small"
-                                        sx={{ color: '#415EDE' }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleRowClick(row.warehouseId);
+                                        color="primary"
+                                        onClick={handleSearchClick}
+                                        sx={{
+                                            bgcolor: 'white',
+                                            border: '1px solid #E2E8F0',
+                                            borderRadius: 2,
+                                            height: 40,
+                                            width: 40,
+                                            '&:hover': {
+                                                borderColor: '#415EDE',
+                                                bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                            }
                                         }}
                                     >
-                                        <VisibilityIcon fontSize="small" />
+                                        <SearchIcon sx={{ fontSize: 20 }} />
                                     </IconButton>
-                                )}
-                                pagination={{
-                                    count: totalCount,
-                                    page: page,
-                                    rowsPerPage: rowsPerPage,
-                                    onPageChange: handleChangePage
-                                }}
-                                minWidth={800}
-                            />
+                                </Box>
+                            </Box>
+                        </Box>
+
+                        <StyledTable<StockByWarehouse>
+                            columns={[
+                                {
+                                    id: 'warehouse',
+                                    label: t('byWarehouse.warehouse'),
+                                    render: (row) => (
+                                        <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                            {row.warehouseDescription}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'totalQuantity',
+                                    label: t('byWarehouse.totalQuantity'),
+                                    align: 'center',
+                                    render: (row) => (
+                                        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                                            <Typography sx={{ color: '#334155' }}>
+                                                {row.totalQuantity}
+                                            </Typography>
+                                        </Box>
+                                    )
+                                }
+                            ]}
+                            data={stocks}
+                            getRowId={(row) => String(row.warehouseId)}
+                            loading={loading}
+                            loadingMessage="Cargando stock..."
+                            emptyMessage={t('byWarehouse.noData')}
+                            onRowClick={(row) => handleRowClick(row.warehouseId)}
+                            renderActions={(row) => (
+                                <IconButton
+                                    size="small"
+                                    sx={{ color: '#415EDE' }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRowClick(row.warehouseId);
+                                    }}
+                                >
+                                    <VisibilityIcon fontSize="small" />
+                                </IconButton>
+                            )}
+                            pagination={{
+                                count: totalCount,
+                                page: page,
+                                rowsPerPage: rowsPerPage,
+                                onPageChange: handleChangePage
+                            }}
+                            minWidth={800}
+                        />
                     </div>
                 }
             />

@@ -14,7 +14,7 @@ import './i18n';
 import { getTransfers, createTransfer } from "./transferService";
 import { MovementDto } from "../receiving/models/Receiving";
 import { CreateTransferDto } from "./models/Transfer";
-import { 
+import {
     getItemsWithStock,
     getLotsByItemWithStock,
     getWarehousesByItemAndLotWithStock,
@@ -30,6 +30,16 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
         borderBottomWidth: 1,
         borderStyle: "solid",
         borderColor: theme.palette.divider,
+    },
+    "& .FusePageSimple-content > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
+    },
+    "& .FusePageSimple-header > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
     },
 }));
 
@@ -151,13 +161,13 @@ function Transfers() {
 
     const handleFormChange = (field: keyof CreateTransferDto, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        
+
         if (field === 'itemId' && value) {
             fetchLotsByItem(value);
-            setFormData(prev => ({ 
-                ...prev, 
-                lotId: 0, 
-                originWarehouseId: 0, 
+            setFormData(prev => ({
+                ...prev,
+                lotId: 0,
+                originWarehouseId: 0,
                 originLocationId: 0,
                 destinationWarehouseId: 0,
                 destinationLocationId: 0
@@ -167,12 +177,12 @@ function Transfers() {
             setOriginLocations([]);
             setDestLocations([]);
         }
-        
+
         if (field === 'lotId' && value && formData.itemId) {
             fetchOriginWarehousesByItemAndLot(formData.itemId, value);
-            setFormData(prev => ({ 
-                ...prev, 
-                originWarehouseId: 0, 
+            setFormData(prev => ({
+                ...prev,
+                originWarehouseId: 0,
                 originLocationId: 0,
                 destinationWarehouseId: 0,
                 destinationLocationId: 0
@@ -181,11 +191,11 @@ function Transfers() {
             setOriginLocations([]);
             setDestLocations([]);
         }
-        
+
         if (field === 'originWarehouseId' && value && formData.itemId && formData.lotId) {
             fetchOriginLocationsByItemLotAndWarehouse(formData.itemId, formData.lotId, value);
-            setFormData(prev => ({ 
-                ...prev, 
+            setFormData(prev => ({
+                ...prev,
                 originLocationId: 0,
                 destinationWarehouseId: 0,
                 destinationLocationId: 0
@@ -193,7 +203,7 @@ function Transfers() {
             setOriginLocations([]);
             setDestLocations([]);
         }
-        
+
         if (field === 'destinationWarehouseId' && value) {
             fetchDestLocations(value);
             setFormData(prev => ({ ...prev, destinationLocationId: 0 }));
@@ -201,14 +211,14 @@ function Transfers() {
     };
 
     const handleCreateTransfer = async () => {
-        if (!formData.itemId || !formData.lotId || !formData.originWarehouseId || 
-            !formData.originLocationId || !formData.destinationWarehouseId || 
+        if (!formData.itemId || !formData.lotId || !formData.originWarehouseId ||
+            !formData.originLocationId || !formData.destinationWarehouseId ||
             !formData.destinationLocationId || !formData.quantity) {
             enqueueSnackbar(t('transfers.messages.requiredFields'), { variant: "warning" });
             return;
         }
 
-        if (formData.originWarehouseId === formData.destinationWarehouseId && 
+        if (formData.originWarehouseId === formData.destinationWarehouseId &&
             formData.originLocationId === formData.destinationLocationId) {
             enqueueSnackbar(t('transfers.messages.sameOriginDestination'), { variant: "warning" });
             return;
@@ -370,11 +380,11 @@ function Transfers() {
                                 label: 'Tipo',
                                 align: 'center',
                                 render: (row) => (
-                                    <Chip 
+                                    <Chip
                                         label={row.type === 1 ? t('transfers.movementType.increase') : t('transfers.movementType.decrease')}
                                         color={row.type === 1 ? 'success' : 'error'}
                                         size="small"
-                                        sx={{ 
+                                        sx={{
                                             opacity: 0.8,
                                             fontWeight: 600,
                                             borderRadius: '6px'
@@ -402,10 +412,10 @@ function Transfers() {
                         minWidth={1100}
                     />
 
-                    <Dialog 
-                        open={createModalOpen} 
-                        onClose={() => setCreateModalOpen(false)} 
-                        maxWidth="md" 
+                    <Dialog
+                        open={createModalOpen}
+                        onClose={() => setCreateModalOpen(false)}
+                        maxWidth="md"
                         fullWidth
                         PaperProps={{
                             sx: {

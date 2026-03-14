@@ -30,10 +30,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useTranslation } from "react-i18next";
+import StyledTable from "@/components/ui/StyledTable";
 import './i18n';
 import { getConsumptions, createConsumption } from "./consumptionService";
 import { MovementDto, CreateConsumptionDto } from "./models/Consumption";
-import { 
+import {
     getItemsWithStock,
     getLotsByItemWithStock,
     getWarehousesByItemAndLotWithStock,
@@ -46,6 +47,16 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
         borderBottomWidth: 1,
         borderStyle: "solid",
         borderColor: theme.palette.divider,
+    },
+    "& .FusePageSimple-content > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
+    },
+    "& .FusePageSimple-header > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
     },
 }));
 
@@ -210,7 +221,7 @@ function Consumption() {
 
     const handleFormChange = (field: keyof CreateConsumptionDto, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        
+
         // Cascading selection: Item -> Lot -> Warehouse -> Location
         if (field === 'itemId' && value) {
             fetchLotsByItem(value);
@@ -220,7 +231,7 @@ function Consumption() {
             setWarehouses([]);
             setLocations([]);
         }
-        
+
         if (field === 'lotId' && value && formData.itemId) {
             fetchWarehousesByItemAndLot(formData.itemId, value);
             // Reset dependent fields
@@ -228,7 +239,7 @@ function Consumption() {
             setWarehouses([]);
             setLocations([]);
         }
-        
+
         if (field === 'warehouseId' && value && formData.itemId && formData.lotId) {
             fetchLocationsByItemLotAndWarehouse(formData.itemId, formData.lotId, value);
             // Reset dependent fields
@@ -238,7 +249,7 @@ function Consumption() {
     };
 
     const handleCreateConsumption = async () => {
-        if (!formData.itemId || !formData.lotId || !formData.warehouseId || 
+        if (!formData.itemId || !formData.lotId || !formData.warehouseId ||
             !formData.locationId || !formData.quantity) {
             enqueueSnackbar(t('consumption.messages.requiredFields'), { variant: "warning" });
             return;
@@ -273,188 +284,65 @@ function Consumption() {
             }
             content={
                 <div className="p-6">
-                    <Box display="flex" justifyContent="flex-end" mb={2}>
+                    <Box display="flex" justifyContent="flex-end" mb={3}>
                         <Button
                             variant="contained"
                             color="primary"
                             onClick={handleOpenCreateModal}
+                            sx={{
+                                borderRadius: '12px',
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                px: 3,
+                                py: 1.2,
+                                bgcolor: '#415EDE',
+                                '&:hover': {
+                                    bgcolor: '#354BB4'
+                                },
+                                boxShadow: '0 4px 6px -1px rgba(65, 94, 222, 0.2)'
+                            }}
                         >
                             Nuevo Consumo
                         </Button>
                     </Box>
-                    <TableContainer component={Paper}>
-                        <Box
-                            display="flex"
-                            flexDirection={{ xs: 'column', md: 'row' }}
-                            gap={2}
-                            p={2}
-                            alignItems={{ xs: 'stretch', md: 'center' }}
-                        >
-                            <FormControl size="small" sx={{ minWidth: 200 }}>
-                                <InputLabel>Almacén</InputLabel>
-                                <Select
-                                    value={warehouseFilter}
-                                    label="Almacén"
-                                    onChange={(e) => {
-                                        setWarehouseFilter(e.target.value as number | "");
-                                        setPage(0);
-                                    }}
-                                >
-                                    <MenuItem value="">Todos</MenuItem>
-                                    {warehouses.map((warehouse) => (
-                                        <MenuItem key={warehouse.id} value={warehouse.id}>
-                                            {warehouse.description}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
 
-                            <FormControl size="small" sx={{ minWidth: 200 }}>
-                                <InputLabel>Artículo</InputLabel>
-                                <Select
-                                    value={itemFilter}
-                                    label="Artículo"
-                                    onChange={(e) => {
-                                        setItemFilter(e.target.value as number | "");
-                                        setPage(0);
-                                    }}
-                                >
-                                    <MenuItem value="">Todos</MenuItem>
-                                    {items.map((item) => (
-                                        <MenuItem key={item.id} value={item.id}>
-                                            {item.description}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-
-                            <Box display="flex" flex={1} gap={1} alignItems="center">
-                                <TextField
-                                    fullWidth
-                                    placeholder="Buscar"
-                                    value={searchInput}
-                                    onChange={(e) => setSearchInput(e.target.value)}
-                                    onKeyDown={handleSearchKeyDown}
-                                    size="small"
-                                />
-                                <IconButton
-                                    color="primary"
-                                    onClick={handleSearchClick}
-                                    sx={{
-                                        border: `1px solid ${theme.palette.primary.main}`,
-                                    }}
-                                    aria-label="Buscar"
-                                >
-                                    <SearchIcon />
-                                </IconButton>
-                            </Box>
-                        </Box>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Fecha</TableCell>
-                                    <TableCell>Artículo</TableCell>
-                                    <TableCell>Lote</TableCell>
-                                    <TableCell>Almacén</TableCell>
-                                    <TableCell>Ubicación</TableCell>
-                                    <TableCell>Cantidad</TableCell>
-                                    <TableCell>Notas</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={7} align="center">
-                                            <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                <CircularProgress size={24} />
-                                                <Typography>Cargando...</Typography>
-                                            </Box>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : consumptions.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={7} align="center">
-                                            <Typography color="text.secondary">No hay registros</Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    consumptions.map((consumption) => (
-                                        <TableRow key={consumption.id} hover>
-                                            <TableCell>
-                                                {new Date(consumption.movementDate).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography fontWeight={600}>{consumption.itemName}</Typography>
-                                            </TableCell>
-                                            <TableCell>{consumption.lotNumber}</TableCell>
-                                            <TableCell>{consumption.warehouseName}</TableCell>
-                                            <TableCell>{consumption.locationName}</TableCell>
-                                            <TableCell>{consumption.quantity}</TableCell>
-                                            <TableCell>{consumption.notes || '-'}</TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                        <TablePagination
-                            component="div"
-                            count={totalCount}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                            labelRowsPerPage="Filas por página"
-                            labelDisplayedRows={({ from, to, count }) =>
-                                `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
-                            }
-                        />
-                    </TableContainer>
-
-                    {/* Create Modal */}
-                    <Dialog open={createModalOpen} onClose={handleCloseCreateModal} maxWidth="sm" fullWidth>
-                        <DialogTitle>Nuevo Consumo</DialogTitle>
-                        <DialogContent dividers>
-                            <Box display="flex" flexDirection="column" gap={3}>
-                                <FormControl fullWidth required>
-                                    <InputLabel>Artículo</InputLabel>
+                    <Box
+                        sx={{
+                            bgcolor: 'white',
+                            borderRadius: '16px',
+                            p: 3,
+                            mb: 3,
+                            border: '1px solid #E2E8F0',
+                            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                        }}
+                    >
+                        <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="center">
+                            <Box sx={{ minWidth: 200 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                    Almacén
+                                </Typography>
+                                <FormControl fullWidth size="small">
                                     <Select
-                                        value={formData.itemId}
-                                        label="Artículo"
-                                        onChange={(e) => handleFormChange('itemId', e.target.value)}
-                                        disabled={creating}
+                                        value={warehouseFilter}
+                                        displayEmpty
+                                        onChange={(e) => {
+                                            setWarehouseFilter(e.target.value as number | "");
+                                            setPage(0);
+                                        }}
+                                        sx={{
+                                            height: 40,
+                                            bgcolor: 'white',
+                                            borderRadius: 2,
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                            }
+                                        }}
                                     >
-                                        {items.map((item) => (
-                                            <MenuItem key={item.id} value={item.id}>
-                                                {item.description}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
-                                <FormControl fullWidth required>
-                                    <InputLabel>Lote</InputLabel>
-                                    <Select
-                                        value={formData.lotId}
-                                        label="Lote"
-                                        onChange={(e) => handleFormChange('lotId', e.target.value)}
-                                        disabled={!formData.itemId || lots.length === 0 || creating}
-                                    >
-                                        {lots.map((lot) => (
-                                            <MenuItem key={lot.id} value={lot.id}>
-                                                {lot.description}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
-                                <FormControl fullWidth required>
-                                    <InputLabel>Almacén</InputLabel>
-                                    <Select
-                                        value={formData.warehouseId}
-                                        label="Almacén"
-                                        onChange={(e) => handleFormChange('warehouseId', e.target.value)}
-                                        disabled={!formData.lotId || warehouses.length === 0 || creating}
-                                    >
+                                        <MenuItem value="">Todos</MenuItem>
                                         {warehouses.map((warehouse) => (
                                             <MenuItem key={warehouse.id} value={warehouse.id}>
                                                 {warehouse.description}
@@ -462,57 +350,359 @@ function Consumption() {
                                         ))}
                                     </Select>
                                 </FormControl>
+                            </Box>
 
-                                <FormControl fullWidth required>
-                                    <InputLabel>Ubicación</InputLabel>
+                            <Box sx={{ minWidth: 200 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                    Artículo
+                                </Typography>
+                                <FormControl fullWidth size="small">
                                     <Select
-                                        value={formData.locationId}
-                                        label="Ubicación"
-                                        onChange={(e) => handleFormChange('locationId', e.target.value)}
-                                        disabled={!formData.warehouseId || locations.length === 0 || creating}
+                                        value={itemFilter}
+                                        displayEmpty
+                                        onChange={(e) => {
+                                            setItemFilter(e.target.value as number | "");
+                                            setPage(0);
+                                        }}
+                                        sx={{
+                                            height: 40,
+                                            bgcolor: 'white',
+                                            borderRadius: 2,
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                            }
+                                        }}
                                     >
-                                        {locations.map((location) => (
-                                            <MenuItem key={location.id} value={location.id}>
-                                                {location.description}
+                                        <MenuItem value="">Todos</MenuItem>
+                                        {items.map((item) => (
+                                            <MenuItem key={item.id} value={item.id}>
+                                                {item.description}
                                             </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
+                            </Box>
 
-                                <TextField
-                                    fullWidth
-                                    required
-                                    label="Cantidad"
-                                    type="number"
-                                    value={formData.quantity || ''}
-                                    onChange={(e) => handleFormChange('quantity', parseInt(e.target.value) || 0)}
-                                    disabled={creating}
+                            <Box display="flex" flex={1} gap={1} alignItems="center" sx={{ mt: 2.5, maxWidth: 400 }}>
+                                <Box
+                                    component="input"
+                                    type="text"
+                                    placeholder="Buscar"
+                                    value={searchInput}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
+                                    onKeyDown={handleSearchKeyDown}
+                                    sx={{
+                                        width: '100%',
+                                        height: 40,
+                                        px: 2,
+                                        borderRadius: 2,
+                                        border: '1px solid #E2E8F0',
+                                        bgcolor: 'white',
+                                        fontSize: '0.9375rem',
+                                        outline: 'none',
+                                        transition: 'all 0.2s',
+                                        '&:focus': {
+                                            borderColor: '#415EDE',
+                                            boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                        }
+                                    }}
                                 />
+                                <IconButton
+                                    onClick={handleSearchClick}
+                                    sx={{
+                                        bgcolor: 'white',
+                                        border: '1px solid #E2E8F0',
+                                        borderRadius: 2,
+                                        height: 40,
+                                        width: 40,
+                                        '&:hover': {
+                                            borderColor: '#415EDE',
+                                            bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                        }
+                                    }}
+                                >
+                                    <SearchIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
+                            </Box>
+                        </Box>
+                    </Box>
 
-                                <TextField
-                                    fullWidth
-                                    label="Notas"
-                                    multiline
-                                    rows={3}
-                                    value={formData.notes}
-                                    onChange={(e) => handleFormChange('notes', e.target.value)}
-                                    disabled={creating}
-                                />
+                    <StyledTable<MovementDto>
+                        columns={[
+                            {
+                                id: 'movementDate',
+                                label: 'Fecha',
+                                render: (row) => new Date(row.movementDate).toLocaleDateString()
+                            },
+                            {
+                                id: 'itemName',
+                                label: 'Artículo',
+                                render: (row) => (
+                                    <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                        {row.itemName}
+                                    </Typography>
+                                )
+                            },
+                            {
+                                id: 'lotNumber',
+                                label: 'Lote',
+                                render: (row) => row.lotNumber || '-'
+                            },
+                            {
+                                id: 'warehouseName',
+                                label: 'Almacén',
+                                render: (row) => row.warehouseName
+                            },
+                            {
+                                id: 'locationName',
+                                label: 'Ubicación',
+                                render: (row) => row.locationName
+                            },
+                            {
+                                id: 'quantity',
+                                label: 'Cantidad',
+                                align: 'center',
+                                render: (row) => row.quantity
+                            },
+                            {
+                                id: 'notes',
+                                label: 'Notas',
+                                render: (row) => row.notes || '-'
+                            }
+                        ]}
+                        data={consumptions}
+                        getRowId={(row) => String(row.id)}
+                        loading={loading}
+                        loadingMessage="Cargando consumos..."
+                        emptyMessage="No hay registros"
+                        pagination={{
+                            count: totalCount,
+                            page: page,
+                            rowsPerPage: rowsPerPage,
+                            onPageChange: handleChangePage
+                        }}
+                        minWidth={1100}
+                    />
+
+                    {/* Create Modal */}
+                    <Dialog
+                        open={createModalOpen}
+                        onClose={handleCloseCreateModal}
+                        maxWidth="sm"
+                        fullWidth
+                        PaperProps={{
+                            sx: {
+                                borderRadius: '24px',
+                                bgcolor: 'white'
+                            }
+                        }}
+                    >
+                        <DialogTitle sx={{ p: 3, pb: 0, fontWeight: 700, fontSize: '1.5rem' }}>Nuevo Consumo</DialogTitle>
+                        <DialogContent sx={{ p: 3 }}>
+                            <Box display="flex" flexDirection="column" gap={3} sx={{ mt: 1 }}>
+                                <Box>
+                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                        Artículo
+                                    </Typography>
+                                    <FormControl fullWidth size="small" required>
+                                        <Select
+                                            value={formData.itemId}
+                                            onChange={(e) => handleFormChange('itemId', e.target.value)}
+                                            disabled={creating}
+                                            sx={{
+                                                height: 44,
+                                                bgcolor: 'white',
+                                                borderRadius: 2,
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                    borderWidth: '2px',
+                                                }
+                                            }}
+                                        >
+                                            {items.map((item) => (
+                                                <MenuItem key={item.id} value={item.id}>
+                                                    {item.description}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+
+                                <Box>
+                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                        Lote
+                                    </Typography>
+                                    <FormControl fullWidth size="small" required>
+                                        <Select
+                                            value={formData.lotId}
+                                            onChange={(e) => handleFormChange('lotId', e.target.value)}
+                                            disabled={!formData.itemId || lots.length === 0 || creating}
+                                            sx={{
+                                                height: 44,
+                                                bgcolor: 'white',
+                                                borderRadius: 2,
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                    borderWidth: '2px',
+                                                }
+                                            }}
+                                        >
+                                            {lots.map((lot) => (
+                                                <MenuItem key={lot.id} value={lot.id}>
+                                                    {lot.description}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+
+                                <Box>
+                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                        Almacén
+                                    </Typography>
+                                    <FormControl fullWidth size="small" required>
+                                        <Select
+                                            value={formData.warehouseId}
+                                            onChange={(e) => handleFormChange('warehouseId', e.target.value)}
+                                            disabled={!formData.lotId || warehouses.length === 0 || creating}
+                                            sx={{
+                                                height: 44,
+                                                bgcolor: 'white',
+                                                borderRadius: 2,
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                    borderWidth: '2px',
+                                                }
+                                            }}
+                                        >
+                                            {warehouses.map((warehouse) => (
+                                                <MenuItem key={warehouse.id} value={warehouse.id}>
+                                                    {warehouse.description}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+
+                                <Box>
+                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                        Ubicación
+                                    </Typography>
+                                    <FormControl fullWidth size="small" required>
+                                        <Select
+                                            value={formData.locationId}
+                                            onChange={(e) => handleFormChange('locationId', e.target.value)}
+                                            disabled={!formData.warehouseId || locations.length === 0 || creating}
+                                            sx={{
+                                                height: 44,
+                                                bgcolor: 'white',
+                                                borderRadius: 2,
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                    borderWidth: '2px',
+                                                }
+                                            }}
+                                        >
+                                            {locations.map((location) => (
+                                                <MenuItem key={location.id} value={location.id}>
+                                                    {location.description}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+
+                                <Box>
+                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                        Cantidad
+                                    </Typography>
+                                    <Box
+                                        component="input"
+                                        type="number"
+                                        required
+                                        value={formData.quantity || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFormChange('quantity', parseInt(e.target.value) || 0)}
+                                        disabled={creating}
+                                        sx={{
+                                            width: '100%',
+                                            height: 44,
+                                            px: 2,
+                                            borderRadius: 2,
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: 'white',
+                                            fontSize: '0.9375rem',
+                                            outline: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                </Box>
+
+                                <Box>
+                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                        Notas
+                                    </Typography>
+                                    <Box
+                                        component="textarea"
+                                        rows={3}
+                                        value={formData.notes}
+                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleFormChange('notes', e.target.value)}
+                                        disabled={creating}
+                                        sx={{
+                                            width: '100%',
+                                            p: 2,
+                                            borderRadius: 2,
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: 'white',
+                                            fontSize: '0.9375rem',
+                                            outline: 'none',
+                                            transition: 'all 0.2s',
+                                            fontFamily: 'inherit',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                </Box>
                             </Box>
                         </DialogContent>
-                        <DialogActions>
-                            <Button 
-                                color="inherit"
-                                onClick={handleCloseCreateModal} 
+                        <DialogActions sx={{ p: 3, gap: 1 }}>
+                            <Button
+                                onClick={handleCloseCreateModal}
                                 disabled={creating}
+                                sx={{
+                                    borderRadius: '12px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 3,
+                                    color: 'text.secondary',
+                                    '&:hover': { bgcolor: '#F1F5F9' }
+                                }}
                             >
                                 Cancelar
                             </Button>
                             <Button
                                 variant="contained"
-                                color="primary"
                                 onClick={handleCreateConsumption}
                                 disabled={creating}
+                                sx={{
+                                    borderRadius: '12px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 3,
+                                    bgcolor: '#415EDE',
+                                    color: 'white',
+                                    '&:hover': { bgcolor: '#354BB4' },
+                                    boxShadow: '0 4px 6px -1px rgba(65, 94, 222, 0.2)'
+                                }}
                                 startIcon={creating ? <CircularProgress size={18} color="inherit" /> : undefined}
                             >
                                 {creating ? 'Guardando...' : 'Guardar'}

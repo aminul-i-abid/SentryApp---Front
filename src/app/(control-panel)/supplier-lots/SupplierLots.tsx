@@ -59,7 +59,17 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 		borderStyle: 'solid',
 		borderColor: theme.palette.divider
 	},
-	'& .FusePageSimple-content': {}
+	'& .FusePageSimple-content': {},
+	"& .FusePageSimple-content > .container": {
+		maxWidth: "100% !important",
+		padding: "0 !important",
+		width: "100%",
+	},
+	"& .FusePageSimple-header > .container": {
+		maxWidth: "100% !important",
+		padding: "0 !important",
+		width: "100%",
+	},
 }));
 
 function toDateInputValue(dateString?: string | null): string {
@@ -416,13 +426,13 @@ function SupplierLots() {
 								{
 									id: 'portionQuantity',
 									label: t('table.portionQuantity'),
-									align: 'right',
+									align: 'center',
 									render: (row) => row.portionQuantity
 								},
 								{
 									id: 'portionsPerBox',
 									label: t('table.portionsPerBox'),
-									align: 'right',
+									align: 'center',
 									render: (row) => row.portionsPerBox
 								},
 								{
@@ -449,7 +459,7 @@ function SupplierLots() {
 											sx={{ color: '#415EDE' }}
 											onClick={() => handleOpenModal(row)}
 										>
-											<EditIcon fontSize="small" />
+											<Box component="img" src="./assets/icons/edit-black.png" sx={{ width: 20, height: 20 }} alt="" />
 										</IconButton>
 									</Tooltip>
 									<Tooltip title={t('actions.delete')}>
@@ -458,7 +468,7 @@ function SupplierLots() {
 											sx={{ color: '#EF4444' }}
 											onClick={() => handleOpenDeleteModal(row)}
 										>
-											<DeleteIcon fontSize="small" />
+											<Box component="img" src="./assets/icons/delete.png" sx={{ width: 20, height: 20 }} alt="" />
 										</IconButton>
 									</Tooltip>
 								</Box>
@@ -470,10 +480,10 @@ function SupplierLots() {
 			/>
 
 			{/* Add/Edit Modal */}
-			<Dialog 
-				open={isModalOpen} 
-				onClose={handleCloseModal} 
-				fullWidth 
+			<Dialog
+				open={isModalOpen}
+				onClose={handleCloseModal}
+				fullWidth
 				maxWidth="sm"
 				PaperProps={{
 					sx: {
@@ -710,10 +720,10 @@ function SupplierLots() {
 					</Box>
 				</DialogContent>
 				<DialogActions sx={{ p: 3 }}>
-					<Button 
-						onClick={handleCloseModal} 
+					<Button
+						onClick={handleCloseModal}
 						disabled={saving}
-						sx={{ 
+						sx={{
 							borderRadius: '8px',
 							textTransform: 'none',
 							color: 'text.secondary',
@@ -726,11 +736,12 @@ function SupplierLots() {
 						variant="contained"
 						onClick={handleSave}
 						disabled={saving || !formData.description.trim() || !formData.itemId || !formData.supplierId}
-						sx={{ 
+						sx={{
 							borderRadius: '8px',
 							textTransform: 'none',
 							bgcolor: '#415EDE',
 							fontWeight: 600,
+							color: 'white',
 							'&:hover': {
 								bgcolor: '#354db1'
 							}

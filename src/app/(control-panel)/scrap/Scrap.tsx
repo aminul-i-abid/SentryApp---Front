@@ -24,7 +24,7 @@ import { useTranslation } from "react-i18next";
 import './i18n';
 import { getScrap, createScrap } from "./scrapService";
 import { MovementDto, CreateScrapDto } from "./models/Scrap";
-import { 
+import {
     getItemsWithStock,
     getLotsByItemWithStock,
     getWarehousesByItemAndLotWithStock,
@@ -39,6 +39,16 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
         borderBottomWidth: 1,
         borderStyle: "solid",
         borderColor: theme.palette.divider,
+    },
+    "& .FusePageSimple-content > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
+    },
+    "& .FusePageSimple-header > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
     },
 }));
 
@@ -208,7 +218,7 @@ function Scrap() {
 
     const handleFormChange = (field: keyof CreateScrapDto, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        
+
         if (field === 'itemId' && value) {
             fetchLotsByItem(value);
             setFormData(prev => ({ ...prev, lotId: 0, warehouseId: 0, locationId: 0 }));
@@ -216,14 +226,14 @@ function Scrap() {
             setWarehouses([]);
             setLocations([]);
         }
-        
+
         if (field === 'lotId' && value && formData.itemId) {
             fetchWarehousesByItemAndLot(formData.itemId, value);
             setFormData(prev => ({ ...prev, warehouseId: 0, locationId: 0 }));
             setWarehouses([]);
             setLocations([]);
         }
-        
+
         if (field === 'warehouseId' && value && formData.itemId && formData.lotId) {
             fetchLocationsByItemLotAndWarehouse(formData.itemId, formData.lotId, value);
             setFormData(prev => ({ ...prev, locationId: 0 }));
@@ -232,7 +242,7 @@ function Scrap() {
     };
 
     const handleCreateScrap = async () => {
-        if (!formData.itemId || !formData.lotId || !formData.warehouseId || 
+        if (!formData.itemId || !formData.lotId || !formData.warehouseId ||
             !formData.locationId || !formData.quantity || !formData.reasonId) {
             enqueueSnackbar(t('scrap.messages.requiredFields'), { variant: "warning" });
             return;
@@ -466,10 +476,10 @@ function Scrap() {
                         minWidth={1100}
                     />
 
-                    <Dialog 
-                        open={createModalOpen} 
-                        onClose={handleCloseCreateModal} 
-                        maxWidth="sm" 
+                    <Dialog
+                        open={createModalOpen}
+                        onClose={handleCloseCreateModal}
+                        maxWidth="sm"
                         fullWidth
                         PaperProps={{
                             sx: {
@@ -657,8 +667,8 @@ function Scrap() {
                             </Box>
                         </DialogContent>
                         <DialogActions sx={{ p: 3, gap: 1 }}>
-                            <Button 
-                                onClick={handleCloseCreateModal} 
+                            <Button
+                                onClick={handleCloseCreateModal}
                                 disabled={creating}
                                 sx={{
                                     borderRadius: '12px',

@@ -49,6 +49,16 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
         borderColor: theme.palette.divider
     },
     '& .FusePageSimple-content': {},
+    "& .FusePageSimple-content > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
+    },
+    "& .FusePageSimple-header > .container": {
+        maxWidth: "100% !important",
+        padding: "0 !important",
+        width: "100%",
+    },
 }));
 
 function ItemUnitOfMeasure() {
