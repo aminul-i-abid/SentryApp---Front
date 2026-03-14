@@ -32,11 +32,11 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { 
-    getLots, 
+import {
+    getLots,
     createLot,
     updateLot,
-    deleteLot 
+    deleteLot
 } from './lotsService';
 import { LotResponse, LotFormData } from './models/Lot';
 import { getItems } from '../items/itemsService';
@@ -46,6 +46,7 @@ import authRoles from '@auth/authRoles';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { useSnackbar } from 'notistack';
+import StyledTable from '@/components/ui/StyledTable';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
     '& .FusePageSimple-header': {
@@ -74,7 +75,7 @@ function Lots() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [editingLot, setEditingLot] = useState<LotResponse | null>(null);
     const [deletingLot, setDeletingLot] = useState<LotResponse | null>(null);
-    const [formData, setFormData] = useState<LotFormData>({ 
+    const [formData, setFormData] = useState<LotFormData>({
         itemId: 0,
         description: '',
         quantity: 0,
@@ -178,7 +179,7 @@ function Lots() {
     const handleOpenAddModal = () => {
         setEditingLot(null);
         setExpirationDateInput('');
-        setFormData({ 
+        setFormData({
             itemId: 0,
             description: '',
             quantity: 0,
@@ -191,7 +192,7 @@ function Lots() {
         setEditingLot(lot);
         const dateStr = lot.expirationDate ? new Date(lot.expirationDate).toISOString().split('T')[0] : '';
         setExpirationDateInput(dateStr);
-        setFormData({ 
+        setFormData({
             itemId: lot.itemId,
             description: lot.description,
             quantity: lot.quantity,
@@ -204,7 +205,7 @@ function Lots() {
         setIsModalOpen(false);
         setEditingLot(null);
         setExpirationDateInput('');
-        setFormData({ 
+        setFormData({
             itemId: 0,
             description: '',
             quantity: 0,
@@ -232,7 +233,7 @@ function Lots() {
         setSaving(true);
         try {
             let response;
-            
+
             if (editingLot) {
                 response = await updateLot(editingLot.id, formData);
             } else {
@@ -290,10 +291,10 @@ function Lots() {
     const formatDate = (dateString: string): string => {
         if (!dateString) return '-';
         const date = new Date(dateString);
-        return date.toLocaleDateString('es-CL', { 
-            year: 'numeric', 
-            month: '2-digit', 
-            day: '2-digit' 
+        return date.toLocaleDateString('es-CL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
         });
     };
 
@@ -309,158 +310,188 @@ function Lots() {
                 }
                 content={
                     <div className="p-6">
-                        <Box display="flex" justifyContent="flex-end" mb={2}>
+                        <Box display="flex" justifyContent="flex-end" mb={4}>
                             {isAdmin && (
                                 <Button
                                     variant="contained"
                                     color="primary"
                                     onClick={handleOpenAddModal}
+                                    sx={{
+                                        borderRadius: '8px',
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        px: 3
+                                    }}
                                 >
                                     {t('addNew')}
                                 </Button>
                             )}
                         </Box>
 
-                        <TableContainer component={Paper}>
-                            <Box
-                                display="flex"
-                                flexDirection={{ xs: 'column', md: 'row' }}
-                                gap={2}
-                                p={2}
-                                alignItems={{ xs: 'stretch', md: 'center' }}
-                            >
-                                <Box display="flex" flex={1} gap={1} alignItems="center">
-                                    <TextField
-                                        fullWidth
-                                        placeholder={t('search')}
-                                        value={searchTerm}
-                                        onChange={(event) => setSearchTerm(event.target.value)}
-                                        onKeyDown={handleSearchKeyDown}
-                                        size="small"
-                                    />
-                                    <IconButton
-                                        color="primary"
-                                        onClick={handleSearchClick}
-                                        sx={{
-                                            border: `1px solid ${theme.palette.primary.main}`,
-                                        }}
-                                        aria-label="Buscar"
-                                    >
-                                        <SearchIcon />
-                                    </IconButton>
-                                </Box>
+                        <Box mb={3}>
+                            <Box display="flex" gap={1} alignItems="center" sx={{ maxWidth: 400 }}>
+                                <Box
+                                    component="input"
+                                    type="text"
+                                    placeholder={t('search')}
+                                    value={searchTerm}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
+                                    onKeyDown={handleSearchKeyDown}
+                                    sx={{
+                                        width: '100%',
+                                        height: 40,
+                                        px: 2,
+                                        borderRadius: 2,
+                                        border: '1px solid #E2E8F0',
+                                        bgcolor: 'white',
+                                        fontSize: '0.9375rem',
+                                        outline: 'none',
+                                        transition: 'all 0.2s',
+                                        '&:focus': {
+                                            borderColor: '#415EDE',
+                                            boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                        }
+                                    }}
+                                />
+                                <IconButton
+                                    color="primary"
+                                    onClick={handleSearchClick}
+                                    sx={{
+                                        bgcolor: 'white',
+                                        border: '1px solid #E2E8F0',
+                                        borderRadius: 2,
+                                        height: 40,
+                                        width: 40,
+                                        '&:hover': {
+                                            borderColor: '#415EDE',
+                                            bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                        }
+                                    }}
+                                >
+                                    <SearchIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
                             </Box>
+                        </Box>
 
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>{t('table.item')}</TableCell>
-                                        <TableCell>{t('table.description')}</TableCell>
-                                        <TableCell>{t('table.quantity')}</TableCell>
-                                        <TableCell>{t('table.expirationDate')}</TableCell>
-                                        {isAdmin && <TableCell align="right">{t('table.actions')}</TableCell>}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} align="center">
-                                                <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                    <CircularProgress size={24} />
-                                                    <Typography>Cargando lotes...</Typography>
-                                                </Box>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : lots.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} align="center">
-                                                <Typography color="text.secondary">{t('empty.message')}</Typography>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        lots.map((lot) => (
-                                            <TableRow key={lot.id} hover>
-                                                <TableCell>
-                                                    <Typography>
-                                                        {lot.itemDescription || getItemDescription(lot.itemId)}
-                                                    </Typography>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Typography fontWeight={600}>{lot.description}</Typography>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Typography>{lot.quantity}</Typography>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Typography>{formatDate(lot.expirationDate)}</Typography>
-                                                </TableCell>
-                                                {isAdmin && (
-                                                    <TableCell align="right">
-                                                        <Box display="flex" justifyContent="flex-end" gap={1}>
-                                                            <Tooltip title={t('actions.edit')}>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    color="primary"
-                                                                    onClick={() => handleOpenEditModal(lot)}
-                                                                >
-                                                                    <EditIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                            <Tooltip title={t('actions.delete')}>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    onClick={() => handleOpenDeleteModal(lot)}
-                                                                    color="error"
-                                                                >
-                                                                    <DeleteIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                        </Box>
-                                                    </TableCell>
-                                                )}
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-
-                            <TablePagination
-                                rowsPerPageOptions={[5, 10, 25, 50]}
-                                component="div"
-                                count={totalCount}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
-                                onPageChange={handleChangePage}
-                                onRowsPerPageChange={handleChangeRowsPerPage}
-                                labelRowsPerPage={t('pagination.rowsPerPage')}
-                                labelDisplayedRows={({ from, to, count }) =>
-                                    `${from}-${to} ${t('pagination.of')} ${count !== -1 ? count : `${t('pagination.moreThan')} ${to}`}`
+                        <StyledTable<LotResponse>
+                            columns={[
+                                {
+                                    id: 'item',
+                                    label: t('table.item'),
+                                    render: (row) => (
+                                        <Typography sx={{ color: '#334155' }}>
+                                            {row.itemDescription || getItemDescription(row.itemId)}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'description',
+                                    label: t('table.description'),
+                                    render: (row) => (
+                                        <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                            {row.description}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'quantity',
+                                    label: t('table.quantity'),
+                                    align: 'center',
+                                    render: (row) => (
+                                        <Typography sx={{ color: '#334155' }}>
+                                            {row.quantity}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'expirationDate',
+                                    label: t('table.expirationDate'),
+                                    align: 'center',
+                                    render: (row) => (
+                                        <Typography sx={{ color: '#334155' }}>
+                                            {formatDate(row.expirationDate)}
+                                        </Typography>
+                                    )
                                 }
-                            />
-                        </TableContainer>
+                            ]}
+                            data={lots}
+                            getRowId={(row) => String(row.id)}
+                            loading={loading}
+                            loadingMessage="Cargando lotes..."
+                            emptyMessage={t('empty.message')}
+                            renderActions={(row) => isAdmin && (
+                                <Box display="flex" justifyContent="center" gap={1}>
+                                    <Tooltip title={t('actions.edit')}>
+                                        <IconButton
+                                            size="small"
+                                            sx={{ color: '#415EDE' }}
+                                            onClick={() => handleOpenEditModal(row)}
+                                        >
+                                            <img src="./assets/icons/edit-black.png" alt="" />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title={t('actions.delete')}>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleOpenDeleteModal(row)}
+                                            sx={{ color: '#EF4444' }}
+                                        >
+                                            <img src="./assets/icons/delete.png" alt="" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
+                            )}
+                            pagination={{
+                                count: totalCount,
+                                page: page,
+                                rowsPerPage: rowsPerPage,
+                                onPageChange: handleChangePage
+                            }}
+                            minWidth={1000}
+                        />
                     </div>
                 }
             />
 
             {/* Add/Edit Modal */}
-            <Dialog 
-                open={isModalOpen} 
+            <Dialog
+                open={isModalOpen}
                 onClose={handleCloseModal}
                 fullWidth
                 maxWidth="sm"
+                PaperProps={{
+                    sx: {
+                        borderRadius: '16px',
+                        bgcolor: 'white'
+                    }
+                }}
             >
-                <DialogTitle>
+                <DialogTitle sx={{ fontWeight: 700, px: 3, pt: 3 }}>
                     {editingLot ? t('modal.editTitle') : t('modal.addTitle')}
                 </DialogTitle>
-                <DialogContent dividers>
-                    <Box display="flex" flexDirection="column" gap={3} mt={1}>
+                <DialogContent>
+                    <Box display="flex" flexDirection="column" gap={2} mt={2}>
+                        <Box>
+                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+                                {t('form.item')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+                            </Typography>
                             <FormControl fullWidth required disabled={saving || loadingItems}>
-                                <InputLabel id="item-label">{t('form.item')}</InputLabel>
                                 <Select
-                                    labelId="item-label"
                                     value={formData.itemId || ''}
-                                    label={t('form.item')}
+                                    displayEmpty
                                     onChange={(e) => setFormData({ ...formData, itemId: Number(e.target.value) })}
+                                    sx={{
+                                        height: 44,
+                                        borderRadius: 2,
+                                        bgcolor: 'white',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#415EDE',
+                                            borderWidth: '2px',
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#415EDE',
+                                        }
+                                    }}
                                 >
                                     <MenuItem value="">
                                         <em>{t('form.selectItem')}</em>
@@ -472,58 +503,122 @@ function Lots() {
                                     ))}
                                 </Select>
                             </FormControl>
+                        </Box>
 
-                            <TextField
-                                label={t('form.description')}
+                        <Box>
+                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+                                {t('form.description')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+                            </Typography>
+                            <Box
+                                component="textarea"
                                 value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                fullWidth
-                                required
-                                disabled={saving}
+                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
                                 placeholder="Ingrese la descripción del lote"
-                                multiline
                                 rows={3}
+                                sx={{
+                                    width: '100%',
+                                    p: 1.5,
+                                    borderRadius: 2,
+                                    border: '1px solid #E2E8F0',
+                                    bgcolor: 'white',
+                                    fontSize: '0.9375rem',
+                                    outline: 'none',
+                                    fontFamily: 'inherit',
+                                    transition: 'all 0.2s',
+                                    '&:focus': {
+                                        borderColor: '#415EDE',
+                                        boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                                    }
+                                }}
                             />
+                        </Box>
 
-                            <TextField
-                                label={t('form.quantity')}
+                        <Box>
+                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+                                {t('form.quantity')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+                            </Typography>
+                            <Box
+                                component="input"
                                 type="number"
                                 value={formData.quantity || ''}
-                                onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
-                                fullWidth
-                                required
-                                disabled={saving}
-                                inputProps={{ min: 1 }}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+                                min={1}
+                                sx={{
+                                    width: '100%',
+                                    height: 44,
+                                    px: 2,
+                                    borderRadius: 2,
+                                    border: '1px solid #E2E8F0',
+                                    bgcolor: 'white',
+                                    fontSize: '0.9375rem',
+                                    outline: 'none',
+                                    transition: 'all 0.2s',
+                                    '&:focus': {
+                                        borderColor: '#415EDE',
+                                        boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                                    }
+                                }}
                             />
+                        </Box>
 
-                            <TextField
-                                label={t('form.expirationDate')}
+                        <Box>
+                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+                                {t('form.expirationDate')}
+                            </Typography>
+                            <Box
+                                component="input"
                                 type="date"
                                 value={expirationDateInput}
-                                onChange={(e) => {
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                     setExpirationDateInput(e.target.value);
                                     setFormData({ ...formData, expirationDate: e.target.value ? new Date(e.target.value) : null });
                                 }}
-                                fullWidth
-                                disabled={saving}
-                                InputLabelProps={{ shrink: true }}
+                                sx={{
+                                    width: '100%',
+                                    height: 44,
+                                    px: 2,
+                                    borderRadius: 2,
+                                    border: '1px solid #E2E8F0',
+                                    bgcolor: 'white',
+                                    fontSize: '0.9375rem',
+                                    outline: 'none',
+                                    transition: 'all 0.2s',
+                                    '&:focus': {
+                                        borderColor: '#415EDE',
+                                        boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                                    }
+                                }}
                             />
                         </Box>
+                    </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button 
-                        color="inherit"
-                        onClick={handleCloseModal} 
+                <DialogActions sx={{ p: 3 }}>
+                    <Button
+                        onClick={handleCloseModal}
                         disabled={saving}
+                        sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            color: 'text.secondary',
+                            fontWeight: 600
+                        }}
                     >
                         {t('modal.cancel')}
                     </Button>
                     <Button
                         variant="contained"
-                        color="primary"
                         onClick={handleSave}
                         disabled={saving || !formData.description.trim() || !formData.itemId || !formData.quantity}
-                        startIcon={saving ? <CircularProgress size={18} color="inherit" /> : undefined}
+                        sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            bgcolor: '#415EDE',
+                            fontWeight: 600,
+                            color: 'white',
+                            '&:hover': {
+                                bgcolor: '#354db1'
+                            }
+                        }}
                     >
                         {saving ? 'Guardando...' : t('modal.save')}
                     </Button>

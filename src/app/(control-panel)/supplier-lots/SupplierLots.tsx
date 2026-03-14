@@ -35,6 +35,7 @@ import authRoles from '@auth/authRoles';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { useSnackbar } from 'notistack';
+import StyledTable from '@/components/ui/StyledTable';
 
 import { getItems } from '../items/itemsService';
 import type { ItemResponse } from '../items/models/Item';
@@ -319,25 +320,66 @@ function SupplierLots() {
 				}
 				content={
 					<div className="p-6">
-						<Box display="flex" flexDirection={isMobile ? 'column' : 'row'} gap={2} mb={2}>
-							<Box display="flex" flex={1} gap={2} alignItems="center">
-								<TextField
+						<Box display="flex" justifyContent="flex-end" mb={4}>
+							{isAdmin && (
+								<Button
+									variant="contained"
+									color="primary"
+									onClick={() => handleOpenModal()}
+									sx={{
+										borderRadius: '8px',
+										textTransform: 'none',
+										fontWeight: 600,
+										px: 3
+									}}
+								>
+									{t('addNew')}
+								</Button>
+							)}
+						</Box>
+
+						<Box mb={3} display="flex" flexDirection={isMobile ? 'column' : 'row'} gap={2}>
+							<Box display="flex" flex={1} gap={2} alignItems="center" sx={{ maxWidth: isMobile ? '100%' : 600 }}>
+								<Box
+									component="input"
+									type="text"
 									placeholder={t('search')}
 									value={searchTerm}
-									onChange={(e) => setSearchTerm(e.target.value)}
-									fullWidth
-									InputProps={{
-										startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+									sx={{
+										flex: 1,
+										height: 40,
+										px: 2,
+										borderRadius: 2,
+										border: '1px solid #E2E8F0',
+										bgcolor: 'white',
+										fontSize: '0.9375rem',
+										outline: 'none',
+										transition: 'all 0.2s',
+										'&:focus': {
+											borderColor: '#415EDE',
+											boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+										}
 									}}
 								/>
 
-								<FormControl sx={{ minWidth: 240 }} disabled={loadingItems}>
-									<InputLabel id="supplier-lots-item-filter-label">{t('filters.item')}</InputLabel>
+								<FormControl sx={{ minWidth: 240 }} disabled={loadingItems} size="small">
 									<Select
-										labelId="supplier-lots-item-filter-label"
-										label={t('filters.item')}
 										value={selectedItemId}
 										onChange={(e) => setSelectedItemId(Number(e.target.value))}
+										displayEmpty
+										sx={{
+											height: 40,
+											bgcolor: 'white',
+											borderRadius: 2,
+											'&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+												borderColor: '#415EDE',
+												borderWidth: '2px',
+											},
+											'&:hover .MuiOutlinedInput-notchedOutline': {
+												borderColor: '#415EDE',
+											}
+										}}
 									>
 										<MenuItem value={0}>{t('filters.allItems')}</MenuItem>
 										{items.map((item) => (
@@ -348,195 +390,351 @@ function SupplierLots() {
 									</Select>
 								</FormControl>
 							</Box>
-
-							{isAdmin && (
-								<Button variant="contained" color="primary" onClick={() => handleOpenModal()}>
-									{t('addNew')}
-								</Button>
-							)}
 						</Box>
 
-						{loading ? (
-							<Box display="flex" justifyContent="center" mt={4}>
-								<CircularProgress />
-							</Box>
-						) : filteredSupplierLots.length === 0 ? (
-							<Box textAlign="center" mt={4}>
-								<Typography variant="h6" gutterBottom>
-									{t('empty.title')}
-								</Typography>
-								<Typography color="text.secondary">{t('empty.message')}</Typography>
-							</Box>
-						) : (
-							<TableContainer component={Paper}>
-								<Table size="small">
-									<TableHead>
-										<TableRow>
-											<TableCell>{t('table.item')}</TableCell>
-											<TableCell>{t('table.supplier')}</TableCell>
-											<TableCell>{t('table.description')}</TableCell>
-											<TableCell align="right">{t('table.portionQuantity')}</TableCell>
-											<TableCell align="right">{t('table.portionsPerBox')}</TableCell>
-											<TableCell>{t('table.productionDate')}</TableCell>
-											<TableCell>{t('table.expirationDate')}</TableCell>
-											{isAdmin && <TableCell align="center">{t('table.actions')}</TableCell>}
-										</TableRow>
-									</TableHead>
-									<TableBody>
-										{filteredSupplierLots.map((lot) => (
-											<TableRow key={lot.id} hover>
-												<TableCell>{lot.itemDescription || lot.itemId}</TableCell>
-												<TableCell>{lot.supplierDescription || lot.supplierId}</TableCell>
-												<TableCell>{lot.description}</TableCell>
-												<TableCell align="right">{lot.portionQuantity}</TableCell>
-												<TableCell align="right">{lot.portionsPerBox}</TableCell>
-												<TableCell>{toDateDisplay(lot.productionDate)}</TableCell>
-												<TableCell>{toDateDisplay(lot.expirationDate)}</TableCell>
-												{isAdmin && (
-													<TableCell align="center">
-														<Box display="flex" justifyContent="center" gap={1}>
-															<Tooltip title={t('actions.edit')}>
-																<IconButton size="small" onClick={() => handleOpenModal(lot)} color="primary">
-																	<EditIcon fontSize="small" />
-																</IconButton>
-															</Tooltip>
-															<Tooltip title={t('actions.delete')}>
-																<IconButton size="small" onClick={() => handleOpenDeleteModal(lot)} color="error">
-																	<DeleteIcon fontSize="small" />
-																</IconButton>
-															</Tooltip>
-														</Box>
-													</TableCell>
-												)}
-											</TableRow>
-										))}
-									</TableBody>
-								</Table>
-							</TableContainer>
-						)}
+						<StyledTable<SupplierLotResponse>
+							columns={[
+								{
+									id: 'item',
+									label: t('table.item'),
+									render: (row) => row.itemDescription || row.itemId
+								},
+								{
+									id: 'supplier',
+									label: t('table.supplier'),
+									render: (row) => row.supplierDescription || row.supplierId
+								},
+								{
+									id: 'description',
+									label: t('table.description'),
+									render: (row) => (
+										<Typography fontWeight={600} sx={{ color: '#334155' }}>
+											{row.description}
+										</Typography>
+									)
+								},
+								{
+									id: 'portionQuantity',
+									label: t('table.portionQuantity'),
+									align: 'right',
+									render: (row) => row.portionQuantity
+								},
+								{
+									id: 'portionsPerBox',
+									label: t('table.portionsPerBox'),
+									align: 'right',
+									render: (row) => row.portionsPerBox
+								},
+								{
+									id: 'productionDate',
+									label: t('table.productionDate'),
+									render: (row) => toDateDisplay(row.productionDate)
+								},
+								{
+									id: 'expirationDate',
+									label: t('table.expirationDate'),
+									render: (row) => toDateDisplay(row.expirationDate)
+								}
+							]}
+							data={filteredSupplierLots}
+							getRowId={(row) => String(row.id)}
+							loading={loading}
+							loadingMessage={t('loading')}
+							emptyMessage={t('empty.message')}
+							renderActions={(row) => isAdmin && (
+								<Box display="flex" justifyContent="center" gap={1}>
+									<Tooltip title={t('actions.edit')}>
+										<IconButton
+											size="small"
+											sx={{ color: '#415EDE' }}
+											onClick={() => handleOpenModal(row)}
+										>
+											<EditIcon fontSize="small" />
+										</IconButton>
+									</Tooltip>
+									<Tooltip title={t('actions.delete')}>
+										<IconButton
+											size="small"
+											sx={{ color: '#EF4444' }}
+											onClick={() => handleOpenDeleteModal(row)}
+										>
+											<DeleteIcon fontSize="small" />
+										</IconButton>
+									</Tooltip>
+								</Box>
+							)}
+							minWidth={1200}
+						/>
 					</div>
 				}
 			/>
 
 			{/* Add/Edit Modal */}
-			<Dialog open={isModalOpen} onClose={handleCloseModal} fullWidth maxWidth="sm">
-				<DialogTitle>{editingSupplierLot ? t('modal.editTitle') : t('modal.addTitle')}</DialogTitle>
-				<DialogContent dividers>
-					<Box display="flex" flexDirection="column" gap={3} mt={1}>
-						<FormControl fullWidth required disabled={saving || loadingItems}>
-							<InputLabel id="supplier-lots-item-label">{t('form.item')}</InputLabel>
-							<Select
-								labelId="supplier-lots-item-label"
-								value={formData.itemId || ''}
-								label={t('form.item')}
-								onChange={(e) => setFormData({ ...formData, itemId: Number(e.target.value) })}
-							>
-								<MenuItem value="">
-									<em>{t('form.selectItem')}</em>
-								</MenuItem>
-								{items.map((item) => (
-									<MenuItem key={item.id} value={item.id}>
-										{item.description}
+			<Dialog 
+				open={isModalOpen} 
+				onClose={handleCloseModal} 
+				fullWidth 
+				maxWidth="sm"
+				PaperProps={{
+					sx: {
+						borderRadius: '16px',
+						bgcolor: 'white'
+					}
+				}}
+			>
+				<DialogTitle sx={{ fontWeight: 700, px: 3, pt: 3 }}>
+					{editingSupplierLot ? t('modal.editTitle') : t('modal.addTitle')}
+				</DialogTitle>
+				<DialogContent>
+					<Box display="flex" flexDirection="column" gap={2} mt={2}>
+						<Box>
+							<Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+								{t('form.item')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+							</Typography>
+							<FormControl fullWidth required disabled={saving || loadingItems} size="small">
+								<Select
+									value={formData.itemId || ''}
+									displayEmpty
+									onChange={(e) => setFormData({ ...formData, itemId: Number(e.target.value) })}
+									sx={{
+										height: 40,
+										bgcolor: 'white',
+										borderRadius: 2,
+										'&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+											borderColor: '#415EDE',
+											borderWidth: '2px',
+										},
+										'&:hover .MuiOutlinedInput-notchedOutline': {
+											borderColor: '#415EDE',
+										}
+									}}
+								>
+									<MenuItem value="">
+										<em>{t('form.selectItem')}</em>
 									</MenuItem>
-								))}
-							</Select>
-						</FormControl>
+									{items.map((item) => (
+										<MenuItem key={item.id} value={item.id}>
+											{item.description}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+						</Box>
 
-						<FormControl fullWidth required disabled={saving || loadingSuppliers}>
-							<InputLabel id="supplier-lots-supplier-label">{t('form.supplier')}</InputLabel>
-							<Select
-								labelId="supplier-lots-supplier-label"
-								value={formData.supplierId || ''}
-								label={t('form.supplier')}
-								onChange={(e) => setFormData({ ...formData, supplierId: Number(e.target.value) })}
-							>
-								<MenuItem value="">
-									<em>{t('form.selectSupplier')}</em>
-								</MenuItem>
-								{suppliers.map((supplier) => (
-									<MenuItem key={supplier.id} value={supplier.id}>
-										{supplier.description}
+						<Box>
+							<Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+								{t('form.supplier')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+							</Typography>
+							<FormControl fullWidth required disabled={saving || loadingSuppliers} size="small">
+								<Select
+									value={formData.supplierId || ''}
+									displayEmpty
+									onChange={(e) => setFormData({ ...formData, supplierId: Number(e.target.value) })}
+									sx={{
+										height: 40,
+										bgcolor: 'white',
+										borderRadius: 2,
+										'&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+											borderColor: '#415EDE',
+											borderWidth: '2px',
+										},
+										'&:hover .MuiOutlinedInput-notchedOutline': {
+											borderColor: '#415EDE',
+										}
+									}}
+								>
+									<MenuItem value="">
+										<em>{t('form.selectSupplier')}</em>
 									</MenuItem>
-								))}
-							</Select>
-						</FormControl>
+									{suppliers.map((supplier) => (
+										<MenuItem key={supplier.id} value={supplier.id}>
+											{supplier.description}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+						</Box>
 
-						<TextField
-							label={t('form.description')}
-							value={formData.description}
-							onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-							fullWidth
-							required
-							disabled={saving}
-							multiline
-							rows={3}
-						/>
+						<Box>
+							<Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+								{t('form.description')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+							</Typography>
+							<Box
+								component="textarea"
+								value={formData.description}
+								onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
+								placeholder="Ingrese la descripción del lote"
+								rows={2}
+								sx={{
+									width: '100%',
+									p: 2,
+									borderRadius: 2,
+									border: '1px solid #E2E8F0',
+									bgcolor: 'white',
+									fontSize: '0.9375rem',
+									outline: 'none',
+									transition: 'all 0.2s',
+									fontFamily: 'inherit',
+									resize: 'vertical',
+									'&:focus': {
+										borderColor: '#415EDE',
+										boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+									}
+								}}
+							/>
+						</Box>
 
-						<TextField
-							label={t('form.portionQuantity')}
-							type="number"
-							value={formData.portionQuantity ?? 0}
-							onChange={(e) => setFormData({ ...formData, portionQuantity: Number(e.target.value) })}
-							fullWidth
-							required
-							disabled={saving}
-							inputProps={{ min: 0 }}
-						/>
+						<Box display="flex" gap={2}>
+							<Box flex={1}>
+								<Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+									{t('form.portionQuantity')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+								</Typography>
+								<Box
+									component="input"
+									type="number"
+									value={formData.portionQuantity ?? 0}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, portionQuantity: Number(e.target.value) })}
+									sx={{
+										width: '100%',
+										height: 40,
+										px: 2,
+										borderRadius: 2,
+										border: '1px solid #E2E8F0',
+										bgcolor: 'white',
+										fontSize: '0.9375rem',
+										outline: 'none',
+										transition: 'all 0.2s',
+										'&:focus': {
+											borderColor: '#415EDE',
+											boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+										}
+									}}
+								/>
+							</Box>
 
-						<TextField
-							label={t('form.portionsPerBox')}
-							type="number"
-							value={formData.portionsPerBox ?? 0}
-							onChange={(e) => setFormData({ ...formData, portionsPerBox: Number(e.target.value) })}
-							fullWidth
-							required
-							disabled={saving}
-							inputProps={{ min: 0 }}
-						/>
+							<Box flex={1}>
+								<Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+									{t('form.portionsPerBox')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+								</Typography>
+								<Box
+									component="input"
+									type="number"
+									value={formData.portionsPerBox ?? 0}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, portionsPerBox: Number(e.target.value) })}
+									sx={{
+										width: '100%',
+										height: 40,
+										px: 2,
+										borderRadius: 2,
+										border: '1px solid #E2E8F0',
+										bgcolor: 'white',
+										fontSize: '0.9375rem',
+										outline: 'none',
+										transition: 'all 0.2s',
+										'&:focus': {
+											borderColor: '#415EDE',
+											boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+										}
+									}}
+								/>
+							</Box>
+						</Box>
 
-						<TextField
-							label={t('form.productionDate')}
-							type="date"
-							value={productionDateInput}
-							onChange={(e) => {
-								setProductionDateInput(e.target.value);
-								setFormData({
-									...formData,
-									productionDate: e.target.value ? new Date(e.target.value) : null
-								});
-							}}
-							fullWidth
-							disabled={saving}
-							InputLabelProps={{ shrink: true }}
-						/>
+						<Box display="flex" gap={2}>
+							<Box flex={1}>
+								<Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+									{t('form.productionDate')}
+								</Typography>
+								<Box
+									component="input"
+									type="date"
+									value={productionDateInput}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+										setProductionDateInput(e.target.value);
+										setFormData({
+											...formData,
+											productionDate: e.target.value ? new Date(e.target.value) : null
+										});
+									}}
+									sx={{
+										width: '100%',
+										height: 40,
+										px: 2,
+										borderRadius: 2,
+										border: '1px solid #E2E8F0',
+										bgcolor: 'white',
+										fontSize: '0.9375rem',
+										outline: 'none',
+										transition: 'all 0.2s',
+										'&:focus': {
+											borderColor: '#415EDE',
+											boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+										}
+									}}
+								/>
+							</Box>
 
-						<TextField
-							label={t('form.expirationDate')}
-							type="date"
-							value={expirationDateInput}
-							onChange={(e) => {
-								setExpirationDateInput(e.target.value);
-								setFormData({
-									...formData,
-									expirationDate: e.target.value ? new Date(e.target.value) : null
-								});
-							}}
-							fullWidth
-							disabled={saving}
-							InputLabelProps={{ shrink: true }}
-						/>
+							<Box flex={1}>
+								<Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+									{t('form.expirationDate')}
+								</Typography>
+								<Box
+									component="input"
+									type="date"
+									value={expirationDateInput}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+										setExpirationDateInput(e.target.value);
+										setFormData({
+											...formData,
+											expirationDate: e.target.value ? new Date(e.target.value) : null
+										});
+									}}
+									sx={{
+										width: '100%',
+										height: 40,
+										px: 2,
+										borderRadius: 2,
+										border: '1px solid #E2E8F0',
+										bgcolor: 'white',
+										fontSize: '0.9375rem',
+										outline: 'none',
+										transition: 'all 0.2s',
+										'&:focus': {
+											borderColor: '#415EDE',
+											boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+										}
+									}}
+								/>
+							</Box>
+						</Box>
 					</Box>
 				</DialogContent>
-				<DialogActions>
-					<Button color="inherit" onClick={handleCloseModal} disabled={saving}>
+				<DialogActions sx={{ p: 3 }}>
+					<Button 
+						onClick={handleCloseModal} 
+						disabled={saving}
+						sx={{ 
+							borderRadius: '8px',
+							textTransform: 'none',
+							color: 'text.secondary',
+							fontWeight: 600
+						}}
+					>
 						{t('modal.cancel')}
 					</Button>
 					<Button
 						variant="contained"
-						color="primary"
 						onClick={handleSave}
 						disabled={saving || !formData.description.trim() || !formData.itemId || !formData.supplierId}
-						startIcon={saving ? <CircularProgress size={18} color="inherit" /> : undefined}
+						sx={{ 
+							borderRadius: '8px',
+							textTransform: 'none',
+							bgcolor: '#415EDE',
+							fontWeight: 600,
+							'&:hover': {
+								bgcolor: '#354db1'
+							}
+						}}
 					>
 						{saving ? 'Guardando...' : t('modal.save')}
 					</Button>

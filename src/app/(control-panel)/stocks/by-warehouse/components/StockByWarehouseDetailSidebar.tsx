@@ -4,19 +4,10 @@ import {
     Box,
     IconButton,
     Typography,
-    Card,
-    CardContent,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
     CircularProgress,
-    TablePagination,
     Divider
 } from '@mui/material';
+import StyledTable from '@/components/ui/StyledTable';
 import CloseIcon from '@mui/icons-material/Close';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
@@ -154,93 +145,51 @@ function StockByWarehouseDetailSidebar({ open, onClose, warehouseId }: StockByWa
                             <CircularProgress />
                         </Box>
                     ) : (
-                        <Card sx={{ 
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                            borderRadius: 2,
-                            overflow: 'hidden'
-                        }}>
-                            <Box sx={{ 
-                                p: 2.5, 
-                                bgcolor: 'background.paper',
-                                borderBottom: '1px solid',
-                                borderColor: 'divider'
-                            }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                    <InventoryIcon sx={{ color: 'primary.main', fontSize: 28 }} />
-                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                        {t('byWarehouse.stockBreakdown')}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            <TableContainer>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow sx={{ bgcolor: 'grey.50' }}>
-                                            <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                                                {t('byWarehouse.article')}
-                                            </TableCell>
-                                            <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                                                {t('byWarehouse.location')}
-                                            </TableCell>
-                                            <TableCell sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                                                {t('byWarehouse.lot')}
-                                            </TableCell>
-                                            <TableCell align="right" sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                                                {t('byWarehouse.quantity')}
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {stocks.length === 0 ? (
-                                            <TableRow>
-                                                <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
-                                                    <Typography color="text.secondary">
-                                                        {t('byWarehouse.noDetails')}
-                                                    </Typography>
-                                                </TableCell>
-                                            </TableRow>
-                                        ) : (
-                                            stocks.map((stock, index) => (
-                                                <TableRow 
-                                                    key={stock.id}
-                                                    hover
-                                                    sx={{ 
-                                                        '&:hover': { bgcolor: 'action.hover' },
-                                                        bgcolor: index % 2 === 0 ? 'background.paper' : 'grey.50'
-                                                    }}
-                                                >
-                                                    <TableCell>{stock.itemDescription}</TableCell>
-                                                    <TableCell>{stock.locationDescription}</TableCell>
-                                                    <TableCell>{stock.lotDescription}</TableCell>
-                                                    <TableCell align="right">
-                                                        <Box display="flex" alignItems="center" justifyContent="flex-end" gap={1}>
-                                                            {stock.quantity <= 0 && (
-                                                                <WarningAmberIcon color="warning" fontSize="small" />
-                                                            )}
-                                                            <Typography sx={{ fontWeight: 500 }}>
-                                                                {stock.quantity}
-                                                            </Typography>
-                                                        </Box>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                            <Divider />
-                            <Box sx={{ bgcolor: 'background.paper' }}>
-                                <TablePagination
-                                    component="div"
-                                    count={totalCount}
-                                    page={page}
-                                    onPageChange={handleChangePage}
-                                    rowsPerPage={rowsPerPage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    rowsPerPageOptions={[5, 10, 25]}
-                                />
-                            </Box>
-                        </Card>
+                        <StyledTable<StockResponse>
+                            columns={[
+                                {
+                                    id: 'article',
+                                    label: t('byWarehouse.article'),
+                                    render: (row) => row.itemDescription
+                                },
+                                {
+                                    id: 'location',
+                                    label: t('byWarehouse.location'),
+                                    render: (row) => row.locationDescription
+                                },
+                                {
+                                    id: 'lot',
+                                    label: t('byWarehouse.lot'),
+                                    render: (row) => row.lotDescription
+                                },
+                                {
+                                    id: 'quantity',
+                                    label: t('byWarehouse.quantity'),
+                                    render: (row) => (
+                                        <Box display="flex" alignItems="center" justifyContent="flex-end" gap={1}>
+                                            {row.quantity <= 0 && (
+                                                <WarningAmberIcon color="warning" fontSize="small" />
+                                            )}
+                                            <Typography sx={{ fontWeight: 500, color: '#334155' }}>
+                                                {row.quantity}
+                                            </Typography>
+                                        </Box>
+                                    )
+                                }
+                            ]}
+                            data={stocks}
+                            getRowId={(row) => String(row.id)}
+                            loading={loading}
+                            loadingMessage="Cargando detalles..."
+                            emptyMessage={t('byWarehouse.noDetails')}
+                            pagination={{
+                                count: totalCount,
+                                page: page,
+                                rowsPerPage: rowsPerPage,
+                                onPageChange: handleChangePage
+                            }}
+                            minWidth={600}
+                        />
                     )}
                 </Box>
             </Box>

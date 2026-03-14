@@ -5,20 +5,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     TextField,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
     IconButton,
     Box,
-    CircularProgress,
     Typography,
-    TablePagination,
     Autocomplete
 } from '@mui/material';
+import StyledTable from '@/components/ui/StyledTable';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -153,108 +145,151 @@ function StocksByArticle() {
                 }
                 content={
                     <div className="p-6">
-                        <TableContainer component={Paper}>
-                            <Box
-                                display="flex"
-                                flexDirection="column"
-                                gap={2}
-                                p={2}
-                            >
-                                    {/* Item Filter */}
-                                <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2}>
-                                    <Autocomplete
-                                        sx={{ minWidth: 300 }}
-                                        options={itemOptions}
-                                        getOptionLabel={(option) => option.description}
-                                        value={selectedItem}
-                                        onChange={(event, newValue) => {
-                                            setSelectedItem(newValue);
-                                            setPage(0);
-                                        }}
-                                        inputValue={itemInputValue}
-                                        onInputChange={(event, newInputValue) => {
-                                            setItemInputValue(newInputValue);
-                                        }}
-                                        loading={itemLoading}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label={t('byArticle.filterByArticle')}
-                                                size="small"
-                                            />
-                                        )}
-                                    />
-                                </Box>
-
-                                
-                            </Box>
-
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>{t('byArticle.article')}</TableCell>
-                                        <TableCell align="right">{t('byArticle.totalQuantity')}</TableCell>
-                                        <TableCell align="center">{t('byArticle.actions')}</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={3} align="center">
-                                                <CircularProgress />
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : stocks.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={3} align="center">
-                                                <Typography>{t('byArticle.noData')}</Typography>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        stocks.map((stock) => (
-                                            <TableRow
-                                                key={stock.itemId}
-                                                hover
-                                                sx={{ cursor: 'pointer' }}
-                                                onClick={() => handleRowClick(stock.itemId)}
-                                            >
-                                                <TableCell>{stock.itemDescription}</TableCell>
-                                                <TableCell align="right">
-                                                    <Box display="flex" alignItems="center" justifyContent="flex-end" gap={1}>
-                                                        {stock.totalQuantity <= 0 && (
-                                                            <WarningAmberIcon color="warning" fontSize="small" />
-                                                        )}
-                                                        {stock.totalQuantity}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <IconButton
-                                                        size="small"
-                                                        color="primary"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleRowClick(stock.itemId);
-                                                        }}
-                                                    >
-                                                        <VisibilityIcon />
-                                                    </IconButton>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
+                        <Box
+                            sx={{
+                                bgcolor: 'white',
+                                borderRadius: '16px',
+                                p: 3,
+                                mb: 3,
+                                border: '1px solid #E2E8F0',
+                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                            }}
+                        >
+                            <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="center">
+                                <Autocomplete
+                                    sx={{ 
+                                        minWidth: 300,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: 2,
+                                            bgcolor: 'white',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                            }
+                                        }
+                                    }}
+                                    options={itemOptions}
+                                    getOptionLabel={(option) => option.description}
+                                    value={selectedItem}
+                                    onChange={(event, newValue) => {
+                                        setSelectedItem(newValue);
+                                        setPage(0);
+                                    }}
+                                    inputValue={itemInputValue}
+                                    onInputChange={(event, newInputValue) => {
+                                        setItemInputValue(newInputValue);
+                                    }}
+                                    loading={itemLoading}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label={t('byArticle.filterByArticle')}
+                                            size="small"
+                                        />
                                     )}
-                                </TableBody>
-                            </Table>
+                                />
 
-                            <TablePagination
-                                component="div"
-                                count={totalCount}
-                                page={page}
-                                onPageChange={handleChangePage}
-                                rowsPerPage={rowsPerPage}
-                                onRowsPerPageChange={handleChangeRowsPerPage}
-                                rowsPerPageOptions={[5, 10, 25, 50]}
-                            />
-                        </TableContainer>
+                                <Box display="flex" gap={1} alignItems="center" sx={{ flex: 1, maxWidth: 400 }}>
+                                    <Box
+                                        component="input"
+                                        type="text"
+                                        placeholder={t('search')}
+                                        value={searchTerm}
+                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
+                                        onKeyDown={handleSearchKeyDown}
+                                        sx={{
+                                            width: '100%',
+                                            height: 40,
+                                            px: 2,
+                                            borderRadius: 2,
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: 'white',
+                                            fontSize: '0.9375rem',
+                                            outline: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                    <IconButton
+                                        color="primary"
+                                        onClick={handleSearchClick}
+                                        sx={{
+                                            bgcolor: 'white',
+                                            border: '1px solid #E2E8F0',
+                                            borderRadius: 2,
+                                            height: 40,
+                                            width: 40,
+                                            '&:hover': {
+                                                borderColor: '#415EDE',
+                                                bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                            }
+                                        }}
+                                    >
+                                        <SearchIcon sx={{ fontSize: 20 }} />
+                                    </IconButton>
+                                </Box>
+                            </Box>
+                        </Box>
+
+                        <StyledTable<StockByArticle>
+                            columns={[
+                                {
+                                    id: 'article',
+                                    label: t('byArticle.article'),
+                                    render: (row) => (
+                                        <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                            {row.itemDescription}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'totalQuantity',
+                                    label: t('byArticle.totalQuantity'),
+                                    align: 'center',
+                                    render: (row) => (
+                                        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                                            {row.totalQuantity <= 0 && (
+                                                <WarningAmberIcon color="warning" fontSize="small" />
+                                            )}
+                                            <Typography sx={{ color: '#334155' }}>
+                                                {row.totalQuantity}
+                                            </Typography>
+                                        </Box>
+                                    )
+                                }
+                            ]}
+                            data={stocks}
+                            getRowId={(row) => String(row.itemId)}
+                            loading={loading}
+                            loadingMessage="Cargando stock..."
+                            emptyMessage={t('byArticle.noData')}
+                            onRowClick={(row) => handleRowClick(row.itemId)}
+                            renderActions={(row) => (
+                                <IconButton
+                                    size="small"
+                                    sx={{ color: '#415EDE' }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRowClick(row.itemId);
+                                    }}
+                                >
+                                    <VisibilityIcon fontSize="small" />
+                                </IconButton>
+                            )}
+                            pagination={{
+                                count: totalCount,
+                                page: page,
+                                rowsPerPage: rowsPerPage,
+                                onPageChange: handleChangePage
+                            }}
+                            minWidth={800}
+                        />
                     </div>
                 }
             />

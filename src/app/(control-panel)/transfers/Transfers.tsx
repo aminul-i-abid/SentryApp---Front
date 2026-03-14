@@ -3,9 +3,8 @@ import NavbarToggleButton from "@/components/theme-layouts/components/navbar/Nav
 import { styled, useTheme } from "@mui/material/styles";
 import {
     Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
-    FormControl, IconButton, InputLabel, MenuItem, Paper, Select,
-    Table, TableBody, TableCell, TableContainer, TableHead, TablePagination,
-    TableRow, TextField, Typography, useMediaQuery, CircularProgress, Chip,
+    FormControl, IconButton, InputLabel, MenuItem, Select,
+    Typography, useMediaQuery, CircularProgress, Chip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useState } from "react";
@@ -23,6 +22,7 @@ import {
 } from "../stocks/stockService";
 import { getWarehouses } from "../warehouses/warehousesService";
 import { getLocations } from "../locations/locationsService";
+import StyledTable from "@/components/ui/StyledTable";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
     "& .FusePageSimple-header": {
@@ -152,10 +152,8 @@ function Transfers() {
     const handleFormChange = (field: keyof CreateTransferDto, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
         
-        // Cascading for origin: Item -> Lot -> Warehouse -> Location (all based on stock)
         if (field === 'itemId' && value) {
             fetchLotsByItem(value);
-            // Reset all dependent fields
             setFormData(prev => ({ 
                 ...prev, 
                 lotId: 0, 
@@ -172,7 +170,6 @@ function Transfers() {
         
         if (field === 'lotId' && value && formData.itemId) {
             fetchOriginWarehousesByItemAndLot(formData.itemId, value);
-            // Reset dependent fields
             setFormData(prev => ({ 
                 ...prev, 
                 originWarehouseId: 0, 
@@ -187,7 +184,6 @@ function Transfers() {
         
         if (field === 'originWarehouseId' && value && formData.itemId && formData.lotId) {
             fetchOriginLocationsByItemLotAndWarehouse(formData.itemId, formData.lotId, value);
-            // Reset dependent fields
             setFormData(prev => ({ 
                 ...prev, 
                 originLocationId: 0,
@@ -198,7 +194,6 @@ function Transfers() {
             setDestLocations([]);
         }
         
-        // For destination, just load locations when warehouse is selected
         if (field === 'destinationWarehouseId' && value) {
             fetchDestLocations(value);
             setFormData(prev => ({ ...prev, destinationLocationId: 0 }));
@@ -249,10 +244,66 @@ function Transfers() {
             }
             content={
                 <div className="p-6">
-                    <Box display="flex" justifyContent="flex-end" mb={2}>
+                    <Box
+                        sx={{
+                            bgcolor: 'white',
+                            borderRadius: '16px',
+                            p: 3,
+                            mb: 3,
+                            border: '1px solid #E2E8F0',
+                            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+                            display: 'flex',
+                            flexDirection: { xs: 'column', md: 'row' },
+                            gap: 2,
+                            justifyContent: 'space-between',
+                            alignItems: { xs: 'stretch', md: 'center' }
+                        }}
+                    >
+                        <Box display="flex" flex={1} gap={1} alignItems="center" sx={{ maxWidth: 400 }}>
+                            <Box
+                                component="input"
+                                type="text"
+                                placeholder="Buscar"
+                                value={searchInput}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
+                                onKeyDown={(e: React.KeyboardEvent) => e.key === "Enter" && setSearch(searchInput)}
+                                sx={{
+                                    width: '100%',
+                                    height: 40,
+                                    px: 2,
+                                    borderRadius: 2,
+                                    border: '1px solid #E2E8F0',
+                                    bgcolor: 'white',
+                                    fontSize: '0.9375rem',
+                                    outline: 'none',
+                                    transition: 'all 0.2s',
+                                    '&:focus': {
+                                        borderColor: '#415EDE',
+                                        boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                    }
+                                }}
+                            />
+                            <IconButton
+                                color="primary"
+                                onClick={() => setSearch(searchInput)}
+                                sx={{
+                                    bgcolor: 'white',
+                                    border: '1px solid #E2E8F0',
+                                    borderRadius: 2,
+                                    height: 40,
+                                    width: 40,
+                                    '&:hover': {
+                                        borderColor: '#415EDE',
+                                        bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                    }
+                                }}
+                            >
+                                <SearchIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
+                        </Box>
+
                         <Button
                             variant="contained"
-                            color="primary"
                             onClick={() => {
                                 setFormData({
                                     itemId: 0, lotId: 0,
@@ -266,119 +317,122 @@ function Transfers() {
                                 setDestLocations([]);
                                 setCreateModalOpen(true);
                             }}
+                            sx={{
+                                bgcolor: '#415EDE',
+                                color: 'white',
+                                borderRadius: '12px',
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                px: 3,
+                                '&:hover': {
+                                    bgcolor: '#354BB0'
+                                }
+                            }}
                         >
                             Nueva Transferencia
                         </Button>
                     </Box>
-                    <TableContainer component={Paper}>
-                        <Box
-                            display="flex"
-                            flexDirection={{ xs: 'column', md: 'row' }}
-                            gap={2}
-                            p={2}
-                            alignItems={{ xs: 'stretch', md: 'center' }}
-                        >
-                            <Box display="flex" flex={1} gap={1} alignItems="center">
-                                <TextField
-                                    fullWidth
-                                    placeholder="Buscar"
-                                    value={searchInput}
-                                    onChange={(e) => setSearchInput(e.target.value)}
-                                    onKeyDown={(e) => e.key === "Enter" && setSearch(searchInput)}
-                                    size="small"
-                                />
-                                <IconButton
-                                    color="primary"
-                                    onClick={() => setSearch(searchInput)}
-                                    sx={{
-                                        border: `1px solid ${theme.palette.primary.main}`,
-                                    }}
-                                    aria-label="Buscar"
-                                >
-                                    <SearchIcon />
-                                </IconButton>
-                            </Box>
-                        </Box>
 
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Fecha</TableCell>
-                                    <TableCell>Artículo</TableCell>
-                                    <TableCell>Lote</TableCell>
-                                    <TableCell>Origen</TableCell>
-                                    <TableCell>Cantidad</TableCell>
-                                    <TableCell>Tipo</TableCell>
-                                    <TableCell>Notas</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={8} align="center">
-                                            <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                <CircularProgress size={24} />
-                                                <Typography>Cargando...</Typography>
-                                            </Box>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : transfers.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={8} align="center">
-                                            <Typography color="text.secondary">No hay registros</Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    transfers.map((transfer) => (
-                                        <TableRow key={transfer.id} hover>
-                                            <TableCell>
-                                                {new Date(transfer.movementDate).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography fontWeight={600}>{transfer.itemName}</Typography>
-                                            </TableCell>
-                                            <TableCell>{transfer.lotNumber}</TableCell>
-                                            <TableCell>{transfer.warehouseName} - {transfer.locationName}</TableCell>
-                                            <TableCell>{transfer.quantity}</TableCell>
-                                            <TableCell>
-                                                <Chip 
-                                                    label={transfer.type === 1 ? t('transfers.movementType.increase') : t('transfers.movementType.decrease')}
-                                                    color={transfer.type === 1 ? 'success' : 'error'}
-                                                    size="small"
-                                                    sx={{ opacity: 0.7 }}
-                                                />
-                                            </TableCell>
-                                            <TableCell>{transfer.notes || '-'}</TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                        <TablePagination
-                            component="div"
-                            count={totalCount}
-                            page={page}
-                            onPageChange={(_, newPage) => setPage(newPage)}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
-                            labelRowsPerPage="Filas por página"
-                            labelDisplayedRows={({ from, to, count }) =>
-                                `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
+                    <StyledTable<MovementDto>
+                        columns={[
+                            {
+                                id: 'date',
+                                label: 'Fecha',
+                                render: (row) => new Date(row.movementDate).toLocaleDateString()
+                            },
+                            {
+                                id: 'article',
+                                label: 'Artículo',
+                                render: (row) => (
+                                    <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                        {row.itemName}
+                                    </Typography>
+                                )
+                            },
+                            {
+                                id: 'lot',
+                                label: 'Lote',
+                                render: (row) => row.lotNumber
+                            },
+                            {
+                                id: 'origin',
+                                label: 'Origen',
+                                render: (row) => `${row.warehouseName} - ${row.locationName}`
+                            },
+                            {
+                                id: 'quantity',
+                                label: 'Cantidad',
+                                align: 'center',
+                                render: (row) => row.quantity
+                            },
+                            {
+                                id: 'type',
+                                label: 'Tipo',
+                                align: 'center',
+                                render: (row) => (
+                                    <Chip 
+                                        label={row.type === 1 ? t('transfers.movementType.increase') : t('transfers.movementType.decrease')}
+                                        color={row.type === 1 ? 'success' : 'error'}
+                                        size="small"
+                                        sx={{ 
+                                            opacity: 0.8,
+                                            fontWeight: 600,
+                                            borderRadius: '6px'
+                                        }}
+                                    />
+                                )
+                            },
+                            {
+                                id: 'notes',
+                                label: 'Notas',
+                                render: (row) => row.notes || '-'
                             }
-                        />
-                    </TableContainer>
+                        ]}
+                        data={transfers}
+                        getRowId={(row) => String(row.id)}
+                        loading={loading}
+                        loadingMessage="Cargando transferencias..."
+                        emptyMessage="No hay registros"
+                        pagination={{
+                            count: totalCount,
+                            page: page,
+                            rowsPerPage: rowsPerPage,
+                            onPageChange: (_, newPage) => setPage(newPage)
+                        }}
+                        minWidth={1100}
+                    />
 
-                    <Dialog open={createModalOpen} onClose={() => setCreateModalOpen(false)} maxWidth="md" fullWidth>
-                        <DialogTitle>Nueva Transferencia</DialogTitle>
-                        <DialogContent dividers>
-                            <Box display="flex" flexDirection="column" gap={3}>
+                    <Dialog 
+                        open={createModalOpen} 
+                        onClose={() => setCreateModalOpen(false)} 
+                        maxWidth="md" 
+                        fullWidth
+                        PaperProps={{
+                            sx: {
+                                borderRadius: '24px',
+                                p: 1
+                            }
+                        }}
+                    >
+                        <DialogTitle sx={{ fontWeight: 800, fontSize: '1.5rem', color: '#1E293B', pb: 1 }}>
+                            Nueva Transferencia
+                        </DialogTitle>
+                        <DialogContent>
+                            <Box display="flex" flexDirection="column" gap={3} pt={2}>
                                 <FormControl fullWidth required>
-                                    <InputLabel>Artículo</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>Artículo</InputLabel>
                                     <Select
                                         value={formData.itemId}
                                         label="Artículo"
                                         onChange={(e) => handleFormChange('itemId', e.target.value)}
                                         disabled={creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {items.map((item) => (
                                             <MenuItem key={item.id} value={item.id}>
@@ -389,12 +443,19 @@ function Transfers() {
                                 </FormControl>
 
                                 <FormControl fullWidth required>
-                                    <InputLabel>Lote</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>Lote</InputLabel>
                                     <Select
                                         value={formData.lotId}
                                         label="Lote"
                                         onChange={(e) => handleFormChange('lotId', e.target.value)}
                                         disabled={!formData.itemId || lots.length === 0 || creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {lots.map((lot) => (
                                             <MenuItem key={lot.id} value={lot.id}>
@@ -404,15 +465,22 @@ function Transfers() {
                                     </Select>
                                 </FormControl>
 
-                                <Typography variant="h6">Origen</Typography>
+                                <Typography variant="h6" fontWeight={700} sx={{ color: '#475569', mt: 1 }}>Origen</Typography>
                                 <Box display="flex" gap={2}>
                                     <FormControl fullWidth required>
-                                        <InputLabel>Almacén</InputLabel>
+                                        <InputLabel sx={{ fontWeight: 500 }}>Almacén</InputLabel>
                                         <Select
                                             value={formData.originWarehouseId}
                                             label="Almacén"
                                             onChange={(e) => handleFormChange('originWarehouseId', e.target.value)}
                                             disabled={!formData.lotId || originWarehouses.length === 0 || creating}
+                                            sx={{
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                    borderWidth: '2px',
+                                                }
+                                            }}
                                         >
                                             {originWarehouses.map((w) => (
                                                 <MenuItem key={w.id} value={w.id}>{w.description}</MenuItem>
@@ -420,12 +488,19 @@ function Transfers() {
                                         </Select>
                                     </FormControl>
                                     <FormControl fullWidth required>
-                                        <InputLabel>Ubicación</InputLabel>
+                                        <InputLabel sx={{ fontWeight: 500 }}>Ubicación</InputLabel>
                                         <Select
                                             value={formData.originLocationId}
                                             label="Ubicación"
                                             disabled={!formData.originWarehouseId || originLocations.length === 0 || creating}
                                             onChange={(e) => handleFormChange('originLocationId', e.target.value)}
+                                            sx={{
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                    borderWidth: '2px',
+                                                }
+                                            }}
                                         >
                                             {originLocations.map((l) => (
                                                 <MenuItem key={l.id} value={l.id}>{l.description}</MenuItem>
@@ -434,15 +509,22 @@ function Transfers() {
                                     </FormControl>
                                 </Box>
 
-                                <Typography variant="h6">Destino</Typography>
+                                <Typography variant="h6" fontWeight={700} sx={{ color: '#475569', mt: 1 }}>Destino</Typography>
                                 <Box display="flex" gap={2}>
                                     <FormControl fullWidth required>
-                                        <InputLabel>Almacén</InputLabel>
+                                        <InputLabel sx={{ fontWeight: 500 }}>Almacén</InputLabel>
                                         <Select
                                             value={formData.destinationWarehouseId}
                                             label="Almacén"
                                             onChange={(e) => handleFormChange('destinationWarehouseId', e.target.value)}
                                             disabled={!formData.originLocationId || creating}
+                                            sx={{
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                    borderWidth: '2px',
+                                                }
+                                            }}
                                         >
                                             {destWarehouses.map((w) => (
                                                 <MenuItem key={w.id} value={w.id}>{w.description}</MenuItem>
@@ -450,12 +532,19 @@ function Transfers() {
                                         </Select>
                                     </FormControl>
                                     <FormControl fullWidth required>
-                                        <InputLabel>Ubicación</InputLabel>
+                                        <InputLabel sx={{ fontWeight: 500 }}>Ubicación</InputLabel>
                                         <Select
                                             value={formData.destinationLocationId}
                                             label="Ubicación"
                                             disabled={!formData.destinationWarehouseId || creating}
                                             onChange={(e) => handleFormChange('destinationLocationId', e.target.value)}
+                                            sx={{
+                                                borderRadius: '12px',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                    borderWidth: '2px',
+                                                }
+                                            }}
                                         >
                                             {destLocations.map((l) => (
                                                 <MenuItem key={l.id} value={l.id}>{l.description}</MenuItem>
@@ -464,40 +553,93 @@ function Transfers() {
                                     </FormControl>
                                 </Box>
 
-                                <TextField
-                                    fullWidth
-                                    required
-                                    label="Cantidad"
-                                    type="number"
-                                    value={formData.quantity || ''}
-                                    onChange={(e) => handleFormChange('quantity', parseInt(e.target.value) || 0)}
-                                    disabled={creating}
-                                />
+                                <Box>
+                                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 600, color: '#64748B', mb: 0.5, display: 'block' }}>
+                                        Cantidad *
+                                    </Typography>
+                                    <Box
+                                        component="input"
+                                        type="number"
+                                        value={formData.quantity || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFormChange('quantity', parseInt(e.target.value) || 0)}
+                                        disabled={creating}
+                                        placeholder="0"
+                                        sx={{
+                                            width: '100%',
+                                            height: 48,
+                                            px: 2,
+                                            borderRadius: '12px',
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: 'white',
+                                            fontSize: '1rem',
+                                            outline: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                </Box>
 
-                                <TextField
-                                    fullWidth
-                                    label="Notas"
-                                    multiline
-                                    rows={3}
-                                    value={formData.notes}
-                                    onChange={(e) => handleFormChange('notes', e.target.value)}
-                                    disabled={creating}
-                                />
+                                <Box>
+                                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 600, color: '#64748B', mb: 0.5, display: 'block' }}>
+                                        Notas
+                                    </Typography>
+                                    <Box
+                                        component="textarea"
+                                        rows={3}
+                                        value={formData.notes}
+                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleFormChange('notes', e.target.value)}
+                                        disabled={creating}
+                                        sx={{
+                                            width: '100%',
+                                            p: 2,
+                                            borderRadius: '12px',
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: 'white',
+                                            fontSize: '1rem',
+                                            outline: 'none',
+                                            resize: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                </Box>
                             </Box>
                         </DialogContent>
-                        <DialogActions>
+                        <DialogActions sx={{ p: 3, gap: 1 }}>
                             <Button
-                                color="inherit"
                                 onClick={() => setCreateModalOpen(false)}
                                 disabled={creating}
+                                sx={{
+                                    borderRadius: '12px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 3,
+                                    color: '#64748B'
+                                }}
                             >
                                 Cancelar
                             </Button>
                             <Button
                                 variant="contained"
-                                color="primary"
                                 onClick={handleCreateTransfer}
                                 disabled={creating}
+                                sx={{
+                                    bgcolor: '#415EDE',
+                                    color: 'white',
+                                    borderRadius: '12px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 4,
+                                    '&:hover': {
+                                        bgcolor: '#354BB0'
+                                    }
+                                }}
                                 startIcon={creating ? <CircularProgress size={18} color="inherit" /> : undefined}
                             >
                                 {creating ? 'Guardando...' : 'Guardar'}

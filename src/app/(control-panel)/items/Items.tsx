@@ -33,11 +33,11 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { 
-    getItems, 
+import {
+    getItems,
     createItem,
     updateItem,
-    deleteItem 
+    deleteItem
 } from './itemsService';
 import { ItemResponse, ItemFormData } from './models/Item';
 import { getItemUnitOfMeasures } from '../item-unit-of-measure/itemUnitOfMeasureService';
@@ -47,6 +47,7 @@ import authRoles from '@auth/authRoles';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { useSnackbar } from 'notistack';
+import StyledTable from '@/components/ui/StyledTable';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
     '& .FusePageSimple-header': {
@@ -75,7 +76,7 @@ function Items() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<ItemResponse | null>(null);
     const [deletingItem, setDeletingItem] = useState<ItemResponse | null>(null);
-    const [formData, setFormData] = useState<ItemFormData>({ 
+    const [formData, setFormData] = useState<ItemFormData>({
         description: '',
         hasLot: false,
         unitOfMeasureId: 0
@@ -173,7 +174,7 @@ function Items() {
 
     const handleOpenAddModal = () => {
         setEditingItem(null);
-        setFormData({ 
+        setFormData({
             description: '',
             hasLot: false,
             unitOfMeasureId: 0
@@ -183,7 +184,7 @@ function Items() {
 
     const handleOpenEditModal = (item: ItemResponse) => {
         setEditingItem(item);
-        setFormData({ 
+        setFormData({
             description: item.description,
             hasLot: item.hasLot,
             unitOfMeasureId: item.unitOfMeasureId
@@ -194,7 +195,7 @@ function Items() {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setEditingItem(null);
-        setFormData({ 
+        setFormData({
             description: '',
             hasLot: false,
             unitOfMeasureId: 0
@@ -216,7 +217,7 @@ function Items() {
         setSaving(true);
         try {
             let response;
-            
+
             if (editingItem) {
                 response = await updateItem(editingItem.id, formData);
             } else {
@@ -283,179 +284,218 @@ function Items() {
                 }
                 content={
                     <div className="p-6">
-                        <Box display="flex" justifyContent="flex-end" mb={2}>
+                        <Box display="flex" justifyContent="flex-end" mb={4}>
                             {isAdmin && (
                                 <Button
                                     variant="contained"
                                     color="primary"
                                     onClick={handleOpenAddModal}
+                                    sx={{
+                                        borderRadius: '8px',
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        px: 3
+                                    }}
                                 >
                                     {t('addNew')}
                                 </Button>
                             )}
                         </Box>
 
-                        <TableContainer component={Paper}>
-                            <Box
-                                display="flex"
-                                flexDirection={{ xs: 'column', md: 'row' }}
-                                gap={2}
-                                p={2}
-                                alignItems={{ xs: 'stretch', md: 'center' }}
-                            >
-                                <Box display="flex" flex={1} gap={1} alignItems="center">
-                                    <TextField
-                                        fullWidth
-                                        placeholder={t('search')}
-                                        value={searchTerm}
-                                        onChange={(event) => setSearchTerm(event.target.value)}
-                                        onKeyDown={handleSearchKeyDown}
-                                        size="small"
-                                    />
-                                    <IconButton
-                                        color="primary"
-                                        onClick={handleSearchClick}
-                                        sx={{
-                                            border: `1px solid ${theme.palette.primary.main}`,
-                                        }}
-                                        aria-label="Buscar"
-                                    >
-                                        <SearchIcon />
-                                    </IconButton>
-                                </Box>
+                        <Box mb={3}>
+                            <Box display="flex" gap={1} alignItems="center" sx={{ maxWidth: 400 }}>
+                                <Box
+                                    component="input"
+                                    type="text"
+                                    placeholder={t('search')}
+                                    value={searchTerm}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
+                                    onKeyDown={handleSearchKeyDown}
+                                    sx={{
+                                        width: '100%',
+                                        height: 40,
+                                        px: 2,
+                                        borderRadius: 2,
+                                        border: '1px solid #E2E8F0',
+                                        bgcolor: 'white',
+                                        fontSize: '0.9375rem',
+                                        outline: 'none',
+                                        transition: 'all 0.2s',
+                                        '&:focus': {
+                                            borderColor: '#415EDE',
+                                            boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                        }
+                                    }}
+                                />
+                                <IconButton
+                                    color="primary"
+                                    onClick={handleSearchClick}
+                                    sx={{
+                                        bgcolor: 'white',
+                                        border: '1px solid #E2E8F0',
+                                        borderRadius: 2,
+                                        height: 40,
+                                        width: 40,
+                                        '&:hover': {
+                                            borderColor: '#415EDE',
+                                            bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                        }
+                                    }}
+                                >
+                                    <SearchIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
                             </Box>
+                        </Box>
 
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>{t('table.description')}</TableCell>
-                                        <TableCell>{t('table.hasLot')}</TableCell>
-                                        <TableCell>{t('table.unitOfMeasure')}</TableCell>
-                                        {isAdmin && <TableCell align="right">{t('table.actions')}</TableCell>}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={4} align="center">
-                                                <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                    <CircularProgress size={24} />
-                                                    <Typography>Cargando items...</Typography>
-                                                </Box>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : items.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={4} align="center">
-                                                <Typography color="text.secondary">{t('empty.message')}</Typography>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        items.map((item) => (
-                                            <TableRow key={item.id} hover>
-                                                <TableCell>
-                                                    <Typography fontWeight={600}>{item.description}</Typography>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Typography>
-                                                        {item.hasLot ? t('table.yes') : t('table.no')}
-                                                    </Typography>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Typography>
-                                                        {item.unitOfMeasureDescription || getUnitOfMeasureDescription(item.unitOfMeasureId)}
-                                                    </Typography>
-                                                </TableCell>
-                                                {isAdmin && (
-                                                    <TableCell align="right">
-                                                        <Box display="flex" justifyContent="flex-end" gap={1}>
-                                                            <Tooltip title={t('actions.edit')}>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    color="primary"
-                                                                    onClick={() => handleOpenEditModal(item)}
-                                                                >
-                                                                    <EditIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                            <Tooltip title={t('actions.delete')}>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    onClick={() => handleOpenDeleteModal(item)}
-                                                                    color="error"
-                                                                >
-                                                                    <DeleteIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                        </Box>
-                                                    </TableCell>
-                                                )}
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-
-                            <TablePagination
-                                rowsPerPageOptions={[5, 10, 25, 50]}
-                                component="div"
-                                count={totalCount}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
-                                onPageChange={handleChangePage}
-                                onRowsPerPageChange={handleChangeRowsPerPage}
-                                labelRowsPerPage={t('pagination.rowsPerPage')}
-                                labelDisplayedRows={({ from, to, count }) =>
-                                    `${from}-${to} ${t('pagination.of')} ${count !== -1 ? count : `${t('pagination.moreThan')} ${to}`}`
+                        <StyledTable<ItemResponse>
+                            columns={[
+                                {
+                                    id: 'description',
+                                    label: t('table.description'),
+                                    render: (row) => (
+                                        <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                            {row.description}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'hasLot',
+                                    label: t('table.hasLot'),
+                                    align: 'center',
+                                    render: (row) => (
+                                        <Typography sx={{ color: '#334155' }}>
+                                            {row.hasLot ? t('table.yes') : t('table.no')}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'unitOfMeasure',
+                                    label: t('table.unitOfMeasure'),
+                                    render: (row) => (
+                                        <Typography sx={{ color: '#334155' }}>
+                                            {row.unitOfMeasureDescription || getUnitOfMeasureDescription(row.unitOfMeasureId)}
+                                        </Typography>
+                                    )
                                 }
-                            />
-                        </TableContainer>
+                            ]}
+                            data={items}
+                            getRowId={(row) => String(row.id)}
+                            loading={loading}
+                            loadingMessage="Cargando items..."
+                            emptyMessage={t('empty.message')}
+                            renderActions={(row) => isAdmin && (
+                                <Box display="flex" justifyContent="center" gap={1}>
+                                    <Tooltip title={t('actions.edit')}>
+                                        <IconButton
+                                            size="small"
+                                            sx={{ color: '#415EDE' }}
+                                            onClick={() => handleOpenEditModal(row)}
+                                        >
+                                            <img src="./assets/icons/edit-black.png" />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title={t('actions.delete')}>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleOpenDeleteModal(row)}
+                                            sx={{ color: '#EF4444' }}
+                                        >
+                                            <img src="./assets/icons/delete.png" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
+                            )}
+                            pagination={{
+                                count: totalCount,
+                                page: page,
+                                rowsPerPage: rowsPerPage,
+                                onPageChange: handleChangePage
+                            }}
+                            minWidth={1000}
+                        />
                     </div>
                 }
             />
 
             {/* Add/Edit Modal */}
-            <Dialog 
-                open={isModalOpen} 
+            <Dialog
+                open={isModalOpen}
                 onClose={handleCloseModal}
                 fullWidth
                 maxWidth="sm"
+                PaperProps={{
+                    sx: {
+                        borderRadius: '16px',
+                        bgcolor: 'white'
+                    }
+                }}
             >
-                <DialogTitle>
+                <DialogTitle sx={{ fontWeight: 700, px: 3, pt: 3 }}>
                     {editingItem ? t('modal.editTitle') : t('modal.addTitle')}
                 </DialogTitle>
-                <DialogContent dividers>
-                    <Box display="flex" flexDirection="column" gap={3} mt={1}>
-                        <TextField
-                            label={t('form.description')}
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            fullWidth
-                            required
-                            disabled={saving}
-                            placeholder="Ingrese la descripción del item"
-                            multiline
-                            rows={3}
-                        />
-                        
-                        <FormControl fullWidth required disabled={saving || loadingUnitOfMeasures}>
-                            <InputLabel id="unit-of-measure-label">{t('form.unitOfMeasure')}</InputLabel>
-                            <Select
-                                labelId="unit-of-measure-label"
-                                value={formData.unitOfMeasureId || ''}
-                                label={t('form.unitOfMeasure')}
-                                onChange={(e) => setFormData({ ...formData, unitOfMeasureId: Number(e.target.value) })}
-                            >
-                                <MenuItem value="">
-                                    <em>{t('form.selectUnitOfMeasure')}</em>
-                                </MenuItem>
-                                {unitOfMeasures.map((unit) => (
-                                    <MenuItem key={unit.id} value={unit.id}>
-                                        {unit.description}
+                <DialogContent>
+                    <Box display="flex" flexDirection="column" gap={2} mt={2}>
+                        <Box>
+                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+                                {t('form.description')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+                            </Typography>
+                            <Box
+                                component="textarea"
+                                value={formData.description}
+                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
+                                placeholder="Ingrese la descripción del item"
+                                rows={3}
+                                sx={{
+                                    width: '100%',
+                                    p: 1.5,
+                                    borderRadius: 2,
+                                    border: '1px solid #E2E8F0',
+                                    bgcolor: 'white',
+                                    fontSize: '0.9375rem',
+                                    outline: 'none',
+                                    fontFamily: 'inherit',
+                                    transition: 'all 0.2s',
+                                    '&:focus': {
+                                        borderColor: '#415EDE',
+                                        boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                                    }
+                                }}
+                            />
+                        </Box>
+
+                        <Box>
+                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+                                {t('form.unitOfMeasure')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+                            </Typography>
+                            <FormControl fullWidth required disabled={saving || loadingUnitOfMeasures}>
+                                <Select
+                                    value={formData.unitOfMeasureId || ''}
+                                    displayEmpty
+                                    onChange={(e) => setFormData({ ...formData, unitOfMeasureId: Number(e.target.value) })}
+                                    sx={{
+                                        height: 44,
+                                        borderRadius: 2,
+                                        bgcolor: 'white',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#415EDE',
+                                            borderWidth: '2px',
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#415EDE',
+                                        }
+                                    }}
+                                >
+                                    <MenuItem value="">
+                                        <em>{t('form.selectUnitOfMeasure')}</em>
                                     </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                                    {unitOfMeasures.map((unit) => (
+                                        <MenuItem key={unit.id} value={unit.id}>
+                                            {unit.description}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
 
                         <FormControlLabel
                             control={
@@ -463,26 +503,49 @@ function Items() {
                                     checked={formData.hasLot}
                                     onChange={(e) => setFormData({ ...formData, hasLot: e.target.checked })}
                                     disabled={saving}
+                                    sx={{
+                                        color: '#E2E8F0',
+                                        '&.Mui-checked': {
+                                            color: '#415EDE',
+                                        },
+                                    }}
                                 />
                             }
-                            label={t('form.hasLot')}
+                            label={
+                                <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
+                                    {t('form.hasLot')}
+                                </Typography>
+                            }
                         />
                     </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button 
-                        color="inherit"
-                        onClick={handleCloseModal} 
+                <DialogActions sx={{ p: 3 }}>
+                    <Button
+                        onClick={handleCloseModal}
                         disabled={saving}
+                        sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            color: 'text.secondary',
+                            fontWeight: 600
+                        }}
                     >
                         {t('modal.cancel')}
                     </Button>
                     <Button
                         variant="contained"
-                        color="primary"
                         onClick={handleSave}
                         disabled={saving || !formData.description.trim() || !formData.unitOfMeasureId}
-                        startIcon={saving ? <CircularProgress size={18} color="inherit" /> : undefined}
+                        sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            bgcolor: '#415EDE',
+                            color: 'white',
+                            fontWeight: 600,
+                            '&:hover': {
+                                bgcolor: '#354db1'
+                            }
+                        }}
                     >
                         {saving ? 'Guardando...' : t('modal.save')}
                     </Button>

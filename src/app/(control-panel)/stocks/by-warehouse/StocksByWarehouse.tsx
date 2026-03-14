@@ -5,20 +5,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     TextField,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
     IconButton,
     Box,
-    CircularProgress,
     Typography,
-    TablePagination,
     Autocomplete
 } from '@mui/material';
+import StyledTable from '@/components/ui/StyledTable';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -153,17 +145,32 @@ function StocksByWarehouse() {
                 }
                 content={
                     <div className="p-6">
-                        <TableContainer component={Paper}>
-                            <Box
-                                display="flex"
-                                flexDirection="column"
-                                gap={2}
-                                p={2}
+                        <Box
+                                sx={{
+                                    bgcolor: 'white',
+                                    borderRadius: '16px',
+                                    p: 3,
+                                    mb: 3,
+                                    border: '1px solid #E2E8F0',
+                                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                                }}
                             >
-                                    {/* Warehouse Filter */}
-                                <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2}>
+                                <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="center">
                                     <Autocomplete
-                                        sx={{ minWidth: 300 }}
+                                        sx={{ 
+                                            minWidth: 300,
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: 2,
+                                                bgcolor: 'white',
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                    borderWidth: '2px',
+                                                },
+                                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#415EDE',
+                                                }
+                                            }
+                                        }}
                                         options={warehouseOptions}
                                         getOptionLabel={(option) => option.description}
                                         value={selectedWarehouse}
@@ -184,74 +191,102 @@ function StocksByWarehouse() {
                                             />
                                         )}
                                     />
-                                </Box>
 
-                                
+                                    <Box display="flex" gap={1} alignItems="center" sx={{ flex: 1, maxWidth: 400 }}>
+                                        <Box
+                                            component="input"
+                                            type="text"
+                                            placeholder={t('search')}
+                                            value={searchTerm}
+                                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
+                                            onKeyDown={handleSearchKeyDown}
+                                            sx={{
+                                                width: '100%',
+                                                height: 40,
+                                                px: 2,
+                                                borderRadius: 2,
+                                                border: '1px solid #E2E8F0',
+                                                bgcolor: 'white',
+                                                fontSize: '0.9375rem',
+                                                outline: 'none',
+                                                transition: 'all 0.2s',
+                                                '&:focus': {
+                                                    borderColor: '#415EDE',
+                                                    boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                                }
+                                            }}
+                                        />
+                                        <IconButton
+                                            color="primary"
+                                            onClick={handleSearchClick}
+                                            sx={{
+                                                bgcolor: 'white',
+                                                border: '1px solid #E2E8F0',
+                                                borderRadius: 2,
+                                                height: 40,
+                                                width: 40,
+                                                '&:hover': {
+                                                    borderColor: '#415EDE',
+                                                    bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                                }
+                                            }}
+                                        >
+                                            <SearchIcon sx={{ fontSize: 20 }} />
+                                        </IconButton>
+                                    </Box>
+                                </Box>
                             </Box>
 
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>{t('byWarehouse.warehouse')}</TableCell>
-                                        <TableCell align="right">{t('byWarehouse.totalQuantity')}</TableCell>
-                                        <TableCell align="center">{t('byWarehouse.actions')}</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={3} align="center">
-                                                <CircularProgress />
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : stocks.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={3} align="center">
-                                                <Typography>{t('byWarehouse.noData')}</Typography>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        stocks.map((stock) => (
-                                            <TableRow
-                                                key={stock.warehouseId}
-                                                hover
-                                                sx={{ cursor: 'pointer' }}
-                                                onClick={() => handleRowClick(stock.warehouseId)}
-                                            >
-                                                <TableCell>{stock.warehouseDescription}</TableCell>
-                                                <TableCell align="right">
-                                                    <Box display="flex" alignItems="center" justifyContent="flex-end" gap={1}>
-                                                        {stock.totalQuantity}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <IconButton
-                                                        size="small"
-                                                        color="primary"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleRowClick(stock.warehouseId);
-                                                        }}
-                                                    >
-                                                        <VisibilityIcon />
-                                                    </IconButton>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-
-                            <TablePagination
-                                component="div"
-                                count={totalCount}
-                                page={page}
-                                onPageChange={handleChangePage}
-                                rowsPerPage={rowsPerPage}
-                                onRowsPerPageChange={handleChangeRowsPerPage}
-                                rowsPerPageOptions={[5, 10, 25, 50]}
+                            <StyledTable<StockByWarehouse>
+                                columns={[
+                                    {
+                                        id: 'warehouse',
+                                        label: t('byWarehouse.warehouse'),
+                                        render: (row) => (
+                                            <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                                {row.warehouseDescription}
+                                            </Typography>
+                                        )
+                                    },
+                                    {
+                                        id: 'totalQuantity',
+                                        label: t('byWarehouse.totalQuantity'),
+                                        align: 'center',
+                                        render: (row) => (
+                                            <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                                                <Typography sx={{ color: '#334155' }}>
+                                                    {row.totalQuantity}
+                                                </Typography>
+                                            </Box>
+                                        )
+                                    }
+                                ]}
+                                data={stocks}
+                                getRowId={(row) => String(row.warehouseId)}
+                                loading={loading}
+                                loadingMessage="Cargando stock..."
+                                emptyMessage={t('byWarehouse.noData')}
+                                onRowClick={(row) => handleRowClick(row.warehouseId)}
+                                renderActions={(row) => (
+                                    <IconButton
+                                        size="small"
+                                        sx={{ color: '#415EDE' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleRowClick(row.warehouseId);
+                                        }}
+                                    >
+                                        <VisibilityIcon fontSize="small" />
+                                    </IconButton>
+                                )}
+                                pagination={{
+                                    count: totalCount,
+                                    page: page,
+                                    rowsPerPage: rowsPerPage,
+                                    onPageChange: handleChangePage
+                                }}
+                                minWidth={800}
                             />
-                        </TableContainer>
                     </div>
                 }
             />

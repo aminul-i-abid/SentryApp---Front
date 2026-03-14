@@ -40,6 +40,7 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
+import StyledTable from '@/components/ui/StyledTable';
 import './i18n';
 import { getAllMovements } from "./movementsService";
 import { MovementDto } from "./models/Movements";
@@ -225,201 +226,302 @@ function Movements() {
                 </div>
             }
             content={
-                <div className="p-6">
-                    {/* Filters Section */}
-                    {/* Main Content Paper */}
-                    <Paper elevation={1} variant="outlined" className="w-full overflow-hidden">
-                        {/* Filters Section */}
-                        <Box p={2} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <div className="p-6">
+                        <Box
+                            sx={{
+                                bgcolor: 'white',
+                                borderRadius: '16px',
+                                p: 3,
+                                mb: 3,
+                                border: '1px solid #E2E8F0',
+                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                            }}
+                        >
                             <Grid container spacing={2} alignItems="center">
-
-                                {/* Filters */}
                                 <Grid item xs={12} sm={6} md={3} lg={2.5}>
-                                    <FormControl fullWidth size="small">
-                                        <InputLabel>Artículo</InputLabel>
-                                        <Select
-                                            value={itemFilter}
-                                            label="Artículo"
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                            Artículo
+                                        </Typography>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                value={itemFilter}
+                                                displayEmpty
+                                                onChange={(e) => {
+                                                    setItemFilter(e.target.value as number | "");
+                                                    setPage(0);
+                                                }}
+                                                sx={{
+                                                    height: 40,
+                                                    bgcolor: 'white',
+                                                    borderRadius: 2,
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                    }
+                                                }}
+                                            >
+                                                <MenuItem value="">Todos</MenuItem>
+                                                {items.map((item) => (
+                                                    <MenuItem key={item.id} value={item.id}>
+                                                        {item.description}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </Grid>
+
+                                <Grid item xs={12} sm={6} md={3} lg={2.5}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                            Almacén
+                                        </Typography>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                value={warehouseFilter}
+                                                displayEmpty
+                                                onChange={(e) => {
+                                                    setWarehouseFilter(e.target.value as number | "");
+                                                    setPage(0);
+                                                }}
+                                                sx={{
+                                                    height: 40,
+                                                    bgcolor: 'white',
+                                                    borderRadius: 2,
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                    }
+                                                }}
+                                            >
+                                                <MenuItem value="">Todos</MenuItem>
+                                                {warehouses.map((warehouse) => (
+                                                    <MenuItem key={warehouse.id} value={warehouse.id}>
+                                                        {warehouse.description}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </Grid>
+
+                                <Grid item xs={12} sm={6} md={3} lg={2.5}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                            Transacción
+                                        </Typography>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                value={transactionTypeFilter}
+                                                displayEmpty
+                                                onChange={(e) => {
+                                                    setTransactionTypeFilter(e.target.value as number | "");
+                                                    setPage(0);
+                                                }}
+                                                sx={{
+                                                    height: 40,
+                                                    bgcolor: 'white',
+                                                    borderRadius: 2,
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                    }
+                                                }}
+                                            >
+                                                <MenuItem value="">Todas</MenuItem>
+                                                <MenuItem value={1}>Recepción</MenuItem>
+                                                <MenuItem value={2}>Transferencia</MenuItem>
+                                                <MenuItem value={3}>Consumo</MenuItem>
+                                                <MenuItem value={4}>Scrap</MenuItem>
+                                                <MenuItem value={5}>Ajuste Pos.</MenuItem>
+                                                <MenuItem value={6}>Ajuste Neg.</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </Grid>
+
+                                <Grid item xs={12} sm={6} md={3} lg={2}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                            Desde
+                                        </Typography>
+                                        <TextField
+                                            fullWidth
+                                            size="small"
+                                            type="date"
+                                            value={dateFromFilter}
                                             onChange={(e) => {
-                                                setItemFilter(e.target.value as number | "");
+                                                setDateFromFilter(e.target.value);
                                                 setPage(0);
                                             }}
-                                        >
-                                            <MenuItem value="">Todos</MenuItem>
-                                            {items.map((item) => (
-                                                <MenuItem key={item.id} value={item.id}>
-                                                    {item.description}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
+                                            sx={{
+                                                '& .MuiOutlinedInput-root': {
+                                                    height: 40,
+                                                    bgcolor: 'white',
+                                                    borderRadius: 2,
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </Box>
                                 </Grid>
 
-                                <Grid item xs={12} sm={6} md={2} lg={2.5}>
-                                    <FormControl fullWidth size="small">
-                                        <InputLabel>Almacén</InputLabel>
-                                        <Select
-                                            value={warehouseFilter}
-                                            label="Almacén"
+                                <Grid item xs={12} sm={6} md={3} lg={2}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                            Hasta
+                                        </Typography>
+                                        <TextField
+                                            fullWidth
+                                            size="small"
+                                            type="date"
+                                            value={dateToFilter}
                                             onChange={(e) => {
-                                                setWarehouseFilter(e.target.value as number | "");
+                                                setDateToFilter(e.target.value);
                                                 setPage(0);
                                             }}
-                                        >
-                                            <MenuItem value="">Todos</MenuItem>
-                                            {warehouses.map((warehouse) => (
-                                                <MenuItem key={warehouse.id} value={warehouse.id}>
-                                                    {warehouse.description}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-
-                                <Grid item xs={12} sm={6} md={2} lg={2.5}>
-                                    <FormControl fullWidth size="small">
-                                        <InputLabel>Transacción</InputLabel>
-                                        <Select
-                                            value={transactionTypeFilter}
-                                            label="Transacción"
-                                            onChange={(e) => {
-                                                setTransactionTypeFilter(e.target.value as number | "");
-                                                setPage(0);
+                                            sx={{
+                                                '& .MuiOutlinedInput-root': {
+                                                    height: 40,
+                                                    bgcolor: 'white',
+                                                    borderRadius: 2,
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                    }
+                                                }
                                             }}
+                                        />
+                                    </Box>
+                                </Grid>
+
+                                <Grid item xs={12} md="auto">
+                                    <Box sx={{ mt: 2.5 }}>
+                                        <IconButton 
+                                            onClick={handleSetAllFilters} 
+                                            sx={{ 
+                                                bgcolor: 'white',
+                                                border: '1px solid #E2E8F0',
+                                                '&:hover': {
+                                                    bgcolor: '#F8FAFC',
+                                                    borderColor: '#415EDE'
+                                                }
+                                            }}
+                                            size="small"
+                                            title="Limpiar Filtros"
                                         >
-                                            <MenuItem value="">Todas</MenuItem>
-                                            <MenuItem value={1}>Recepción</MenuItem>
-                                            <MenuItem value={2}>Transferencia</MenuItem>
-                                            <MenuItem value={3}>Consumo</MenuItem>
-                                            <MenuItem value={4}>Scrap</MenuItem>
-                                            <MenuItem value={5}>Ajuste Pos.</MenuItem>
-                                            <MenuItem value={6}>Ajuste Neg.</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-
-                                <Grid item xs={12} sm={6} md={2} lg={1.8}>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
-                                        type="date"
-                                        label="Desde"
-                                        value={dateFromFilter}
-                                        onChange={(e) => {
-                                            setDateFromFilter(e.target.value);
-                                            setPage(0);
-                                        }}
-                                        InputLabelProps={{ shrink: true }}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={12} sm={6} md={2} lg={1.8}>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
-                                        type="date"
-                                        label="Hasta"
-                                        value={dateToFilter}
-                                        onChange={(e) => {
-                                            setDateToFilter(e.target.value);
-                                            setPage(0);
-                                        }}
-                                        InputLabelProps={{ shrink: true }}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={12} md="auto" sx={{ ml: 'auto' }}>
-                                    <IconButton 
-                                        onClick={handleSetAllFilters} 
-                                        color="inherit" 
-                                        size="small"
-                                        title="Limpiar Filtros"
-                                    >
-                                        <CleaningServicesIcon />
-                                    </IconButton>
+                                            <CleaningServicesIcon sx={{ fontSize: 20 }} />
+                                        </IconButton>
+                                    </Box>
                                 </Grid>
                             </Grid>
                         </Box>
 
-                        <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Fecha</TableCell>
-                                    <TableCell>Artículo</TableCell>
-                                    <TableCell>Lote</TableCell>
-                                    <TableCell>Almacén</TableCell>
-                                    <TableCell>Ubicación</TableCell>
-                                    <TableCell>Cantidad</TableCell>
-                                    <TableCell>Tipo</TableCell>
-                                    <TableCell>Transacción</TableCell>
-                                    <TableCell>Operador</TableCell>
-                                    <TableCell>Notas</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={10} align="center">
-                                            <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                <CircularProgress size={24} />
-                                                <Typography>Cargando...</Typography>
-                                            </Box>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : movements.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={10} align="center">
-                                            <Typography color="text.secondary">No hay registros</Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    movements.map((movement) => (
-                                        <TableRow key={movement.id} hover>
-                                            <TableCell>
-                                                {new Date(movement.movementDate).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography fontWeight={600}>{movement.itemName}</Typography>
-                                            </TableCell>
-                                            <TableCell>{movement.lotNumber}</TableCell>
-                                            <TableCell>{movement.warehouseName}</TableCell>
-                                            <TableCell>{movement.locationName}</TableCell>
-                                            <TableCell>
-                                                    {movement.quantity}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    label={getTypeLabel(movement.type)}
-                                                    color={getTypeColor(movement.type)}
-                                                    size="small"
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                {getTransactionTypeLabel(movement.transactionType)}
-                                            </TableCell>
-                                            <TableCell>{movement.operatorName}</TableCell>
-                                            <TableCell>{movement.notes || '-'}</TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                        <TablePagination
-                            component="div"
-                            count={totalCount}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                            labelRowsPerPage="Filas por página"
-                            labelDisplayedRows={({ from, to, count }) =>
-                                `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
-                            }
+                        <StyledTable<MovementDto>
+                            columns={[
+                                {
+                                    id: 'movementDate',
+                                    label: 'Fecha',
+                                    render: (row) => new Date(row.movementDate).toLocaleDateString()
+                                },
+                                {
+                                    id: 'itemName',
+                                    label: 'Artículo',
+                                    render: (row) => (
+                                        <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                            {row.itemName}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'lotNumber',
+                                    label: 'Lote',
+                                    render: (row) => row.lotNumber || '-'
+                                },
+                                {
+                                    id: 'warehouseName',
+                                    label: 'Almacén',
+                                    render: (row) => row.warehouseName
+                                },
+                                {
+                                    id: 'locationName',
+                                    label: 'Ubicación',
+                                    render: (row) => row.locationName
+                                },
+                                {
+                                    id: 'quantity',
+                                    label: 'Cantidad',
+                                    render: (row) => row.quantity
+                                },
+                                {
+                                    id: 'type',
+                                    label: 'Tipo',
+                                    render: (row) => (
+                                        <Chip
+                                            label={getTypeLabel(row.type)}
+                                            color={getTypeColor(row.type)}
+                                            variant="outlined"
+                                            size="small"
+                                            sx={{ fontWeight: 600 }}
+                                        />
+                                    )
+                                },
+                                {
+                                    id: 'transactionType',
+                                    label: 'Transacción',
+                                    render: (row) => (
+                                        <Chip
+                                            label={getTransactionTypeLabel(row.transactionType)}
+                                            color={getTransactionTypeColor(row.transactionType)}
+                                            size="small"
+                                            sx={{ color: 'white', fontWeight: 600 }}
+                                        />
+                                    )
+                                },
+                                {
+                                    id: 'operatorName',
+                                    label: 'Operador',
+                                    render: (row) => row.operatorName
+                                },
+                                {
+                                    id: 'notes',
+                                    label: 'Notas',
+                                    render: (row) => row.notes || '-'
+                                }
+                            ]}
+                            data={movements}
+                            getRowId={(row) => String(row.id)}
+                            loading={loading}
+                            loadingMessage="Cargando movimientos..."
+                            emptyMessage="No hay registros"
+                            pagination={{
+                                count: totalCount,
+                                page: page,
+                                rowsPerPage: rowsPerPage,
+                                onPageChange: handleChangePage
+                            }}
+                            minWidth={1200}
                         />
-                    </TableContainer>
-                    </Paper>
-                </div>
+                    </div>
             }
         />
     );

@@ -12,15 +12,7 @@ import {
     IconButton,
     InputLabel,
     MenuItem,
-    Paper,
     Select,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
     Typography,
     useMediaQuery,
     CircularProgress,
@@ -40,6 +32,7 @@ import { getSupplierLots } from "../supplier-lots/supplierLotsService";
 import { getWarehouses } from "../warehouses/warehousesService";
 import { getLocations } from "../locations/locationsService";
 import type { SupplierLotResponse } from "../supplier-lots/models/SupplierLot";
+import StyledTable from "@/components/ui/StyledTable";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
     "& .FusePageSimple-header": {
@@ -155,7 +148,6 @@ function Receiving() {
     };
 
     const handleScanProduct = () => {
-        // Placeholder para funcionalidad de escaneo
         enqueueSnackbar('Funcionalidad de escaneo en desarrollo', { variant: "info" });
     };
 
@@ -164,7 +156,6 @@ function Receiving() {
         setSelectedSupplierLot(selectedLot || null);
         
         if (selectedLot) {
-            // Auto-llenar los datos del lote de proveedor
             setFormData(prev => ({
                 ...prev,
                 supplierLotId: selectedLot.id,
@@ -193,7 +184,6 @@ function Receiving() {
             return;
         }
 
-        // Encontrar nombres para mostrar
         const item = items.find(i => i.id === formData.itemId);
         const supplier = suppliers.find(s => s.id === formData.supplierId);
         const supplierLot = supplierLots.find(sl => sl.id === formData.supplierLotId);
@@ -240,11 +230,9 @@ function Receiving() {
                     successCount++;
                 } else {
                     failCount++;
-                    console.error("Error creating receiving:", response.message);
                 }
             } catch (error) {
                 failCount++;
-                console.error("Error creating receiving:", error);
             }
         }
 
@@ -255,7 +243,6 @@ function Receiving() {
             setAddedProducts([]);
         } else if (successCount > 0) {
             enqueueSnackbar(t('receiving.messages.someMovementsFailed'), { variant: "warning" });
-            // Mantener solo los que fallaron (esto requeriría un tracking más complejo)
             setAddedProducts([]);
         } else {
             enqueueSnackbar(t('receiving.messages.createError'), { variant: "error" });
@@ -274,109 +261,180 @@ function Receiving() {
             content={
                 <div className="p-6">
                     {/* Action Buttons */}
-                    <Box display="flex" gap={2} mb={3}>
+                    <Box display="flex" gap={2} mb={4}>
                         <Button
                             variant="outlined"
-                            color="primary"
-                            startIcon={<QrCodeScannerIcon />}
                             onClick={handleScanProduct}
+                            sx={{
+                                color: '#415EDE',
+                                borderColor: '#415EDE',
+                                borderRadius: '12px',
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                px: 3,
+                                '&:hover': {
+                                    borderColor: '#415EDE',
+                                    bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                }
+                            }}
+                            startIcon={<QrCodeScannerIcon />}
                         >
                             {t('receiving.scan')}
                         </Button>
                         <Button
                             variant="contained"
-                            color="primary"
-                            startIcon={<EditIcon />}
                             onClick={handleOpenCreateModal}
+                            sx={{
+                                bgcolor: '#415EDE',
+                                color: 'white',
+                                borderRadius: '12px',
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                px: 3,
+                                '&:hover': {
+                                    bgcolor: '#354BB0'
+                                }
+                            }}
+                            startIcon={<EditIcon />}
                         >
                             {t('receiving.manualEntry')}
                         </Button>
                     </Box>
 
-                    {/* Added Products Panel */}
-                    <Paper sx={{ mb: 3 }}>
-                        <Box p={2} borderBottom={1} borderColor="divider">
-                            <Typography variant="h6" fontWeight={600}>
+                    {/* Added Products Table */}
+                    <Box sx={{ mb: 4 }}>
+                        <Box p={2} sx={{ bgcolor: 'white', borderRadius: '16px 16px 0 0', border: '1px solid #E2E8F0', borderBottom: 'none' }}>
+                            <Typography variant="h6" fontWeight={700} sx={{ color: '#1E293B' }}>
                                 {t('receiving.addedProducts')}
                             </Typography>
                         </Box>
-                        <TableContainer>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>{t('receiving.table.item')}</TableCell>
-                                        <TableCell>{t('receiving.table.supplierLot')}</TableCell>
-                                        <TableCell>{t('receiving.table.supplier')}</TableCell>
-                                        <TableCell>{t('receiving.table.warehouse')}</TableCell>
-                                        <TableCell>{t('receiving.table.location')}</TableCell>
-                                        <TableCell>{t('receiving.table.quantity')}</TableCell>
-                                        <TableCell>{t('receiving.table.notes')}</TableCell>
-                                        <TableCell align="center">{t('receiving.table.actions')}</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {addedProducts.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={8} align="center">
-                                                <Typography color="text.secondary" py={3}>
-                                                    {t('receiving.noAddedProducts')}
-                                                </Typography>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        addedProducts.map((product) => (
-                                            <TableRow key={product.tempId} hover>
-                                                <TableCell>
-                                                    <Typography fontWeight={600}>{product.itemName}</Typography>
-                                                </TableCell>
-                                                <TableCell>{product.supplierLotName}</TableCell>
-                                                <TableCell>{product.supplierName}</TableCell>
-                                                <TableCell>{product.warehouseName}</TableCell>
-                                                <TableCell>{product.locationName}</TableCell>
-                                                <TableCell>{product.quantity}</TableCell>
-                                                <TableCell>{product.notes || '-'}</TableCell>
-                                                <TableCell align="center">
-                                                    <IconButton
-                                                        size="small"
-                                                        color="error"
-                                                        onClick={() => handleRemoveProduct(product.tempId)}
-                                                    >
-                                                        <DeleteIcon />
-                                                    </IconButton>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        <StyledTable<AddedProduct>
+                            columns={[
+                                {
+                                    id: 'item',
+                                    label: t('receiving.table.item'),
+                                    render: (row) => (
+                                        <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                            {row.itemName}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'supplierLot',
+                                    label: t('receiving.table.supplierLot'),
+                                    render: (row) => row.supplierLotName
+                                },
+                                {
+                                    id: 'supplier',
+                                    label: t('receiving.table.supplier'),
+                                    render: (row) => row.supplierName
+                                },
+                                {
+                                    id: 'warehouse',
+                                    label: t('receiving.table.warehouse'),
+                                    render: (row) => row.warehouseName
+                                },
+                                {
+                                    id: 'location',
+                                    label: t('receiving.table.location'),
+                                    render: (row) => row.locationName
+                                },
+                                {
+                                    id: 'quantity',
+                                    label: t('receiving.table.quantity'),
+                                    render: (row) => row.quantity
+                                },
+                                {
+                                    id: 'notes',
+                                    label: t('receiving.table.notes'),
+                                    render: (row) => row.notes || '-'
+                                }
+                            ]}
+                            data={addedProducts}
+                            getRowId={(row) => String(row.tempId)}
+                            emptyMessage={t('receiving.noAddedProducts')}
+                            renderActions={(row) => (
+                                <IconButton
+                                    size="small"
+                                    color="error"
+                                    onClick={() => handleRemoveProduct(row.tempId)}
+                                    sx={{
+                                        '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.08)' }
+                                    }}
+                                >
+                                    <DeleteIcon fontSize="small" />
+                                </IconButton>
+                            )}
+                            minWidth={1000}
+                        />
                         {addedProducts.length > 0 && (
-                            <Box p={2} display="flex" justifyContent="flex-end">
+                            <Box 
+                                p={3} 
+                                display="flex" 
+                                justifyContent="flex-end" 
+                                sx={{ 
+                                    bgcolor: 'white', 
+                                    borderRadius: '0 0 16px 16px', 
+                                    border: '1px solid #E2E8F0', 
+                                    borderTop: 'none' 
+                                }}
+                            >
                                 <Button
                                     variant="contained"
                                     color="success"
                                     onClick={handleLoadMovements}
                                     disabled={loadingMovements}
+                                    sx={{
+                                        borderRadius: '12px',
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        px: 4,
+                                        py: 1.5,
+                                        boxShadow: 'none',
+                                        '&:hover': {
+                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                        }
+                                    }}
                                     startIcon={loadingMovements ? <CircularProgress size={18} color="inherit" /> : undefined}
                                 >
                                     {loadingMovements ? 'Cargando...' : t('receiving.loadMovement')}
                                 </Button>
                             </Box>
                         )}
-                    </Paper>
+                    </Box>
 
                     {/* Add Product Modal */}
-                    <Dialog open={createModalOpen} onClose={handleCloseCreateModal} maxWidth="sm" fullWidth>
-                        <DialogTitle>{t('receiving.form.title')}</DialogTitle>
-                        <DialogContent dividers>
-                            <Box display="flex" flexDirection="column" gap={3}>
+                    <Dialog 
+                        open={createModalOpen} 
+                        onClose={handleCloseCreateModal} 
+                        maxWidth="sm" 
+                        fullWidth
+                        PaperProps={{
+                            sx: {
+                                borderRadius: '24px',
+                                p: 1
+                            }
+                        }}
+                    >
+                        <DialogTitle sx={{ fontWeight: 800, fontSize: '1.5rem', color: '#1E293B', pb: 1 }}>
+                            {t('receiving.form.title')}
+                        </DialogTitle>
+                        <DialogContent>
+                            <Box display="flex" flexDirection="column" gap={3} pt={2}>
                                 <FormControl fullWidth required>
-                                    <InputLabel>{t('receiving.form.supplierLot')}</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>{t('receiving.form.supplierLot')}</InputLabel>
                                     <Select
                                         value={formData.supplierLotId || ''}
                                         label={t('receiving.form.supplierLot')}
                                         onChange={(e) => handleSupplierLotChange(e.target.value as number)}
                                         disabled={creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {supplierLots.map((lot) => (
                                             <MenuItem key={lot.id} value={lot.id}>
@@ -387,12 +445,19 @@ function Receiving() {
                                 </FormControl>
 
                                 <FormControl fullWidth required>
-                                    <InputLabel>{t('receiving.form.item')}</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>{t('receiving.form.item')}</InputLabel>
                                     <Select
                                         value={formData.itemId || ''}
                                         label={t('receiving.form.item')}
                                         onChange={(e) => handleFormChange('itemId', e.target.value)}
                                         disabled={creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {items.map((item) => (
                                             <MenuItem key={item.id} value={item.id}>
@@ -403,12 +468,19 @@ function Receiving() {
                                 </FormControl>
 
                                 <FormControl fullWidth required>
-                                    <InputLabel>{t('receiving.form.supplier')}</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>{t('receiving.form.supplier')}</InputLabel>
                                     <Select
                                         value={formData.supplierId || ''}
                                         label={t('receiving.form.supplier')}
                                         onChange={(e) => handleFormChange('supplierId', e.target.value)}
                                         disabled={creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {suppliers.map((supplier) => (
                                             <MenuItem key={supplier.id} value={supplier.id}>
@@ -418,23 +490,50 @@ function Receiving() {
                                     </Select>
                                 </FormControl>
 
-                                <TextField
-                                    fullWidth
-                                    required
-                                    label={t('receiving.form.quantity')}
-                                    type="number"
-                                    value={formData.quantity || ''}
-                                    onChange={(e) => handleFormChange('quantity', parseInt(e.target.value) || 0)}
-                                    disabled={creating}
-                                />
+                                <Box>
+                                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 600, color: '#64748B', mb: 0.5, display: 'block' }}>
+                                        {t('receiving.form.quantity')} *
+                                    </Typography>
+                                    <Box
+                                        component="input"
+                                        type="number"
+                                        value={formData.quantity || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFormChange('quantity', parseInt(e.target.value) || 0)}
+                                        disabled={creating}
+                                        placeholder="0"
+                                        sx={{
+                                            width: '100%',
+                                            height: 48,
+                                            px: 2,
+                                            borderRadius: '12px',
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: '#F8FAFC',
+                                            fontSize: '1rem',
+                                            outline: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                bgcolor: 'white',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                </Box>
 
-                                                                <FormControl fullWidth required>
-                                    <InputLabel>{t('receiving.form.warehouse')}</InputLabel>
+                                <FormControl fullWidth required>
+                                    <InputLabel sx={{ fontWeight: 500 }}>{t('receiving.form.warehouse')}</InputLabel>
                                     <Select
                                         value={formData.warehouseId || ''}
                                         label={t('receiving.form.warehouse')}
                                         onChange={(e) => handleWarehouseChange(e.target.value as number)}
                                         disabled={creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {warehouses.map((warehouse) => (
                                             <MenuItem key={warehouse.id} value={warehouse.id}>
@@ -445,12 +544,19 @@ function Receiving() {
                                 </FormControl>
 
                                 <FormControl fullWidth required>
-                                    <InputLabel>{t('receiving.form.location')}</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>{t('receiving.form.location')}</InputLabel>
                                     <Select
                                         value={formData.locationId || ''}
                                         label={t('receiving.form.location')}
                                         onChange={(e) => handleFormChange('locationId', e.target.value)}
                                         disabled={creating || !formData.warehouseId}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {locations.map((location) => (
                                             <MenuItem key={location.id} value={location.id}>
@@ -460,30 +566,65 @@ function Receiving() {
                                     </Select>
                                 </FormControl>
 
-                                <TextField
-                                    fullWidth
-                                    label={t('receiving.form.notes')}
-                                    multiline
-                                    rows={3}
-                                    value={formData.notes}
-                                    onChange={(e) => handleFormChange('notes', e.target.value)}
-                                    disabled={creating}
-                                />
+                                <Box>
+                                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 600, color: '#64748B', mb: 0.5, display: 'block' }}>
+                                        {t('receiving.form.notes')}
+                                    </Typography>
+                                    <Box
+                                        component="textarea"
+                                        rows={3}
+                                        value={formData.notes}
+                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleFormChange('notes', e.target.value)}
+                                        disabled={creating}
+                                        sx={{
+                                            width: '100%',
+                                            p: 2,
+                                            borderRadius: '12px',
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: '#F8FAFC',
+                                            fontSize: '1rem',
+                                            outline: 'none',
+                                            resize: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                bgcolor: 'white',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                </Box>
                             </Box>
                         </DialogContent>
-                        <DialogActions>
+                        <DialogActions sx={{ p: 3, gap: 1 }}>
                             <Button 
-                                color="inherit"
                                 onClick={handleCloseCreateModal} 
                                 disabled={creating}
+                                sx={{
+                                    borderRadius: '12px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 3,
+                                    color: '#64748B'
+                                }}
                             >
                                 {t('receiving.form.cancel')}
                             </Button>
                             <Button
                                 variant="contained"
-                                color="primary"
                                 onClick={handleAddProduct}
                                 disabled={creating}
+                                sx={{
+                                    bgcolor: '#415EDE',
+                                    color: 'white',
+                                    borderRadius: '12px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 4,
+                                    '&:hover': {
+                                        bgcolor: '#354BB0'
+                                    }
+                                }}
                             >
                                 {t('receiving.form.save')}
                             </Button>

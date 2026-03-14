@@ -12,16 +12,7 @@ import {
     IconButton,
     InputLabel,
     MenuItem,
-    Paper,
     Select,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    TextField,
     Typography,
     useMediaQuery,
     CircularProgress,
@@ -40,6 +31,7 @@ import {
     getLocationsByItemLotAndWarehouseWithStock
 } from "../stocks/stockService";
 import { getMovementReasons } from "../movement-reasons/movementReasonService";
+import StyledTable from "@/components/ui/StyledTable";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
     "& .FusePageSimple-header": {
@@ -196,11 +188,6 @@ function Scrap() {
         setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
-
     const handleOpenCreateModal = () => {
         setFormData({
             itemId: 0,
@@ -222,10 +209,8 @@ function Scrap() {
     const handleFormChange = (field: keyof CreateScrapDto, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
         
-        // Cascading selection: Item -> Lot -> Warehouse -> Location
         if (field === 'itemId' && value) {
             fetchLotsByItem(value);
-            // Reset dependent fields
             setFormData(prev => ({ ...prev, lotId: 0, warehouseId: 0, locationId: 0 }));
             setLots([]);
             setWarehouses([]);
@@ -234,7 +219,6 @@ function Scrap() {
         
         if (field === 'lotId' && value && formData.itemId) {
             fetchWarehousesByItemAndLot(formData.itemId, value);
-            // Reset dependent fields
             setFormData(prev => ({ ...prev, warehouseId: 0, locationId: 0 }));
             setWarehouses([]);
             setLocations([]);
@@ -242,7 +226,6 @@ function Scrap() {
         
         if (field === 'warehouseId' && value && formData.itemId && formData.lotId) {
             fetchLocationsByItemLotAndWarehouse(formData.itemId, formData.lotId, value);
-            // Reset dependent fields
             setFormData(prev => ({ ...prev, locationId: 0 }));
             setLocations([]);
         }
@@ -285,31 +268,36 @@ function Scrap() {
             }
             content={
                 <div className="p-6">
-                    <Box display="flex" justifyContent="flex-end" mb={2}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleOpenCreateModal}
-                        >
-                            Nuevo Scrap
-                        </Button>
-                    </Box>
-                    <TableContainer component={Paper}>
-                        <Box
-                            display="flex"
-                            flexDirection={{ xs: 'column', md: 'row' }}
-                            gap={2}
-                            p={2}
-                            alignItems={{ xs: 'stretch', md: 'center' }}
-                        >
+                    <Box
+                        sx={{
+                            bgcolor: 'white',
+                            borderRadius: '16px',
+                            p: 3,
+                            mb: 3,
+                            border: '1px solid #E2E8F0',
+                            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                        }}
+                    >
+                        <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2} alignItems="center" mb={3}>
                             <FormControl size="small" sx={{ minWidth: 200 }}>
-                                <InputLabel>Almacén</InputLabel>
+                                <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                    Almacén
+                                </Typography>
                                 <Select
                                     value={warehouseFilter}
-                                    label="Almacén"
+                                    displayEmpty
                                     onChange={(e) => {
                                         setWarehouseFilter(e.target.value as number | "");
                                         setPage(0);
+                                    }}
+                                    sx={{
+                                        borderRadius: 2,
+                                        height: 40,
+                                        bgcolor: 'white',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#415EDE',
+                                            borderWidth: '2px',
+                                        }
                                     }}
                                 >
                                     <MenuItem value="">Todos</MenuItem>
@@ -322,13 +310,24 @@ function Scrap() {
                             </FormControl>
 
                             <FormControl size="small" sx={{ minWidth: 200 }}>
-                                <InputLabel>Artículo</InputLabel>
+                                <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                    Artículo
+                                </Typography>
                                 <Select
                                     value={itemFilter}
-                                    label="Artículo"
+                                    displayEmpty
                                     onChange={(e) => {
                                         setItemFilter(e.target.value as number | "");
                                         setPage(0);
+                                    }}
+                                    sx={{
+                                        borderRadius: 2,
+                                        height: 40,
+                                        bgcolor: 'white',
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: '#415EDE',
+                                            borderWidth: '2px',
+                                        }
                                     }}
                                 >
                                     <MenuItem value="">Todos</MenuItem>
@@ -340,103 +339,164 @@ function Scrap() {
                                 </Select>
                             </FormControl>
 
-                            <Box display="flex" flex={1} gap={1} alignItems="center">
-                                <TextField
-                                    fullWidth
+                            <Box display="flex" flex={1} gap={1} alignItems="center" sx={{ mt: 'auto' }}>
+                                <Box
+                                    component="input"
+                                    type="text"
                                     placeholder="Buscar"
                                     value={searchInput}
-                                    onChange={(e) => setSearchInput(e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
                                     onKeyDown={handleSearchKeyDown}
-                                    size="small"
+                                    sx={{
+                                        width: '100%',
+                                        height: 40,
+                                        px: 2,
+                                        borderRadius: 2,
+                                        border: '1px solid #E2E8F0',
+                                        bgcolor: 'white',
+                                        fontSize: '0.9375rem',
+                                        outline: 'none',
+                                        transition: 'all 0.2s',
+                                        '&:focus': {
+                                            borderColor: '#415EDE',
+                                            boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                        }
+                                    }}
                                 />
                                 <IconButton
                                     color="primary"
                                     onClick={handleSearchClick}
                                     sx={{
-                                        border: `1px solid ${theme.palette.primary.main}`,
+                                        bgcolor: 'white',
+                                        border: '1px solid #E2E8F0',
+                                        borderRadius: 2,
+                                        height: 40,
+                                        width: 40,
+                                        '&:hover': {
+                                            borderColor: '#415EDE',
+                                            bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                        }
                                     }}
-                                    aria-label="Buscar"
                                 >
-                                    <SearchIcon />
+                                    <SearchIcon sx={{ fontSize: 20 }} />
                                 </IconButton>
                             </Box>
                         </Box>
 
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Fecha</TableCell>
-                                    <TableCell>Artículo</TableCell>
-                                    <TableCell>Lote</TableCell>
-                                    <TableCell>Almacén</TableCell>
-                                    <TableCell>Ubicación</TableCell>
-                                    <TableCell>Cantidad</TableCell>
-                                    <TableCell>Razón</TableCell>
-                                    <TableCell>Notas</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={8} align="center">
-                                            <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                <CircularProgress size={24} />
-                                                <Typography>Cargando...</Typography>
-                                            </Box>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : scraps.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={8} align="center">
-                                            <Typography color="text.secondary">No hay registros</Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    scraps.map((scrap) => (
-                                        <TableRow key={scrap.id} hover>
-                                            <TableCell>
-                                                {new Date(scrap.movementDate).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography fontWeight={600}>{scrap.itemName}</Typography>
-                                            </TableCell>
-                                            <TableCell>{scrap.lotNumber}</TableCell>
-                                            <TableCell>{scrap.warehouseName}</TableCell>
-                                            <TableCell>{scrap.locationName}</TableCell>
-                                            <TableCell>{scrap.quantity}</TableCell>
-                                            <TableCell>{scrap.reasonName || '-'}</TableCell>
-                                            <TableCell>{scrap.notes || '-'}</TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                        <TablePagination
-                            component="div"
-                            count={totalCount}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                            labelRowsPerPage="Filas por página"
-                            labelDisplayedRows={({ from, to, count }) =>
-                                `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
-                            }
-                        />
-                    </TableContainer>
+                        <Box display="flex" justifyContent="flex-end">
+                            <Button
+                                variant="contained"
+                                onClick={handleOpenCreateModal}
+                                sx={{
+                                    bgcolor: '#415EDE',
+                                    color: 'white',
+                                    borderRadius: '12px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 3,
+                                    '&:hover': {
+                                        bgcolor: '#354BB0'
+                                    }
+                                }}
+                            >
+                                Nuevo Scrap
+                            </Button>
+                        </Box>
+                    </Box>
 
-                    {/* Create Modal */}
-                    <Dialog open={createModalOpen} onClose={handleCloseCreateModal} maxWidth="sm" fullWidth>
-                        <DialogTitle>Nuevo Scrap</DialogTitle>
-                        <DialogContent dividers>
-                            <Box display="flex" flexDirection="column" gap={3}>
+                    <StyledTable<MovementDto>
+                        columns={[
+                            {
+                                id: 'date',
+                                label: 'Fecha',
+                                render: (row) => new Date(row.movementDate).toLocaleDateString()
+                            },
+                            {
+                                id: 'article',
+                                label: 'Artículo',
+                                render: (row) => (
+                                    <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                        {row.itemName}
+                                    </Typography>
+                                )
+                            },
+                            {
+                                id: 'lot',
+                                label: 'Lote',
+                                render: (row) => row.lotNumber
+                            },
+                            {
+                                id: 'warehouse',
+                                label: 'Almacén',
+                                render: (row) => row.warehouseName
+                            },
+                            {
+                                id: 'location',
+                                label: 'Ubicación',
+                                render: (row) => row.locationName
+                            },
+                            {
+                                id: 'quantity',
+                                label: 'Cantidad',
+                                align: 'center',
+                                render: (row) => row.quantity
+                            },
+                            {
+                                id: 'reason',
+                                label: 'Razón',
+                                render: (row) => row.reasonName || '-'
+                            },
+                            {
+                                id: 'notes',
+                                label: 'Notas',
+                                render: (row) => row.notes || '-'
+                            }
+                        ]}
+                        data={scraps}
+                        getRowId={(row) => String(row.id)}
+                        loading={loading}
+                        loadingMessage="Cargando scraps..."
+                        emptyMessage="No hay registros"
+                        pagination={{
+                            count: totalCount,
+                            page: page,
+                            rowsPerPage: rowsPerPage,
+                            onPageChange: (_, newPage) => setPage(newPage)
+                        }}
+                        minWidth={1100}
+                    />
+
+                    <Dialog 
+                        open={createModalOpen} 
+                        onClose={handleCloseCreateModal} 
+                        maxWidth="sm" 
+                        fullWidth
+                        PaperProps={{
+                            sx: {
+                                borderRadius: '24px',
+                                p: 1
+                            }
+                        }}
+                    >
+                        <DialogTitle sx={{ fontWeight: 800, fontSize: '1.5rem', color: '#1E293B', pb: 1 }}>
+                            Nuevo Scrap
+                        </DialogTitle>
+                        <DialogContent>
+                            <Box display="flex" flexDirection="column" gap={3} pt={2}>
                                 <FormControl fullWidth required>
-                                    <InputLabel>Artículo</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>Artículo</InputLabel>
                                     <Select
                                         value={formData.itemId}
                                         label="Artículo"
                                         onChange={(e) => handleFormChange('itemId', e.target.value)}
                                         disabled={creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {items.map((item) => (
                                             <MenuItem key={item.id} value={item.id}>
@@ -447,12 +507,19 @@ function Scrap() {
                                 </FormControl>
 
                                 <FormControl fullWidth required>
-                                    <InputLabel>Lote</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>Lote</InputLabel>
                                     <Select
                                         value={formData.lotId}
                                         label="Lote"
                                         onChange={(e) => handleFormChange('lotId', e.target.value)}
                                         disabled={!formData.itemId || lots.length === 0 || creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {lots.map((lot) => (
                                             <MenuItem key={lot.id} value={lot.id}>
@@ -463,12 +530,19 @@ function Scrap() {
                                 </FormControl>
 
                                 <FormControl fullWidth required>
-                                    <InputLabel>Almacén</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>Almacén</InputLabel>
                                     <Select
                                         value={formData.warehouseId}
                                         label="Almacén"
                                         onChange={(e) => handleFormChange('warehouseId', e.target.value)}
                                         disabled={!formData.lotId || warehouses.length === 0 || creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {warehouses.map((warehouse) => (
                                             <MenuItem key={warehouse.id} value={warehouse.id}>
@@ -479,12 +553,19 @@ function Scrap() {
                                 </FormControl>
 
                                 <FormControl fullWidth required>
-                                    <InputLabel>Ubicación</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>Ubicación</InputLabel>
                                     <Select
                                         value={formData.locationId}
                                         label="Ubicación"
                                         onChange={(e) => handleFormChange('locationId', e.target.value)}
                                         disabled={!formData.warehouseId || locations.length === 0 || creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {locations.map((location) => (
                                             <MenuItem key={location.id} value={location.id}>
@@ -495,12 +576,19 @@ function Scrap() {
                                 </FormControl>
 
                                 <FormControl fullWidth required>
-                                    <InputLabel>Razón</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 500 }}>Razón</InputLabel>
                                     <Select
                                         value={formData.reasonId}
                                         label="Razón"
                                         onChange={(e) => handleFormChange('reasonId', e.target.value)}
                                         disabled={creating}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#415EDE',
+                                                borderWidth: '2px',
+                                            }
+                                        }}
                                     >
                                         {reasons.map((reason) => (
                                             <MenuItem key={reason.id} value={reason.id}>
@@ -510,40 +598,93 @@ function Scrap() {
                                     </Select>
                                 </FormControl>
 
-                                <TextField
-                                    fullWidth
-                                    required
-                                    label="Cantidad"
-                                    type="number"
-                                    value={formData.quantity || ''}
-                                    onChange={(e) => handleFormChange('quantity', parseInt(e.target.value) || 0)}
-                                    disabled={creating}
-                                />
+                                <Box>
+                                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 600, color: '#64748B', mb: 0.5, display: 'block' }}>
+                                        Cantidad *
+                                    </Typography>
+                                    <Box
+                                        component="input"
+                                        type="number"
+                                        value={formData.quantity || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFormChange('quantity', parseInt(e.target.value) || 0)}
+                                        disabled={creating}
+                                        placeholder="0"
+                                        sx={{
+                                            width: '100%',
+                                            height: 48,
+                                            px: 2,
+                                            borderRadius: '12px',
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: 'white',
+                                            fontSize: '1rem',
+                                            outline: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                </Box>
 
-                                <TextField
-                                    fullWidth
-                                    label="Notas"
-                                    multiline
-                                    rows={3}
-                                    value={formData.notes}
-                                    onChange={(e) => handleFormChange('notes', e.target.value)}
-                                    disabled={creating}
-                                />
+                                <Box>
+                                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 600, color: '#64748B', mb: 0.5, display: 'block' }}>
+                                        Notas
+                                    </Typography>
+                                    <Box
+                                        component="textarea"
+                                        rows={3}
+                                        value={formData.notes}
+                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleFormChange('notes', e.target.value)}
+                                        disabled={creating}
+                                        sx={{
+                                            width: '100%',
+                                            p: 2,
+                                            borderRadius: '12px',
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: 'white',
+                                            fontSize: '1rem',
+                                            outline: 'none',
+                                            resize: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                </Box>
                             </Box>
                         </DialogContent>
-                        <DialogActions>
+                        <DialogActions sx={{ p: 3, gap: 1 }}>
                             <Button 
-                                color="inherit"
                                 onClick={handleCloseCreateModal} 
                                 disabled={creating}
+                                sx={{
+                                    borderRadius: '12px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 3,
+                                    color: '#64748B'
+                                }}
                             >
                                 Cancelar
                             </Button>
                             <Button
                                 variant="contained"
-                                color="primary"
                                 onClick={handleCreateScrap}
                                 disabled={creating}
+                                sx={{
+                                    bgcolor: '#415EDE',
+                                    color: 'white',
+                                    borderRadius: '12px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 4,
+                                    '&:hover': {
+                                        bgcolor: '#354BB0'
+                                    }
+                                }}
                                 startIcon={creating ? <CircularProgress size={18} color="inherit" /> : undefined}
                             >
                                 {creating ? 'Guardando...' : 'Guardar'}

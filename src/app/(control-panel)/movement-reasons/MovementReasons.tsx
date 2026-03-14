@@ -30,11 +30,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import { 
-    getMovementReasons, 
+import {
+    getMovementReasons,
     createMovementReason,
     updateMovementReason,
-    deleteMovementReason 
+    deleteMovementReason
 } from './movementReasonService';
 import { MovementReasonResponse, MovementReasonFormData } from './models/MovementReason';
 import NavbarToggleButton from '@/components/theme-layouts/components/navbar/NavbarToggleButton';
@@ -42,6 +42,7 @@ import authRoles from '@auth/authRoles';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { useSnackbar } from 'notistack';
+import StyledTable from '@/components/ui/StyledTable';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
     '& .FusePageSimple-header': {
@@ -68,7 +69,7 @@ function MovementReasons() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [editingReason, setEditingReason] = useState<MovementReasonResponse | null>(null);
     const [deletingReason, setDeletingReason] = useState<MovementReasonResponse | null>(null);
-    const [formData, setFormData] = useState<MovementReasonFormData>({ 
+    const [formData, setFormData] = useState<MovementReasonFormData>({
         description: '',
         positiveAdjustment: false,
         negativeAdjustment: false,
@@ -134,7 +135,7 @@ function MovementReasons() {
 
     const handleOpenAddModal = () => {
         setEditingReason(null);
-        setFormData({ 
+        setFormData({
             description: '',
             positiveAdjustment: false,
             negativeAdjustment: false,
@@ -145,7 +146,7 @@ function MovementReasons() {
 
     const handleOpenEditModal = (reason: MovementReasonResponse) => {
         setEditingReason(reason);
-        setFormData({ 
+        setFormData({
             description: reason.description,
             positiveAdjustment: reason.positiveAdjustment,
             negativeAdjustment: reason.negativeAdjustment,
@@ -157,7 +158,7 @@ function MovementReasons() {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setEditingReason(null);
-        setFormData({ 
+        setFormData({
             description: '',
             positiveAdjustment: false,
             negativeAdjustment: false,
@@ -175,7 +176,7 @@ function MovementReasons() {
         setSaving(true);
         try {
             let response;
-            
+
             if (editingReason) {
                 response = await updateMovementReason(editingReason.id, formData);
             } else {
@@ -245,181 +246,265 @@ function MovementReasons() {
                 }
                 content={
                     <div className="p-6">
-                        <Box display="flex" justifyContent="flex-end" mb={2}>
+                        <Box display="flex" justifyContent="flex-end" mb={4}>
                             {isAdmin && (
                                 <Button
                                     variant="contained"
                                     color="primary"
                                     onClick={handleOpenAddModal}
+                                    sx={{
+                                        borderRadius: '8px',
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        px: 3
+                                    }}
                                 >
                                     {t('addNew')}
                                 </Button>
                             )}
                         </Box>
 
-                        <TableContainer component={Paper}>
-                            <Box
-                                display="flex"
-                                flexDirection={{ xs: 'column', md: 'row' }}
-                                gap={2}
-                                p={2}
-                                alignItems={{ xs: 'stretch', md: 'center' }}
-                            >
-                                <Box display="flex" flex={1} gap={1} alignItems="center">
-                                    <TextField
-                                        fullWidth
-                                        placeholder={t('search')}
-                                        value={searchTerm}
-                                        onChange={(event) => setSearchTerm(event.target.value)}
-                                        onKeyDown={handleSearchKeyDown}
-                                        size="small"
-                                    />
-                                    <IconButton
-                                        color="primary"
-                                        onClick={handleSearchClick}
-                                        sx={{
-                                            border: `1px solid ${theme.palette.primary.main}`,
-                                        }}
-                                        aria-label="Buscar"
-                                    >
-                                        <SearchIcon />
-                                    </IconButton>
-                                </Box>
+                        <Box mb={3}>
+                            <Box display="flex" gap={1} alignItems="center" sx={{ maxWidth: 400 }}>
+                                <Box
+                                    component="input"
+                                    type="text"
+                                    placeholder={t('search')}
+                                    value={searchTerm}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
+                                    onKeyDown={handleSearchKeyDown}
+                                    sx={{
+                                        width: '100%',
+                                        height: 40,
+                                        px: 2,
+                                        borderRadius: 2,
+                                        border: '1px solid #E2E8F0',
+                                        bgcolor: 'white',
+                                        fontSize: '0.9375rem',
+                                        outline: 'none',
+                                        transition: 'all 0.2s',
+                                        '&:focus': {
+                                            borderColor: '#415EDE',
+                                            boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                        }
+                                    }}
+                                />
+                                <IconButton
+                                    color="primary"
+                                    onClick={handleSearchClick}
+                                    sx={{
+                                        bgcolor: 'white',
+                                        border: '1px solid #E2E8F0',
+                                        borderRadius: 2,
+                                        height: 40,
+                                        width: 40,
+                                        '&:hover': {
+                                            borderColor: '#415EDE',
+                                            bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                        }
+                                    }}
+                                >
+                                    <SearchIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
                             </Box>
+                        </Box>
 
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>{t('table.description')}</TableCell>
-                                        <TableCell align="center">{t('table.positiveAdjustment')}</TableCell>
-                                        <TableCell align="center">{t('table.negativeAdjustment')}</TableCell>
-                                        <TableCell align="center">{t('table.scrap')}</TableCell>
-                                        {isAdmin && <TableCell align="right">{t('table.actions')}</TableCell>}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} align="center">
-                                                <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                    <CircularProgress size={24} />
-                                                    <Typography>Cargando motivos de movimiento...</Typography>
-                                                </Box>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : filteredReasons.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={5} align="center">
-                                                <Typography color="text.secondary">{t('empty.message')}</Typography>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        filteredReasons.map((reason) => (
-                                            <TableRow key={reason.id} hover>
-                                                <TableCell>
-                                                    <Typography fontWeight={600}>{reason.description}</Typography>
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <BooleanIcon value={reason.positiveAdjustment} />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <BooleanIcon value={reason.negativeAdjustment} />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <BooleanIcon value={reason.scrap} />
-                                                </TableCell>
-                                                {isAdmin && (
-                                                    <TableCell align="right">
-                                                        <Box display="flex" justifyContent="flex-end" gap={1}>
-                                                            <Tooltip title={t('actions.edit')}>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    color="primary"
-                                                                    onClick={() => handleOpenEditModal(reason)}
-                                                                >
-                                                                    <EditIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                            <Tooltip title={t('actions.delete')}>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    color='error'
-                                                                    onClick={() => handleOpenDeleteModal(reason)}
-                                                                >
-                                                                    <DeleteIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                        </Box>
-                                                    </TableCell>
-                                                )}
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        <StyledTable<MovementReasonResponse>
+                            columns={[
+                                {
+                                    id: 'description',
+                                    label: t('table.description'),
+                                    render: (row) => (
+                                        <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                            {row.description}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'positiveAdjustment',
+                                    label: t('table.positiveAdjustment'),
+                                    align: 'center',
+                                    render: (row) => (
+                                        <BooleanIcon value={row.positiveAdjustment} />
+                                    )
+                                },
+                                {
+                                    id: 'negativeAdjustment',
+                                    label: t('table.negativeAdjustment'),
+                                    align: 'center',
+                                    render: (row) => (
+                                        <BooleanIcon value={row.negativeAdjustment} />
+                                    )
+                                },
+                                {
+                                    id: 'scrap',
+                                    label: t('table.scrap'),
+                                    align: 'center',
+                                    render: (row) => (
+                                        <BooleanIcon value={row.scrap} />
+                                    )
+                                }
+                            ]}
+                            data={filteredReasons}
+                            getRowId={(row) => String(row.id)}
+                            loading={loading}
+                            loadingMessage="Cargando motivos de movimiento..."
+                            emptyMessage={t('empty.message')}
+                            renderActions={(row) => isAdmin && (
+                                <Box display="flex" justifyContent="center" gap={1}>
+                                    <Tooltip title={t('actions.edit')}>
+                                        <IconButton
+                                            size="small"
+                                            sx={{ color: '#415EDE' }}
+                                            onClick={() => handleOpenEditModal(row)}
+                                        >
+                                            <img src="./assets/icons/edit-black.png" alt="" />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title={t('actions.delete')}>
+                                        <IconButton
+                                            size="small"
+                                            sx={{ color: '#EF4444' }}
+                                            onClick={() => handleOpenDeleteModal(row)}
+                                        >
+                                            <img src="./assets/icons/delete.png" alt="" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
+                            )}
+                            minWidth={1000}
+                        />
                     </div>
                 }
             />
 
             {/* Modal Agregar/Editar */}
-            <Dialog 
-                open={isModalOpen} 
+            <Dialog
+                open={isModalOpen}
                 onClose={handleCloseModal}
                 maxWidth="sm"
                 fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: '16px',
+                        bgcolor: 'white'
+                    }
+                }}
             >
-                <DialogTitle>
+                <DialogTitle sx={{ fontWeight: 700, px: 3, pt: 3 }}>
                     {editingReason ? t('modal.editTitle') : t('modal.addTitle')}
                 </DialogTitle>
-                <DialogContent dividers>
-                    <Box display="flex" flexDirection="column" gap={2}>
-                        <TextField
-                            fullWidth
-                            label={t('form.description')}
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            disabled={saving}
-                            autoFocus
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={formData.positiveAdjustment}
-                                    onChange={(e) => setFormData({ ...formData, positiveAdjustment: e.target.checked })}
-                                    disabled={saving}
-                                />
-                            }
-                            label={t('form.positiveAdjustment')}
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={formData.negativeAdjustment}
-                                    onChange={(e) => setFormData({ ...formData, negativeAdjustment: e.target.checked })}
-                                    disabled={saving}
-                                />
-                            }
-                            label={t('form.negativeAdjustment')}
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={formData.scrap}
-                                    onChange={(e) => setFormData({ ...formData, scrap: e.target.checked })}
-                                    disabled={saving}
-                                />
-                            }
-                            label={t('form.scrap')}
-                        />
+                <DialogContent>
+                    <Box display="flex" flexDirection="column" gap={2} mt={2}>
+                        <Box>
+                            <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+                                {t('form.description')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+                            </Typography>
+                            <Box
+                                component="input"
+                                type="text"
+                                value={formData.description}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, description: e.target.value })}
+                                placeholder="Ingrese la descripción del motivo"
+                                sx={{
+                                    width: '100%',
+                                    height: 48,
+                                    px: 2,
+                                    borderRadius: 2,
+                                    border: '1px solid #E2E8F0',
+                                    bgcolor: 'white',
+                                    fontSize: '0.9375rem',
+                                    outline: 'none',
+                                    transition: 'all 0.2s',
+                                    '&:focus': {
+                                        borderColor: '#415EDE',
+                                        boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                                    }
+                                }}
+                            />
+                        </Box>
+
+                        <Box display="flex" flexDirection="column" gap={1}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={formData.positiveAdjustment}
+                                        onChange={(e) => setFormData({ ...formData, positiveAdjustment: e.target.checked })}
+                                        sx={{
+                                            color: '#E2E8F0',
+                                            '&.Mui-checked': {
+                                                color: '#415EDE',
+                                            },
+                                        }}
+                                        disabled={saving}
+                                    />
+                                }
+                                label={t('form.positiveAdjustment')}
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={formData.negativeAdjustment}
+                                        onChange={(e) => setFormData({ ...formData, negativeAdjustment: e.target.checked })}
+                                        sx={{
+                                            color: '#E2E8F0',
+                                            '&.Mui-checked': {
+                                                color: '#415EDE',
+                                            },
+                                        }}
+                                        disabled={saving}
+                                    />
+                                }
+                                label={t('form.negativeAdjustment')}
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={formData.scrap}
+                                        onChange={(e) => setFormData({ ...formData, scrap: e.target.checked })}
+                                        sx={{
+                                            color: '#E2E8F0',
+                                            '&.Mui-checked': {
+                                                color: '#415EDE',
+                                            },
+                                        }}
+                                        disabled={saving}
+                                    />
+                                }
+                                label={t('form.scrap')}
+                            />
+                        </Box>
                     </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseModal} disabled={saving}>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button
+                        onClick={handleCloseModal}
+                        disabled={saving}
+                        sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            color: 'text.secondary',
+                            fontWeight: 600
+                        }}
+                    >
                         {t('modal.cancel')}
                     </Button>
-                    <Button onClick={handleSave} variant="contained" color='primary' disabled={saving}>
-                        {saving ? <CircularProgress size={24} /> : t('modal.save')}
+                    <Button
+                        variant="contained"
+                        onClick={handleSave}
+                        disabled={saving || !formData.description.trim()}
+                        sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            bgcolor: '#415EDE',
+                            fontWeight: 600,
+                            color: 'white',
+                            '&:hover': {
+                                bgcolor: '#354db1'
+                            }
+                        }}
+                    >
+                        {saving ? 'Guardando...' : t('modal.save')}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -27,11 +27,11 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { 
-    getItemUnitOfMeasures, 
+import {
+    getItemUnitOfMeasures,
     createItemUnitOfMeasure,
     updateItemUnitOfMeasure,
-    deleteItemUnitOfMeasure 
+    deleteItemUnitOfMeasure
 } from './itemUnitOfMeasureService';
 import { ItemUnitOfMeasureResponse, ItemUnitOfMeasureFormData } from './models/ItemUnitOfMeasure';
 import NavbarToggleButton from '@/components/theme-layouts/components/navbar/NavbarToggleButton';
@@ -39,6 +39,7 @@ import authRoles from '@auth/authRoles';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { useSnackbar } from 'notistack';
+import StyledTable, { TableColumnDef } from '@/components/ui/StyledTable';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
     '& .FusePageSimple-header': {
@@ -166,7 +167,7 @@ function ItemUnitOfMeasure() {
         setSaving(true);
         try {
             let response;
-            
+
             if (editingUnit) {
                 response = await updateItemUnitOfMeasure(editingUnit.id, formData);
             } else {
@@ -228,162 +229,192 @@ function ItemUnitOfMeasure() {
                 }
                 content={
                     <div className="p-6">
-                        <Box display="flex" justifyContent="flex-end" mb={2}>
+                        <Box display="flex" justifyContent="flex-end" mb={4}>
                             {isAdmin && (
                                 <Button
                                     variant="contained"
                                     color="primary"
                                     onClick={handleOpenAddModal}
+                                    sx={{
+                                        borderRadius: '8px',
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        px: 3
+                                    }}
                                 >
                                     {t('addNew')}
                                 </Button>
                             )}
                         </Box>
 
-                        <TableContainer component={Paper}>
-                            <Box
-                                display="flex"
-                                flexDirection={{ xs: 'column', md: 'row' }}
-                                gap={2}
-                                p={2}
-                                alignItems={{ xs: 'stretch', md: 'center' }}
-                            >
-                                <Box display="flex" flex={1} gap={1} alignItems="center">
-                                    <TextField
-                                        fullWidth
-                                        placeholder={t('search')}
-                                        value={searchTerm}
-                                        onChange={(event) => setSearchTerm(event.target.value)}
-                                        onKeyDown={handleSearchKeyDown}
-                                        size="small"
-                                    />
-                                    <IconButton
-                                        color="primary"
-                                        onClick={handleSearchClick}
-                                        sx={{
-                                            border: `1px solid ${theme.palette.primary.main}`,
-                                        }}
-                                        aria-label="Buscar"
-                                    >
-                                        <SearchIcon />
-                                    </IconButton>
-                                </Box>
+                        <Box mb={3}>
+                            <Box display="flex" gap={1} alignItems="center" sx={{ maxWidth: 400 }}>
+                                <Box
+                                    component="input"
+                                    type="text"
+                                    placeholder={t('search')}
+                                    value={searchTerm}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
+                                    onKeyDown={handleSearchKeyDown}
+                                    sx={{
+                                        width: '100%',
+                                        height: 40,
+                                        px: 2,
+                                        borderRadius: 2,
+                                        border: '1px solid #E2E8F0',
+                                        bgcolor: 'white',
+                                        fontSize: '0.9375rem',
+                                        outline: 'none',
+                                        transition: 'all 0.2s',
+                                        '&:focus': {
+                                            borderColor: '#415EDE',
+                                            boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                        }
+                                    }}
+                                />
+                                <IconButton
+                                    color="primary"
+                                    onClick={handleSearchClick}
+                                    sx={{
+                                        bgcolor: 'white',
+                                        border: '1px solid #E2E8F0',
+                                        borderRadius: 2,
+                                        height: 40,
+                                        width: 40,
+                                        '&:hover': {
+                                            borderColor: '#415EDE',
+                                            bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                        }
+                                    }}
+                                >
+                                    <SearchIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
                             </Box>
+                        </Box>
 
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>{t('table.description')}</TableCell>
-                                        {isAdmin && <TableCell align="right">{t('table.actions')}</TableCell>}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={2} align="center">
-                                                <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                    <CircularProgress size={24} />
-                                                    <Typography>Cargando unidades de medida...</Typography>
-                                                </Box>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : units.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={2} align="center">
-                                                <Typography color="text.secondary">{t('empty.message')}</Typography>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        units.map((unit) => (
-                                            <TableRow key={unit.id} hover>
-                                                <TableCell>
-                                                    <Typography fontWeight={600}>{unit.description}</Typography>
-                                                </TableCell>
-                                                {isAdmin && (
-                                                    <TableCell align="right">
-                                                        <Box display="flex" justifyContent="flex-end" gap={1}>
-                                                            <Tooltip title={t('actions.edit')}>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    color="primary"
-                                                                    onClick={() => handleOpenEditModal(unit)}
-                                                                >
-                                                                    <EditIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                            <Tooltip title={t('actions.delete')}>
-                                                                <IconButton
-                                                                    size="small"
-                                                                    onClick={() => handleOpenDeleteModal(unit)}
-                                                                    color="error"
-                                                                >
-                                                                    <DeleteIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                        </Box>
-                                                    </TableCell>
-                                                )}
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-
-                            <TablePagination
-                                rowsPerPageOptions={[5, 10, 25, 50]}
-                                component="div"
-                                count={totalCount}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
-                                onPageChange={handleChangePage}
-                                onRowsPerPageChange={handleChangeRowsPerPage}
-                                labelRowsPerPage={t('pagination.rowsPerPage')}
-                                labelDisplayedRows={({ from, to, count }) =>
-                                    `${from}-${to} ${t('pagination.of')} ${count !== -1 ? count : `${t('pagination.moreThan')} ${to}`}`
+                        <StyledTable<ItemUnitOfMeasureResponse>
+                            columns={[
+                                {
+                                    id: 'description',
+                                    label: t('table.description'),
+                                    render: (row) => (
+                                        <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                            {row.description}
+                                        </Typography>
+                                    )
                                 }
-                            />
-                        </TableContainer>
+                            ]}
+                            data={units}
+                            getRowId={(row) => String(row.id)}
+                            loading={loading}
+                            loadingMessage="Cargando unidades de medida..."
+                            emptyMessage={t('empty.message')}
+                            renderActions={(row) => isAdmin && (
+                                <Box display="flex" justifyContent="center" gap={1}>
+                                    <Tooltip title={t('actions.edit')}>
+                                        <IconButton
+                                            size="small"
+                                            sx={{ color: '#415EDE' }}
+                                            onClick={() => handleOpenEditModal(row)}
+                                        >
+                                            <img src='./assets/icons/edit-black.png' />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title={t('actions.delete')}>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleOpenDeleteModal(row)}
+                                            sx={{ color: '#EF4444' }}
+                                        >
+                                            <img src="./assets/icons/delete.png" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
+                            )}
+                            pagination={{
+                                count: totalCount,
+                                page: page,
+                                rowsPerPage: rowsPerPage,
+                                onPageChange: handleChangePage
+                            }}
+                            minWidth={800}
+                        />
                     </div>
                 }
             />
 
             {/* Add/Edit Modal */}
-            <Dialog 
-                open={isModalOpen} 
+            <Dialog
+                open={isModalOpen}
                 onClose={handleCloseModal}
                 fullWidth
                 maxWidth="sm"
+                PaperProps={{
+                    sx: {
+                        borderRadius: '16px',
+                        bgcolor: 'white'
+                    }
+                }}
             >
-                <DialogTitle>
+                <DialogTitle sx={{ fontWeight: 700, px: 3, pt: 3 }}>
                     {editingUnit ? t('modal.editTitle') : t('modal.addTitle')}
                 </DialogTitle>
-                <DialogContent dividers>
-                    <Box display="flex" flexDirection="column" gap={3}>
-                        <TextField
-                            label={t('form.description')}
+                <DialogContent>
+                    <Box display="flex" flexDirection="column" gap={1} mt={2}>
+                        <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500, color: 'text.secondary' }}>
+                            {t('form.description')} <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+                        </Typography>
+                        <Box
+                            component="input"
+                            type="text"
                             value={formData.description}
-                            onChange={(e) => setFormData({ description: e.target.value })}
-                            fullWidth
-                            required
-                            disabled={saving}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ description: e.target.value })}
                             placeholder="Ingrese la descripción de la unidad de medida"
+                            sx={{
+                                width: '100%',
+                                height: 44,
+                                px: 2,
+                                borderRadius: 2,
+                                border: '1px solid #E2E8F0',
+                                bgcolor: 'white',
+                                fontSize: '0.9375rem',
+                                outline: 'none',
+                                transition: 'all 0.2s',
+                                '&:focus': {
+                                    borderColor: '#415EDE',
+                                    boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                                }
+                            }}
                         />
                     </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button 
-                        color="inherit"
-                        onClick={handleCloseModal} 
+                <DialogActions sx={{ p: 3 }}>
+                    <Button
+                        onClick={handleCloseModal}
                         disabled={saving}
+                        sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            color: 'text.secondary',
+                            fontWeight: 600
+                        }}
                     >
                         {t('modal.cancel')}
                     </Button>
                     <Button
                         variant="contained"
-                        color="primary"
                         onClick={handleSave}
                         disabled={saving || !formData.description.trim()}
-                        startIcon={saving ? <CircularProgress size={18} color="inherit" /> : undefined}
+                        sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            bgcolor: '#415EDE',
+                            color: 'white',
+                            fontWeight: 600,
+                            '&:hover': {
+                                bgcolor: '#354db1'
+                            }
+                        }}
                     >
                         {saving ? 'Guardando...' : t('modal.save')}
                     </Button>

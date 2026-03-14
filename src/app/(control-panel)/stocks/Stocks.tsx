@@ -21,7 +21,8 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    SelectChangeEvent
+    SelectChangeEvent,
+    Grid
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -29,6 +30,7 @@ import { getStocks } from './stockService';
 import { StockResponse } from './models/Stock';
 import NavbarToggleButton from '@/components/theme-layouts/components/navbar/NavbarToggleButton';
 import { useSnackbar } from 'notistack';
+import StyledTable from '@/components/ui/StyledTable';
 import { getWarehouses } from '../warehouses/warehousesService';
 import { getLocations } from '../locations/locationsService';
 import { getItems } from '../items/itemsService';
@@ -209,181 +211,267 @@ function Stocks() {
                 </div>
             }
             content={
-                <div className="p-6">
-                    <TableContainer component={Paper}>
+                    <div className="p-6">
                         <Box
-                            display="flex"
-                            flexDirection="column"
-                            gap={2}
-                            p={2}
+                            sx={{
+                                bgcolor: 'white',
+                                borderRadius: '16px',
+                                p: 3,
+                                mb: 3,
+                                border: '1px solid #E2E8F0',
+                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                            }}
                         >
-                            {/* Search Bar */}
-                            <Box display="flex" gap={1} alignItems="center">
-                                <TextField
-                                    fullWidth
-                                    placeholder={t('search')}
-                                    value={searchTerm}
-                                    onChange={(event) => setSearchTerm(event.target.value)}
-                                    onKeyDown={handleSearchKeyDown}
-                                    size="small"
-                                />
-                                <IconButton
-                                    onClick={handleSearchClick}
-                                    color='primary'
-                                    sx={{
-                                        border: '1px solid',
-                                        borderColor: 'primary',
-                                        borderRadius: 1,
-                                    }}
-                                >
-                                    <SearchIcon />
-                                </IconButton>
+                            <Box sx={{ maxWidth: 400, mb: 3 }}>
+                                <Box display="flex" gap={1} alignItems="center">
+                                    <Box
+                                        component="input"
+                                        type="text"
+                                        placeholder={t('search')}
+                                        value={searchTerm}
+                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value)}
+                                        onKeyDown={handleSearchKeyDown}
+                                        sx={{
+                                            width: '100%',
+                                            height: 40,
+                                            px: 2,
+                                            borderRadius: 2,
+                                            border: '1px solid #E2E8F0',
+                                            bgcolor: 'white',
+                                            fontSize: '0.9375rem',
+                                            outline: 'none',
+                                            transition: 'all 0.2s',
+                                            '&:focus': {
+                                                borderColor: '#415EDE',
+                                                boxShadow: '0 0 0 2px rgba(65, 94, 222, 0.1)',
+                                            }
+                                        }}
+                                    />
+                                    <IconButton
+                                        onClick={handleSearchClick}
+                                        sx={{
+                                            bgcolor: 'white',
+                                            border: '1px solid #E2E8F0',
+                                            borderRadius: 2,
+                                            height: 40,
+                                            width: 40,
+                                            '&:hover': {
+                                                borderColor: '#415EDE',
+                                                bgcolor: 'rgba(65, 94, 222, 0.04)'
+                                            }
+                                        }}
+                                    >
+                                        <SearchIcon sx={{ fontSize: 20 }} />
+                                    </IconButton>
+                                </Box>
                             </Box>
 
-                            {/* Filters */}
-                            <Box
-                                display="flex"
-                                flexDirection={{ xs: 'column', md: 'row' }}
-                                gap={2}
-                            >
-                                <FormControl size="small" sx={{ minWidth: 200 }}>
-                                    <InputLabel>{t('filters.warehouse')}</InputLabel>
-                                    <Select
-                                        value={warehouseId}
-                                        onChange={handleWarehouseChange}
-                                        label={t('filters.warehouse')}
-                                    >
-                                        <MenuItem value="">
-                                            <em>{t('filters.all')}</em>
-                                        </MenuItem>
-                                        {warehouses.map((warehouse) => (
-                                            <MenuItem key={warehouse.id} value={warehouse.id}>
-                                                {warehouse.description}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                            {t('filters.warehouse')}
+                                        </Typography>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                value={warehouseId}
+                                                displayEmpty
+                                                onChange={handleWarehouseChange}
+                                                sx={{
+                                                    height: 40,
+                                                    bgcolor: 'white',
+                                                    borderRadius: 2,
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                    }
+                                                }}
+                                            >
+                                                <MenuItem value="">
+                                                    <em>{t('filters.all')}</em>
+                                                </MenuItem>
+                                                {warehouses.map((warehouse) => (
+                                                    <MenuItem key={warehouse.id} value={warehouse.id}>
+                                                        {warehouse.description}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </Grid>
 
-                                <FormControl size="small" sx={{ minWidth: 200 }}>
-                                    <InputLabel>{t('filters.location')}</InputLabel>
-                                    <Select
-                                        value={locationId}
-                                        onChange={handleLocationChange}
-                                        label={t('filters.location')}
-                                    >
-                                        <MenuItem value="">
-                                            <em>{t('filters.all')}</em>
-                                        </MenuItem>
-                                        {locations.map((location) => (
-                                            <MenuItem key={location.id} value={location.id}>
-                                                {location.description}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                            {t('filters.location')}
+                                        </Typography>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                value={locationId}
+                                                displayEmpty
+                                                onChange={handleLocationChange}
+                                                sx={{
+                                                    height: 40,
+                                                    bgcolor: 'white',
+                                                    borderRadius: 2,
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                    }
+                                                }}
+                                            >
+                                                <MenuItem value="">
+                                                    <em>{t('filters.all')}</em>
+                                                </MenuItem>
+                                                {locations.map((location) => (
+                                                    <MenuItem key={location.id} value={location.id}>
+                                                        {location.description}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </Grid>
 
-                                <FormControl size="small" sx={{ minWidth: 200 }}>
-                                    <InputLabel>{t('filters.item')}</InputLabel>
-                                    <Select
-                                        value={itemId}
-                                        onChange={handleItemChange}
-                                        label={t('filters.item')}
-                                    >
-                                        <MenuItem value="">
-                                            <em>{t('filters.all')}</em>
-                                        </MenuItem>
-                                        {items.map((item) => (
-                                            <MenuItem key={item.id} value={item.id}>
-                                                {item.description}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                            {t('filters.item')}
+                                        </Typography>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                value={itemId}
+                                                displayEmpty
+                                                onChange={handleItemChange}
+                                                sx={{
+                                                    height: 40,
+                                                    bgcolor: 'white',
+                                                    borderRadius: 2,
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                    }
+                                                }}
+                                            >
+                                                <MenuItem value="">
+                                                    <em>{t('filters.all')}</em>
+                                                </MenuItem>
+                                                {items.map((item) => (
+                                                    <MenuItem key={item.id} value={item.id}>
+                                                        {item.description}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </Grid>
 
-                                <FormControl size="small" sx={{ minWidth: 200 }}>
-                                    <InputLabel>{t('filters.lot')}</InputLabel>
-                                    <Select
-                                        value={lotId}
-                                        onChange={handleLotChange}
-                                        label={t('filters.lot')}
-                                    >
-                                        <MenuItem value="">
-                                            <em>{t('filters.all')}</em>
-                                        </MenuItem>
-                                        {lots.map((lot) => (
-                                            <MenuItem key={lot.id} value={lot.id}>
-                                                {lot.description}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Box>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+                                            {t('filters.lot')}
+                                        </Typography>
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                value={lotId}
+                                                displayEmpty
+                                                onChange={handleLotChange}
+                                                sx={{
+                                                    height: 40,
+                                                    bgcolor: 'white',
+                                                    borderRadius: 2,
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                        borderColor: '#415EDE',
+                                                    }
+                                                }}
+                                            >
+                                                <MenuItem value="">
+                                                    <em>{t('filters.all')}</em>
+                                                </MenuItem>
+                                                {lots.map((lot) => (
+                                                    <MenuItem key={lot.id} value={lot.id}>
+                                                        {lot.description}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                </Grid>
+                            </Grid>
                         </Box>
 
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>{t('table.item')}</TableCell>
-                                    <TableCell>{t('table.warehouse')}</TableCell>
-                                    <TableCell>{t('table.location')}</TableCell>
-                                    <TableCell>{t('table.lot')}</TableCell>
-                                    <TableCell align="right">{t('table.quantity')}</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
-                                            <CircularProgress />
-                                        </TableCell>
-                                    </TableRow>
-                                ) : stocks.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
-                                            <Typography variant="body2" color="textSecondary">
-                                                {t('noData')}
+                        <StyledTable<StockResponse>
+                            columns={[
+                                {
+                                    id: 'itemDescription',
+                                    label: t('table.item'),
+                                    render: (row) => (
+                                        <Typography fontWeight={600} sx={{ color: '#334155' }}>
+                                            {row.itemDescription || '-'}
+                                        </Typography>
+                                    )
+                                },
+                                {
+                                    id: 'warehouseDescription',
+                                    label: t('table.warehouse'),
+                                    render: (row) => row.warehouseDescription || '-'
+                                },
+                                {
+                                    id: 'locationDescription',
+                                    label: t('table.location'),
+                                    render: (row) => row.locationDescription || '-'
+                                },
+                                {
+                                    id: 'lotDescription',
+                                    label: t('table.lot'),
+                                    render: (row) => row.lotDescription || '-'
+                                },
+                                {
+                                    id: 'quantity',
+                                    label: t('table.quantity'),
+                                    align: 'center',
+                                    render: (row) => (
+                                        <Box display="flex" alignItems="center" justifyContent="center" gap={0.5}>
+                                            {row.quantity < 0 && (
+                                                <WarningAmberIcon sx={{ color: '#EF4444', fontSize: '1.1rem' }} />
+                                            )}
+                                            {row.quantity === 0 && (
+                                                <WarningAmberIcon sx={{ color: '#F59E0B', fontSize: '1.1rem' }} />
+                                            )}
+                                            <Typography fontWeight={600} color={row.quantity < 0 ? '#EF4444' : 'inherit'}>
+                                                {row.quantity}
                                             </Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    stocks.map((stock) => (
-                                        <TableRow key={stock.id} hover>
-                                            <TableCell>{stock.itemDescription || '-'}</TableCell>
-                                            <TableCell>{stock.warehouseDescription || '-'}</TableCell>
-                                            <TableCell>{stock.locationDescription || '-'}</TableCell>
-                                            <TableCell>{stock.lotDescription || '-'}</TableCell>
-                                            <TableCell align="right">
-                                                <Box display="flex" alignItems="center" justifyContent="flex-end" gap={0.5}>
-                                                    {stock.quantity < 0 && (
-                                                        <WarningAmberIcon sx={{ color: '#c62828', fontSize: '1.2rem' }} />
-                                                    )}
-                                                    {stock.quantity === 0 && (
-                                                        <WarningAmberIcon sx={{ color: '#e65100', fontSize: '1.2rem' }} />
-                                                    )}
-                                                    {stock.quantity}
-                                                </Box>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25, 50]}
-                            component="div"
-                            count={totalCount}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                            labelRowsPerPage={t('rowsPerPage')}
-                            labelDisplayedRows={({ from, to, count }) =>
-                                `${from}-${to} ${t('of')} ${count !== -1 ? count : `${t('moreThan')} ${to}`}`
-                            }
+                                        </Box>
+                                    )
+                                }
+                            ]}
+                            data={stocks}
+                            getRowId={(row) => String(row.id)}
+                            loading={loading}
+                            loadingMessage="Cargando existencias..."
+                            emptyMessage={t('noData')}
+                            pagination={{
+                                count: totalCount,
+                                page: page,
+                                rowsPerPage: rowsPerPage,
+                                onPageChange: handleChangePage
+                            }}
+                            minWidth={1000}
                         />
-                    </TableContainer>
-                </div>
+                    </div>
             }
         />
     );
