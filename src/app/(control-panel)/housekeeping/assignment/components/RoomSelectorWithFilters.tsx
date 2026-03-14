@@ -10,13 +10,6 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
@@ -25,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getRoomsPaged } from '@/store/housekeeping/assignmentGroupThunks';
 import type { RoomOption } from '@/store/housekeeping/housekeepingTypes';
 import apiService from '@/utils/apiService';
+import StyledTable, { TableColumnDef } from '@/components/ui/StyledTable';
 
 // ─── Local block shape from /Blocks endpoint ──────────────────────────────────
 
@@ -50,7 +44,7 @@ interface RoomSelectorWithFiltersProps {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 15;
 const SELECT_ALL_PAGE_SIZE = 1000;
 
 const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
@@ -227,7 +221,12 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
           value={filterFloor}
           onChange={(e) => setFilterFloor(e.target.value)}
           disabled={disabled}
-          sx={{ width: 100, bgcolor: 'white' }}
+          sx={{
+            width: 100,
+            "& .MuiInputBase-root": {
+              bgcolor: 'white',
+            },
+          }}
           inputProps={{ min: 0 }}
         />
 
@@ -237,7 +236,12 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
           value={filterSearch}
           onChange={(e) => setFilterSearch(e.target.value)}
           disabled={disabled}
-          sx={{ width: 160, bgcolor: 'white' }}
+          sx={{
+            width: 160,
+            "& .MuiInputBase-root": {
+              backgroundColor: "white"
+            }
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleSearch();
@@ -251,6 +255,10 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
           startIcon={<SearchIcon />}
           onClick={handleSearch}
           disabled={disabled || roomsLoading}
+          sx={{
+            backgroundColor: "white",
+            border: "1px solid gray"
+          }}
         >
           Buscar
         </Button>
@@ -271,111 +279,93 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
             : 'Ninguna habitación seleccionada'}
         </Typography>
 
-        <Button
+        {/* <Button
           size="small"
           variant="outlined"
           onClick={() => void handleSelectAllFiltered()}
           disabled={disabled || roomsLoading || totalItems === 0}
         >
           Seleccionar todo en filtro actual
-        </Button>
+        </Button> */}
       </Box>
 
       {/* Loading bar */}
       {roomsLoading && <LinearProgress sx={{ mb: 1 }} />}
 
-      {/* Table */}
-      <TableContainer>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell padding="checkbox" />
-              <TableCell>N° Hab.</TableCell>
-              <TableCell>Pabellón</TableCell>
-              <TableCell>Piso</TableCell>
-              <TableCell>Camas</TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {!roomsLoading && currentRows.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} align="center">
-                  <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
-                    No se encontraron habitaciones con los filtros aplicados.
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            )}
-
-            {roomsLoading && currentRows.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} align="center">
-                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                    <CircularProgress size={28} />
-                  </Box>
-                </TableCell>
-              </TableRow>
-            )}
-
-            {currentRows.map((room) => {
-              const checked = isRoomSelected(room.id);
-              return (
-                <TableRow
-                  key={room.id}
-                  hover
-                  selected={checked}
-                  onClick={() => {
-                    if (!disabled) handleToggleRoom(room);
-                  }}
-                  sx={{ cursor: disabled ? 'default' : 'pointer' }}
-                >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={checked}
-                      disabled={disabled}
-                      onChange={() => handleToggleRoom(room)}
-                      onClick={(e) => e.stopPropagation()}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={500}>
-                      {room.number}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">{room.blockName}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {room.floor !== undefined && room.floor !== null
-                        ? room.floor
-                        : '—'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">{room.bedCount}</Typography>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Pagination */}
-      <TablePagination
-        component="div"
-        count={totalItems}
-        page={currentPage}
-        onPageChange={handlePageChange}
-        rowsPerPage={PAGE_SIZE}
-        rowsPerPageOptions={[PAGE_SIZE]}
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} de ${count !== -1 ? count : `más de ${to}`}`
-        }
-        labelRowsPerPage="Filas por página:"
+      {/* Styled Table */}
+      <StyledTable<RoomOption>
+        loading={roomsLoading}
+        data={currentRows}
+        getRowId={(room) => room.id}
+        selectable
+        selected={selectedRooms.map((r) => r.id)}
+        onSelectRow={(_, id) => {
+          if (disabled) return;
+          const room = currentRows.find((r) => r.id === id);
+          if (room) handleToggleRoom(room);
+        }}
+        onSelectAll={(e) => {
+          if (disabled) return;
+          if (e.target.checked) {
+            // Select all visible items
+            const newRooms = [...selectedRooms];
+            currentRows.forEach((r) => {
+              if (!newRooms.some((nr) => nr.id === r.id)) {
+                newRooms.push(r);
+              }
+            });
+            onRoomsChange(newRooms);
+          } else {
+            // Unselect visible items
+            const visibleIds = currentRows.map((r) => r.id);
+            onRoomsChange(selectedRooms.filter((r) => !visibleIds.includes(r.id)));
+          }
+        }}
+        isRowSelectable={() => !disabled}
+        columns={[
+          {
+            id: 'number',
+            label: 'N° Hab.',
+            render: (room) => (
+              <Typography variant="body2" fontWeight={500}>
+                {room.number}
+              </Typography>
+            ),
+          },
+          {
+            id: 'blockName',
+            label: 'Pabellón',
+            render: (room) => (
+              <Typography variant="body2">{room.blockName}</Typography>
+            ),
+          },
+          {
+            id: 'floor',
+            label: 'Piso',
+            render: (room) => (
+              <Typography variant="body2">
+                {room.floor !== undefined && room.floor !== null
+                  ? room.floor
+                  : '—'}
+              </Typography>
+            ),
+          },
+          {
+            id: 'bedCount',
+            label: 'Camas',
+            render: (room) => (
+              <Typography variant="body2">{room.bedCount}</Typography>
+            ),
+          },
+        ]}
+        pagination={{
+          count: totalItems,
+          page: currentPage,
+          rowsPerPage: PAGE_SIZE,
+          onPageChange: handlePageChange,
+        }}
+        minWidth={600}
+        emptyMessage="No rooms found with applied filters."
       />
     </Box>
   );

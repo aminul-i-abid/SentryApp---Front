@@ -408,7 +408,7 @@ const AssignmentListScreen: React.FC = () => {
                   color="error"
                   onClick={() => handleDeleteClick(row)}
                 >
-                  <DeleteIcon fontSize="small" />
+                  <img src="./assets/icons/delete.png" />
                 </IconButton>
               </Tooltip>
             </>

@@ -393,6 +393,10 @@ const TareasListScreen: React.FC = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleCreate}
+          sx={{
+            backgroundColor: "#415EDE",
+            color: "white"
+          }}
         >
           Nueva Tarea
         </Button>
