@@ -404,15 +404,34 @@ const TemplatesListScreen: React.FC = () => {
             value={state.filters.searchTerm}
             onChange={handleSearchChange}
             size="small"
-            sx={{ minWidth: 250 }}
+            sx={{
+              minWidth: 250,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'white',
+                '&:hover fieldset': {
+                  borderColor: '#415EDE',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#415EDE',
+                  borderWidth: '2px',
+                }
+              },
+            }}
             InputProps={{
               startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-              sx: { backgroundColor: "white" },
             }}
           />
 
           {/* Category Filter */}
-          <FormControl size="small" sx={{ minWidth: 200 }}>
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: 200,
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#415EDE',
+              },
+            }}
+          >
             <InputLabel>Categoría</InputLabel>
             <Select
               value={state.filters.categoryId || ''}
@@ -420,11 +439,12 @@ const TemplatesListScreen: React.FC = () => {
               label="Categoría"
               sx={{
                 backgroundColor: "white",
-                '& .MuiSelect-select': {
-                  backgroundColor: 'white',
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#415EDE',
                 },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  backgroundColor: 'transparent',
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#415EDE',
+                  borderWidth: '2px',
                 },
               }}
               MenuProps={{
@@ -443,7 +463,15 @@ const TemplatesListScreen: React.FC = () => {
           </FormControl>
 
           {/* Active Status Filter */}
-          <FormControl size="small" sx={{ minWidth: 150 }}>
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: 150,
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#415EDE',
+              },
+            }}
+          >
             <InputLabel>Estado</InputLabel>
             <Select
               value={state.filters.isActive === undefined ? '' : String(state.filters.isActive)}
@@ -451,11 +479,12 @@ const TemplatesListScreen: React.FC = () => {
               label="Estado"
               sx={{
                 backgroundColor: "white",
-                '& .MuiSelect-select': {
-                  backgroundColor: 'white',
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#415EDE',
                 },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  backgroundColor: 'transparent',
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#415EDE',
+                  borderWidth: '2px',
                 },
               }}
               MenuProps={{

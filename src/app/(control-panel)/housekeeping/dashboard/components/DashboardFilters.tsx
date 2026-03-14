@@ -242,6 +242,20 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                     sx: {
                       backgroundColor: 'white',
                       '& .MuiInputBase-root': { backgroundColor: 'white' },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: 'rgba(0, 0, 0, 0.23)',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#415EDE',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#415EDE',
+                        },
+                      },
+                      '& .MuiInputLabel-root.Mui-focused': {
+                        color: '#415EDE',
+                      },
                     },
                     InputProps: {
                       startAdornment: (
@@ -299,7 +313,16 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                 }}
               /> */}
               <FormControl fullWidth size="small">
-                <InputLabel id="camp-select-label" sx={{ backgroundColor: 'white', pr: 1 }}>Campamento</InputLabel>
+                <InputLabel 
+                  id="camp-select-label" 
+                  sx={{ 
+                    backgroundColor: 'white', 
+                    pr: 1,
+                    '&.Mui-focused': { color: '#415EDE' }
+                  }}
+                >
+                  Campamento
+                </InputLabel>
                 <Select
                   labelId="camp-select-label"
                   id="camp-select"
@@ -311,6 +334,12 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                     backgroundColor: 'white',
                     '& .MuiOutlinedInput-notchedOutline': {
                       backgroundColor: 'transparent',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
                     },
                     '& .MuiSelect-select': {
                       backgroundColor: 'white',

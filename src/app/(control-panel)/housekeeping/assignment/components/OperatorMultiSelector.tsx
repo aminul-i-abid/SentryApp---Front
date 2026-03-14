@@ -180,6 +180,15 @@ const OperatorMultiSelector: React.FC<OperatorMultiSelectorProps> = ({
               bgcolor: 'white',
               '& .MuiOutlinedInput-root': {
                 bgcolor: 'white',
+                '&:hover fieldset': {
+                  borderColor: '#415EDE',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#415EDE',
+                },
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#415EDE',
               },
             }}
             InputProps={{

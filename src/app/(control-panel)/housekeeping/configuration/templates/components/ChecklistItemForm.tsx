@@ -197,77 +197,102 @@ const ChecklistItemForm = React.memo<ChecklistItemFormProps>(
         <Grid container spacing={2}>
           {/* Description Field */}
           <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              label="Descripción del Ítem"
-              placeholder="Ej. Cambiar sábanas"
-              multiline
-              minRows={2}
-              maxRows={4}
-              value={item.description}
-              onChange={(e) => onItemChange('description', e.target.value)}
-              error={!!errors[`item_${index}_description`]}
-              helperText={
-                errors[`item_${index}_description`] ||
-                'Máximo 255 caracteres'
-              }
-              disabled={disabled}
-              variant="outlined"
-              inputProps={{
-                maxLength: 255,
-                'aria-describedby': `description-${index}-helper`,
-              }}
-              aria-label={`Descripción del ítem ${index + 1}`}
-              sx={{
-                '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
-              }}
-            />
+            <Box>
+              <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+                Descripción del Ítem
+              </Typography>
+              <Box
+                component="textarea"
+                placeholder="Ej. Cambiar sábanas"
+                value={item.description}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onItemChange('description', e.target.value)}
+                disabled={disabled}
+                maxLength={255}
+                sx={{
+                  width: '100%',
+                  minHeight: 80,
+                  px: 2,
+                  py: 1.5,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: errors[`item_${index}_description`] ? 'error.main' : '#E2E8F0',
+                  bgcolor: 'white',
+                  fontSize: '0.9375rem',
+                  fontFamily: 'inherit',
+                  outline: 'none',
+                  resize: 'vertical',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:focus': {
+                    borderColor: '#415EDE',
+                    boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                  },
+                  '&:hover:not(:focus)': {
+                    borderColor: '#415EDE',
+                  },
+                  '&:disabled': {
+                    bgcolor: '#F8FAFC',
+                    cursor: 'not-allowed',
+                  }
+                }}
+              />
+              {errors[`item_${index}_description`] && (
+                <Typography variant="caption" sx={{ color: 'error.main', mt: 0.5, display: 'block' }}>
+                  {errors[`item_${index}_description`]}
+                </Typography>
+              )}
+              {!errors[`item_${index}_description`] && (
+                <Typography variant="caption" sx={{ color: 'text.disabled', mt: 0.5, display: 'block' }}>
+                  Máximo 255 caracteres
+                </Typography>
+              )}
+            </Box>
           </Grid>
 
           {/* Input Type Selection */}
           <Grid item xs={12} md={3}>
-            <FormControl fullWidth disabled={disabled}>
-              <InputLabel id={`input-type-${index}-label`}>Tipo de Entrada</InputLabel>
-              <Select
-                labelId={`input-type-${index}-label`}
+            <Box>
+              <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+                Tipo de Entrada
+              </Typography>
+              <Box
+                component="select"
                 value={item.inputType}
-                label="Tipo de Entrada"
-                onChange={(e) =>
-                  onItemChange('inputType', e.target.value as any)
-                }
-                aria-label={`Tipo de entrada del ítem ${index + 1}`}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onItemChange('inputType', e.target.value as any)}
+                disabled={disabled}
                 sx={{
-                  backgroundColor: 'white',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    backgroundColor: 'transparent',
+                  width: '100%',
+                  height: 44,
+                  px: 2,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: '#E2E8F0',
+                  bgcolor: 'white',
+                  fontSize: '0.9375rem',
+                  outline: 'none',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 12px center',
+                  backgroundSize: '16px',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:focus': {
+                    borderColor: '#415EDE',
+                    boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
                   },
-                  '& .MuiSelect-select': {
-                    backgroundColor: 'white',
-                  }
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: { backgroundColor: 'white !important' }
+                  '&:hover:not(:focus)': {
+                    borderColor: '#415EDE',
+                  },
+                  '&:disabled': {
+                    bgcolor: '#F8FAFC',
+                    cursor: 'not-allowed',
                   }
                 }}
               >
-                <MenuItem value="checkbox">
-                  <Box display="flex" alignItems="center" gap={1}>
-                    ☑ Casilla de verificación
-                  </Box>
-                </MenuItem>
-                <MenuItem value="text">
-                  <Box display="flex" alignItems="center" gap={1}>
-                    ✎ Texto libre
-                  </Box>
-                </MenuItem>
-                <MenuItem value="number">
-                  <Box display="flex" alignItems="center" gap={1}>
-                    # Número
-                  </Box>
-                </MenuItem>
-              </Select>
-            </FormControl>
+                <option value="checkbox">☑ Casilla de verificación</option>
+                <option value="text">✎ Texto libre</option>
+                <option value="number"># Número</option>
+              </Box>
+            </Box>
           </Grid>
 
           {/* Mandatory Checkbox */}

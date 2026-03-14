@@ -74,55 +74,110 @@ const TemplateBasicInfo: React.FC<TemplateBasicInfoProps> = ({
       <Grid container spacing={3}>
         {/* Template Name Field */}
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Nombre de la Plantilla"
-            placeholder="Ej. Limpieza de Habitación"
-            value={template.name}
-            onChange={(e) => onChange('name', e.target.value)}
-            error={!!errors.name}
-            helperText={errors.name || 'Mínimo 3 caracteres, máximo 100'}
-            disabled={disabled}
-            variant="outlined"
-            size="medium"
-            aria-label="Nombre de la plantilla"
-            sx={{
-              '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
-            }}
-            inputProps={{
-              maxLength: 100,
-              'aria-describedby': 'name-helper',
-            }}
-          />
+          <Box>
+            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+              Nombre de la Plantilla <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+            </Typography>
+            <Box
+              component="input"
+              type="text"
+              placeholder="Ej. Limpieza de Habitación"
+              value={template.name}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange('name', e.target.value)}
+              disabled={disabled}
+              maxLength={100}
+              sx={{
+                width: '100%',
+                height: 44,
+                px: 2,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: errors.name ? 'error.main' : '#E2E8F0',
+                bgcolor: 'white',
+                fontSize: '0.9375rem',
+                outline: 'none',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:focus': {
+                  borderColor: '#415EDE',
+                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                },
+                '&:hover:not(:focus)': {
+                  borderColor: '#415EDE',
+                },
+                '&:disabled': {
+                  bgcolor: '#F8FAFC',
+                  cursor: 'not-allowed',
+                  borderColor: '#E2E8F0',
+                }
+              }}
+            />
+            {errors.name && (
+              <Typography variant="caption" sx={{ color: 'error.main', mt: 0.5, display: 'block' }}>
+                {errors.name}
+              </Typography>
+            )}
+            {!errors.name && (
+              <Typography variant="caption" sx={{ color: 'text.disabled', mt: 0.5, display: 'block' }}>
+                Mínimo 3 caracteres, máximo 100
+              </Typography>
+            )}
+          </Box>
         </Grid>
 
         {/* Priority Field */}
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Prioridad"
-            type="number"
-            placeholder="1-10"
-            value={template.priority}
-            onChange={(e) => {
-              const value = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
-              onChange('priority', value);
-            }}
-            error={!!errors.priority}
-            helperText={errors.priority || 'Rango: 1 (baja) a 10 (alta)'}
-            disabled={disabled}
-            variant="outlined"
-            size="medium"
-            sx={{
-              '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
-            }}
-            inputProps={{
-              min: 1,
-              max: 10,
-              'aria-describedby': 'priority-helper',
-            }}
-            aria-label="Prioridad de la plantilla"
-          />
+          <Box>
+            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+              Prioridad
+            </Typography>
+            <Box
+              component="input"
+              type="number"
+              placeholder="1-10"
+              value={template.priority}
+              min={1}
+              max={10}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
+                onChange('priority', value);
+              }}
+              disabled={disabled}
+              sx={{
+                width: '100%',
+                height: 44,
+                px: 2,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: errors.priority ? 'error.main' : '#E2E8F0',
+                bgcolor: 'white',
+                fontSize: '0.9375rem',
+                outline: 'none',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:focus': {
+                  borderColor: '#415EDE',
+                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                },
+                '&:hover:not(:focus)': {
+                  borderColor: '#415EDE',
+                },
+                '&:disabled': {
+                  bgcolor: '#F8FAFC',
+                  cursor: 'not-allowed',
+                  borderColor: '#E2E8F0',
+                }
+              }}
+            />
+            {errors.priority && (
+              <Typography variant="caption" sx={{ color: 'error.main', mt: 0.5, display: 'block' }}>
+                {errors.priority}
+              </Typography>
+            )}
+            {!errors.priority && (
+              <Typography variant="caption" sx={{ color: 'text.disabled', mt: 0.5, display: 'block' }}>
+                Rango: 1 (baja) a 10 (alta)
+              </Typography>
+            )}
+          </Box>
         </Grid>
 
         {/* Active Status Toggle */}
@@ -132,12 +187,17 @@ const TemplateBasicInfo: React.FC<TemplateBasicInfoProps> = ({
               display: 'flex',
               alignItems: 'center',
               height: '100%',
-              minHeight: '56px',
-              px: 2,
+              minHeight: 80,
+              px: 2.5,
+              py: 2,
               border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: '4px',
+              borderColor: '#E2E8F0',
+              borderRadius: 3,
               backgroundColor: 'white',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                borderColor: '#415EDE',
+              }
             }}
           >
             <FormControlLabel
@@ -146,24 +206,28 @@ const TemplateBasicInfo: React.FC<TemplateBasicInfoProps> = ({
                   checked={template.isActive}
                   onChange={(e) => onChange('isActive', e.target.checked)}
                   disabled={disabled}
-                  aria-label="Activar plantilla"
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: '#415EDE',
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: '#415EDE',
+                    },
+                  }}
                 />
               }
               label={
-                <Box>
-                  <Typography variant="body2" fontWeight={500}>
+                <Box sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
                     {template.isActive ? 'Plantilla Activa' : 'Plantilla Inactiva'}
                   </Typography>
-                  <Typography variant="caption" color="textSecondary">
+                  <Typography variant="caption" color="text.secondary">
                     {template.isActive
                       ? 'Disponible para asignar a usuarios'
                       : 'No se puede asignar a nuevas tareas'}
                   </Typography>
                 </Box>
               }
-              slotProps={{
-                typography: { component: 'div' },
-              }}
             />
           </Box>
         </Grid>

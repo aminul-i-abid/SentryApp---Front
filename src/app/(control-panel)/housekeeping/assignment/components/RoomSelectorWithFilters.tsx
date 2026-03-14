@@ -186,14 +186,27 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
           alignItems: 'flex-end',
         }}
       >
-        <FormControl size="small" sx={{ minWidth: 180 }} disabled={disabled || blocksLoading}>
+        <FormControl size="small" sx={{ 
+          minWidth: 180,
+          '& .MuiInputLabel-root.Mui-focused': {
+            color: '#415EDE',
+          },
+        }} disabled={disabled || blocksLoading}>
           <InputLabel id="room-filter-block-label">Pabellón</InputLabel>
           <Select
             labelId="room-filter-block-label"
             value={filterBlockId}
             label="Pabellón"
             onChange={(e: SelectChangeEvent<string>) => setFilterBlockId(e.target.value)}
-            sx={{ bgcolor: 'white' }}
+            sx={{ 
+              bgcolor: 'white',
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#415EDE',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#415EDE',
+              },
+            }}
             MenuProps={{
               PaperProps: {
                 sx: {
@@ -223,8 +236,17 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
           disabled={disabled}
           sx={{
             width: 100,
-            "& .MuiInputBase-root": {
+            "& .MuiOutlinedInput-root": {
               bgcolor: 'white',
+              '&:hover fieldset': {
+                borderColor: '#415EDE',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#415EDE',
+              },
+            },
+            '& .MuiInputLabel-root.Mui-focused': {
+              color: '#415EDE',
             },
           }}
           inputProps={{ min: 0 }}
@@ -238,9 +260,18 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
           disabled={disabled}
           sx={{
             width: 160,
-            "& .MuiInputBase-root": {
-              backgroundColor: "white"
-            }
+            "& .MuiOutlinedInput-root": {
+              bgcolor: 'white',
+              '&:hover fieldset': {
+                borderColor: '#415EDE',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#415EDE',
+              },
+            },
+            '& .MuiInputLabel-root.Mui-focused': {
+              color: '#415EDE',
+            },
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {

@@ -96,113 +96,153 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
       <Grid container spacing={3}>
         {/* Rule Name Field */}
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Nombre de la Regla"
-            placeholder="Ej: Limpieza después de checkout"
-            value={ruleName}
-            onChange={handleNameChange}
-            error={!!errors.name}
-            helperText={errors.name || 'Asigne un nombre descriptivo para la regla'}
-            inputProps={{ maxLength: 100 }}
-            variant="outlined"
-            size="small"
-            sx={{
-              '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
-            }}
-          />
+          <Box>
+            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+              Nombre de la Regla <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+            </Typography>
+            <Box
+              component="input"
+              type="text"
+              placeholder="Ej: Limpieza después de checkout"
+              value={ruleName}
+              onChange={handleNameChange}
+              maxLength={100}
+              sx={{
+                width: '100%',
+                height: 44,
+                px: 2,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: errors.name ? 'error.main' : '#E2E8F0',
+                bgcolor: 'white',
+                fontSize: '0.9375rem',
+                outline: 'none',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:focus': {
+                  borderColor: '#415EDE',
+                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                },
+                '&:hover:not(:focus)': {
+                  borderColor: '#415EDE',
+                }
+              }}
+            />
+            <Typography variant="caption" sx={{ color: errors.name ? 'error.main' : 'text.disabled', mt: 0.5, display: 'block' }}>
+              {errors.name || 'Asigne un nombre descriptivo para la regla'}
+            </Typography>
+          </Box>
         </Grid>
 
         {/* Priority Field */}
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            type="number"
-            label="Prioridad"
-            placeholder="1-5"
-            value={priority}
-            onChange={handlePriorityChange}
-            error={!!errors.priority}
-            helperText={
-              errors.priority ||
-              'Prioridad relativa de la regla (1=muy baja, 5=muy alta)'
-            }
-            inputProps={{ min: 1, max: 5, pattern: '[1-5]' }}
-            variant="outlined"
-            size="small"
-            sx={{
-              '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
-            }}
-          />
+          <Box>
+            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+              Prioridad
+            </Typography>
+            <Box
+              component="input"
+              type="number"
+              placeholder="1-5"
+              value={priority}
+              min={1}
+              max={5}
+              onChange={handlePriorityChange}
+              sx={{
+                width: '100%',
+                height: 44,
+                px: 2,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: errors.priority ? 'error.main' : '#E2E8F0',
+                bgcolor: 'white',
+                fontSize: '0.9375rem',
+                outline: 'none',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:focus': {
+                  borderColor: '#415EDE',
+                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                },
+                '&:hover:not(:focus)': {
+                  borderColor: '#415EDE',
+                }
+              }}
+            />
+            <Typography variant="caption" sx={{ color: errors.priority ? 'error.main' : 'text.disabled', mt: 0.5, display: 'block' }}>
+              {errors.priority || 'Prioridad relativa de la regla (1=muy baja, 5=muy alta)'}
+            </Typography>
+          </Box>
         </Grid>
 
         {/* Template Selection */}
         <Grid item xs={12} md={8}>
-          <FormControl fullWidth size="small" error={!!errors.templateId}>
-            <InputLabel id="template-select-label">Template de Checklist</InputLabel>
-            <Select
-              labelId="template-select-label"
-              id="template-select"
+          <Box>
+            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+              Template de Checklist <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+            </Typography>
+            <Box
+              component="select"
               value={templateId}
-              onChange={handleTemplateChange}
-              label="Template de Checklist"
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange('templateId', e.target.value)}
               sx={{
-                backgroundColor: 'white',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  backgroundColor: 'transparent',
+                width: '100%',
+                height: 44,
+                px: 2,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: errors.templateId ? 'error.main' : '#E2E8F0',
+                bgcolor: 'white',
+                fontSize: '0.9375rem',
+                outline: 'none',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center',
+                backgroundSize: '16px',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:focus': {
+                  borderColor: '#415EDE',
+                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
                 },
-                '& .MuiSelect-select': {
-                  backgroundColor: 'white',
-                }
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: { backgroundColor: 'white !important' }
+                '&:hover:not(:focus)': {
+                  borderColor: '#415EDE',
                 }
               }}
             >
-              <MenuItem value="">
-                <em>Seleccionar un template...</em>
-              </MenuItem>
+              <option value="">Seleccionar un template...</option>
               {availableTemplates.map((template) => (
-                <MenuItem key={template.id} value={template.id}>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography variant="body2">{template.name}</Typography>
-                    {template.categoryName && (
-                      <Chip
-                        label={template.categoryName}
-                        size="small"
-                        variant="outlined"
-                      />
-                    )}
-                  </Stack>
-                </MenuItem>
+                <option key={template.id} value={template.id}>
+                  {template.name} {template.categoryName ? `(${template.categoryName})` : ''}
+                </option>
               ))}
-            </Select>
+            </Box>
             {errors.templateId && (
               <Typography variant="caption" sx={{ color: 'error.main', mt: 0.5, display: 'block' }}>
                 {errors.templateId}
               </Typography>
             )}
-          </FormControl>
+          </Box>
         </Grid>
 
         {/* Template Description */}
         {selectedTemplate && (
           <Grid item xs={12} md={4}>
-            <Paper
+            <Box
               sx={{
                 p: 2,
-                backgroundColor: 'info.lighter',
+                backgroundColor: '#F0F9FF',
                 border: '1px solid',
-                borderColor: 'info.light',
-                borderRadius: 1,
+                borderColor: '#BAE6FD',
+                borderRadius: 2,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
               }}
             >
-              <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                TEMPLATE SELECCIONADO
+              <Typography variant="caption" sx={{ fontWeight: 600, color: '#0369A1', textTransform: 'uppercase' }}>
+                Template Seleccionado
               </Typography>
-              <Typography variant="body2" sx={{ mt: 1, mb: 0.5 }}>
+              <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 600 }}>
                 {selectedTemplate.name}
               </Typography>
               <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
@@ -210,87 +250,117 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
                   label={`${selectedTemplate.items.length} items`}
                   size="small"
                   variant="outlined"
+                  sx={{ borderColor: '#BAE6FD', color: '#0369A1' }}
                 />
                 <Chip
                   label={`Prioridad: ${selectedTemplate.priority}`}
                   size="small"
                   variant="outlined"
-                  color={selectedTemplate.priority >= 4 ? 'error' : 'default'}
+                  sx={{
+                    borderColor: selectedTemplate.priority >= 4 ? '#FECACA' : '#BAE6FD',
+                    color: selectedTemplate.priority >= 4 ? '#B91C1C' : '#0369A1'
+                  }}
                 />
-                {selectedTemplate.isActive && (
-                  <Chip label="Activo" size="small" color="success" />
-                )}
               </Stack>
-            </Paper>
+            </Box>
           </Grid>
         )}
 
         {/* TargetJobTag Selector */}
         <Grid item xs={12} md={8}>
-          <FormControl fullWidth size="small" error={!!errors.targetJobTag}>
-            <InputLabel id="target-job-tag-label">Categoría de Habitación (TAG)</InputLabel>
-            <Select
-              labelId="target-job-tag-label"
-              id="target-job-tag-select"
+          <Box>
+            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+              Categoría de Habitación (TAG)
+            </Typography>
+            <Box
+              component="select"
               value={targetJobTag ?? ''}
-              onChange={handleJobTagChange}
-              label="Categoría de Habitación (TAG)"
-              sx={{
-                backgroundColor: 'white',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  backgroundColor: 'transparent',
-                },
-                '& .MuiSelect-select': {
-                  backgroundColor: 'white',
-                }
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                const raw = e.target.value;
+                onChange('targetJobTag', raw === '' ? null : (raw as JobTagValue));
               }}
-              MenuProps={{
-                PaperProps: {
-                  sx: { backgroundColor: 'white !important' }
+              sx={{
+                width: '100%',
+                height: 44,
+                px: 2,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: '#E2E8F0',
+                bgcolor: 'white',
+                fontSize: '0.9375rem',
+                outline: 'none',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center',
+                backgroundSize: '16px',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:focus': {
+                  borderColor: '#415EDE',
+                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                },
+                '&:hover:not(:focus)': {
+                  borderColor: '#415EDE',
                 }
               }}
             >
-              <MenuItem value="">Todos (sin filtro)</MenuItem>
-              <MenuItem value="CategoriaA">CategoriaA — Gerente</MenuItem>
-              <MenuItem value="CategoriaB">CategoriaB — Supervisor</MenuItem>
-              <MenuItem value="CategoriaC">CategoriaC — Trabajador</MenuItem>
-            </Select>
-            <FormHelperText>
+              <option value="">Todos (sin filtro)</option>
+              <option value="CategoriaA">CategoriaA — Gerente</option>
+              <option value="CategoriaB">CategoriaB — Supervisor</option>
+              <option value="CategoriaC">CategoriaC — Trabajador</option>
+            </Box>
+            <Typography variant="caption" sx={{ color: 'text.disabled', mt: 0.5, display: 'block' }}>
               {errors.targetJobTag || 'Define a qué categoría de habitación aplica esta regla'}
-            </FormHelperText>
-          </FormControl>
+            </Typography>
+          </Box>
         </Grid>
 
         {/* Active Status Toggle */}
         <Grid item xs={12}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isActive}
-                onChange={handleActiveChange}
-                color="primary"
-              />
-            }
-            label={
-              <Box>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  Regla Activa
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {isActive
-                    ? 'La regla está activa y se aplicará automáticamente'
-                    : 'La regla está inactiva. Puedes activarla cuando esté lista'}
-                </Typography>
-              </Box>
-            }
+          <Box
             sx={{
-              p: 2,
+              p: 2.5,
               border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
+              borderColor: '#E2E8F0',
+              borderRadius: 3,
               backgroundColor: "white",
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                borderColor: '#415EDE',
+              }
             }}
-          />
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isActive}
+                  onChange={handleActiveChange}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: '#415EDE',
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: '#415EDE',
+                    },
+                  }}
+                />
+              }
+              label={
+                <Box sx={{ ml: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                    Regla Activa
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                    {isActive
+                      ? 'La regla está activa y se aplicará automáticamente'
+                      : 'La regla está inactiva. Puedes activarla cuando esté lista'}
+                  </Typography>
+                </Box>
+              }
+            />
+          </Box>
         </Grid>
       </Grid>
     </Box>

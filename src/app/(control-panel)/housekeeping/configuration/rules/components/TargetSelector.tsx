@@ -212,7 +212,7 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
       <RadioGroup value={appliesTo} onChange={handleScopeChange}>
         <FormControlLabel
           value="camp"
-          control={<Radio />}
+          control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
           label={
             <Box>
               <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -227,7 +227,7 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
         />
         <FormControlLabel
           value="block"
-          control={<Radio />}
+          control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
           label={
             <Box>
               <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -242,7 +242,7 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
         />
         <FormControlLabel
           value="room"
-          control={<Radio />}
+          control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
           label={
             <Box>
               <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -257,7 +257,7 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
         />
         <FormControlLabel
           value="jobTag"
-          control={<Radio />}
+          control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
           label={
             <Box>
               <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -315,6 +315,7 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
                       <Checkbox
                         checked={isSelected}
                         onChange={() => handleBlockToggle(block.id)}
+                        sx={{ '&.Mui-checked': { color: '#415EDE' } }}
                       />
                     }
                     label={
@@ -377,7 +378,19 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
             InputProps={{
               startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
             }}
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'white',
+                '&:hover fieldset': {
+                  borderColor: '#415EDE',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#415EDE',
+                  borderWidth: '2px',
+                }
+              }
+            }}
           />
 
           {/* Select All / Deselect All Buttons */}
@@ -418,6 +431,7 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
                       <Checkbox
                         checked={isSelected}
                         onChange={() => handleRoomToggle(room.id)}
+                        sx={{ '&.Mui-checked': { color: '#415EDE' } }}
                       />
                     }
                     label={
@@ -501,7 +515,7 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
           >
             <FormControlLabel
               value="CategoriaA"
-              control={<Radio />}
+              control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
               label={
                 <Box>
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -513,7 +527,7 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
             />
             <FormControlLabel
               value="CategoriaB"
-              control={<Radio />}
+              control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
               label={
                 <Box>
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -525,7 +539,7 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
             />
             <FormControlLabel
               value="CategoriaC"
-              control={<Radio />}
+              control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
               label={
                 <Box>
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>

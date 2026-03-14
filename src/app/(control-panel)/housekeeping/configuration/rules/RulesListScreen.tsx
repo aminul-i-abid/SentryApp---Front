@@ -429,7 +429,19 @@ const RulesListScreen: React.FC = () => {
               value={listState.filters.searchTerm}
               onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
               sx={{
-                '& .MuiOutlinedInput-root': { backgroundColor: 'white' }
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'white',
+                  '&:hover fieldset': {
+                    borderColor: '#415EDE',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#415EDE',
+                    borderWidth: '2px',
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#415EDE',
+                },
               }}
               InputProps={{
                 startAdornment: (
@@ -443,12 +455,27 @@ const RulesListScreen: React.FC = () => {
 
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel>Template</InputLabel>
+              <InputLabel
+                sx={{
+                  '&.Mui-focused': { color: '#415EDE' }
+                }}
+              >
+                Template
+              </InputLabel>
               <Select
                 value={listState.filters.templateId || ''}
                 onChange={(e) => handleFilterChange('templateId', e.target.value || undefined)}
                 label="Template"
-                sx={{ bgcolor: 'white' }}
+                sx={{
+                  bgcolor: 'white',
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                    borderWidth: '2px',
+                  },
+                }}
                 MenuProps={{
                   PaperProps: {
                     sx: {
@@ -469,12 +496,27 @@ const RulesListScreen: React.FC = () => {
 
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Tipo de Trigger</InputLabel>
+              <InputLabel
+                sx={{
+                  '&.Mui-focused': { color: '#415EDE' }
+                }}
+              >
+                Tipo de Trigger
+              </InputLabel>
               <Select
                 value={listState.filters.triggerType || ''}
                 onChange={(e) => handleFilterChange('triggerType', e.target.value || undefined)}
                 label="Tipo de Trigger"
-                sx={{ bgcolor: 'white' }}
+                sx={{
+                  bgcolor: 'white',
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                    borderWidth: '2px',
+                  },
+                }}
                 MenuProps={{
                   PaperProps: {
                     sx: {
@@ -494,12 +536,27 @@ const RulesListScreen: React.FC = () => {
 
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Estado</InputLabel>
+              <InputLabel
+                sx={{
+                  '&.Mui-focused': { color: '#415EDE' }
+                }}
+              >
+                Estado
+              </InputLabel>
               <Select
                 value={listState.filters.isActive === undefined ? '' : String(listState.filters.isActive)}
                 onChange={(e) => handleFilterChange('isActive', e.target.value === '' ? undefined : e.target.value === 'true')}
                 label="Estado"
-                sx={{ bgcolor: 'white' }}
+                sx={{
+                  bgcolor: 'white',
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                    borderWidth: '2px',
+                  },
+                }}
                 MenuProps={{
                   PaperProps: {
                     sx: {
@@ -517,12 +574,27 @@ const RulesListScreen: React.FC = () => {
 
           <Grid item xs={12} md={1}>
             <FormControl fullWidth size="small">
-              <InputLabel>Categoría</InputLabel>
+              <InputLabel
+                sx={{
+                  '&.Mui-focused': { color: '#415EDE' }
+                }}
+              >
+                Categoría
+              </InputLabel>
               <Select
                 value={listState.filters.targetJobTag ?? ''}
                 onChange={(e) => handleFilterChange('targetJobTag', (e.target.value as JobTagValue) || undefined)}
                 label="Categoría"
-                sx={{ bgcolor: 'white' }}
+                sx={{
+                  bgcolor: 'white',
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                    borderWidth: '2px',
+                  },
+                }}
                 MenuProps={{
                   PaperProps: {
                     sx: {

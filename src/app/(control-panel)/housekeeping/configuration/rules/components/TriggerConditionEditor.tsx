@@ -154,19 +154,19 @@ const TriggerConditionEditor: React.FC<TriggerConditionEditorProps> = ({
                   p: 2,
                   cursor: 'pointer',
                   border: '2px solid',
-                  borderColor: triggerType === option.type ? 'primary.main' : 'divider',
+                  borderColor: triggerType === option.type ? '#415EDE' : 'divider',
                   backgroundColor:
-                    triggerType === option.type ? 'primary.lighter' : 'background.paper',
+                    triggerType === option.type ? 'rgba(65, 94, 222, 0.05)' : 'background.paper',
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    borderColor: 'primary.main',
-                    boxShadow: 1,
+                    borderColor: '#415EDE',
+                    boxShadow: '0 4px 12px rgba(65, 94, 222, 0.1)',
                   },
                 }}
               >
                 <FormControlLabel
                   value={option.type}
-                  control={<Radio />}
+                  control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
                   label={
                     <Box sx={{ width: '100%' }}>
                       <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ mb: 1 }}>
@@ -210,42 +210,62 @@ const TriggerConditionEditor: React.FC<TriggerConditionEditorProps> = ({
 
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Días de Intervalo"
-                placeholder="7"
-                value={daysInterval || 7}
-                onChange={handleDaysIntervalChange}
-                error={!!errors.daysInterval}
-                helperText={
-                  errors.daysInterval ||
-                  'Intervalo entre 1 y 30 días. La regla se ejecutará cada X días'
-                }
-                inputProps={{ min: 1, max: 30, step: 1 }}
-                variant="outlined"
-                size="small"
-              />
+              <Box>
+                <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+                  Días de Intervalo
+                </Typography>
+                <Box
+                  component="input"
+                  type="number"
+                  placeholder="7"
+                  value={daysInterval || 7}
+                  min={1}
+                  max={30}
+                  onChange={handleDaysIntervalChange}
+                  sx={{
+                    width: '100%',
+                    height: 44,
+                    px: 2,
+                    borderRadius: 2,
+                    border: '1px solid',
+                    borderColor: errors.daysInterval ? 'error.main' : '#E2E8F0',
+                    bgcolor: 'white',
+                    fontSize: '0.9375rem',
+                    outline: 'none',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:focus': {
+                      borderColor: '#415EDE',
+                      boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
+                    },
+                    '&:hover:not(:focus)': {
+                      borderColor: '#415EDE',
+                    }
+                  }}
+                />
+                <Typography variant="caption" sx={{ color: errors.daysInterval ? 'error.main' : 'text.disabled', mt: 0.5, display: 'block' }}>
+                  {errors.daysInterval || 'Intervalo entre 1 y 30 días. La regla se ejecutará cada X días'}
+                </Typography>
+              </Box>
             </Grid>
 
             <Grid item xs={12} sm={6} md={8}>
-              <Paper
+              <Box
                 sx={{
                   p: 2,
-                  backgroundColor: 'info.lighter',
+                  backgroundColor: '#F0F9FF',
                   border: '1px solid',
-                  borderColor: 'info.light',
-                  borderRadius: 1,
+                  borderColor: '#BAE6FD',
+                  borderRadius: 2,
                   height: '100%',
                   display: 'flex',
                   alignItems: 'center',
                 }}
               >
                 <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                    INFORMACIÓN
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#0369A1', textTransform: 'uppercase' }}>
+                    Información
                   </Typography>
-                  <Typography variant="body2" sx={{ mt: 0.5 }}>
+                  <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 500 }}>
                     {daysInterval === 1
                       ? 'La regla se ejecutará diariamente'
                       : daysInterval === 7
@@ -253,7 +273,7 @@ const TriggerConditionEditor: React.FC<TriggerConditionEditorProps> = ({
                         : `La regla se ejecutará cada ${daysInterval} días`}
                   </Typography>
                 </Box>
-              </Paper>
+              </Box>
             </Grid>
           </Grid>
         </Box>
