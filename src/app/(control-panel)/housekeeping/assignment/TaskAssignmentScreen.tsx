@@ -23,7 +23,10 @@ import {
   StepLabel,
   Stepper,
   Typography,
+  StepConnector,
+  stepConnectorClasses,
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import InfoIcon from '@mui/icons-material/InfoOutlined';
 import { useAppDispatch } from '@/store/hooks';
 import { createAssignmentGroup } from '@/store/housekeeping/assignmentGroupThunks';
@@ -39,6 +42,70 @@ import AssignmentLevelPicker from './components/AssignmentLevelPicker';
 import BlockFloorSelector from './components/BlockFloorSelector';
 import RoomSelectorWithFilters from './components/RoomSelectorWithFilters';
 import ConfirmAssignmentSummary from './components/ConfirmAssignmentSummary';
+
+// ─── Custom Stepper Connector ──────────────────────────────────────────────────
+const CustomConnector = styled(StepConnector)(({ theme }) => ({
+  [`&.${stepConnectorClasses.alternativeLabel}`]: {
+    top: 10,
+    left: 'calc(-50% + 16px)',
+    right: 'calc(50% + 16px)',
+  },
+  [`&.${stepConnectorClasses.active}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      borderColor: '#9CA3AF',
+    },
+  },
+  [`&.${stepConnectorClasses.completed}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      borderColor: '#9CA3AF',
+    },
+  },
+  [`& .${stepConnectorClasses.line}`]: {
+    borderColor: '#D1D5DB',
+    borderTopWidth: 2,
+    borderTopStyle: 'dashed',
+    borderRadius: 1,
+  },
+}));
+
+// ─── Custom Step Icon ─────────────────────────────────────────────────────────
+import { StepIconProps } from '@mui/material';
+
+const CustomStepIcon = (props: StepIconProps) => {
+  const { active, completed, className, icon } = props;
+
+  return (
+    <Box
+      className={className}
+      sx={{
+        width: 32,
+        height: 32,
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: active || completed ? '#415EDE' : '#9CA3AF',
+        color: 'white',
+      }}
+    >
+      <Box
+        sx={{
+          width: 24,
+          height: 24,
+          borderRadius: '50%',
+          border: '1px solid white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem', lineHeight: 1 }}>
+          {icon}
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
 
 // ─── Step labels ──────────────────────────────────────────────────────────────
 
@@ -97,39 +164,26 @@ const TaskAssignmentScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const { data: user } = useUser();
 
-  // Current camp and user derived from auth.
-  // companyId IS the campId in this single-camp-per-company model (consistent with
-  // RulesListScreen, TareasListScreen and all other housekeeping screens).
-  // Parsed to number because the backend expects long CampId / long RoomIds.
   const campIdStr: string = user?.companyId || '1';
   const campIdNum: number = parseInt(campIdStr, 10);
   const currentUserId: string = user?.id ?? '';
   const campName = 'Campamento';
 
-  // Stepper state
   const [activeStep, setActiveStep] = useState<number>(0);
-
-  // Form values
   const [formState, setFormState] = useState<AssignmentFormState>(initialFormState);
-
-  // Submission flag
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  // Snackbars
   const [snackbar, setSnackbar] = useState<SnackbarState>({
     open: false,
     message: '',
     severity: 'success',
   });
 
-  // ─── Step validation ──────────────────────────────────────────────────────
-
   const isStepValid = (step: number): boolean => {
     switch (step) {
       case 0:
         return formState.selectedOperators.length > 0;
       case 1:
-        return true; // level always has a default
+        return true;
       case 2:
         if (formState.selectedLevel === 'camp') return true;
         if (formState.selectedLevel === 'block') return formState.selectedRooms.length > 0;
@@ -142,17 +196,8 @@ const TaskAssignmentScreen: React.FC = () => {
     }
   };
 
-  // ─── Navigation handlers ──────────────────────────────────────────────────
-
-  const handleNext = () => {
-    setActiveStep((prev) => prev + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prev) => prev - 1);
-  };
-
-  // ─── Level change: reset downstream selections ────────────────────────────
+  const handleNext = () => setActiveStep((prev) => prev + 1);
+  const handleBack = () => setActiveStep((prev) => prev - 1);
 
   const handleLevelChange = (level: AssignmentLevel) => {
     setFormState((prev) => ({
@@ -165,28 +210,20 @@ const TaskAssignmentScreen: React.FC = () => {
     }));
   };
 
-  // ─── Submit ───────────────────────────────────────────────────────────────
-
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // When the user selected 'block' level and picked floors via BlockFloorSelector,
-      // the form produces explicit roomIds — not a single targetBlockId.
-      // The backend validator requires targetBlockId when level === 'block', so we
-      // submit level 'rooms' instead, which is semantically correct for explicit room lists.
       const effectiveLevel: AssignmentLevel =
         formState.selectedLevel === 'block' ? 'rooms' : formState.selectedLevel;
 
       const request: CreateAssignmentGroupRequest = {
         campId: campIdNum,
         level: effectiveLevel,
-        // targetBlockId is only needed for true block-level assignments (not floor-based)
         targetBlockId:
           formState.selectedLevel !== 'block' && formState.selectedBlockId !== null
             ? parseInt(formState.selectedBlockId, 10)
             : undefined,
         operatorUserIds: formState.selectedOperators.map((o) => o.id),
-        // roomIds are long[] on the backend — parse each string ID to number
         roomIds: formState.selectedRooms.map((r) => parseInt(r.id, 10)),
         createdByUserId: currentUserId,
       };
@@ -199,7 +236,6 @@ const TaskAssignmentScreen: React.FC = () => {
         severity: 'success',
       });
 
-      // Reset form and return to step 0
       setFormState(initialFormState);
       setActiveStep(0);
     } catch {
@@ -217,225 +253,256 @@ const TaskAssignmentScreen: React.FC = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  // ─── Render ───────────────────────────────────────────────────────────────
-
   return (
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100%',
+        bgcolor: '#fff',
+        p: { xs: 2, md: 4 },
       }}
     >
-      {/* Sticky header: title + stepper */}
-      <Box
-        sx={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          px: 4,
-          pt: 4,
-          pb: 0,
-          bgcolor: 'white',
-        }}
-      >
-        <Typography variant="h5" gutterBottom>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
           Nueva Asignación de Operarios
         </Typography>
-
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        <Typography variant="body2" color="text.secondary">
           Sigue los pasos para asignar operarios a habitaciones del campamento.
         </Typography>
-
-        <Stepper activeStep={activeStep} sx={{ mb: 2 }}>
-          {STEPS.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
       </Box>
 
-      {/* Step content */}
-      <Box sx={{ flex: 1, px: 4, py: 3, bgcolor: 'white' }}>
-        {/* Step 0 — Seleccionar Operarios */}
-        {activeStep === 0 && (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Seleccionar Operarios
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Busque y agregue los operarios que recibirán esta asignación.
-            </Typography>
-            <OperatorMultiSelector
-              campId={campIdStr}
-              selectedOperators={formState.selectedOperators}
-              onOperatorsChange={(operators) =>
-                setFormState((prev) => ({ ...prev, selectedOperators: operators }))
-              }
-              disabled={isSubmitting}
-            />
-          </Box>
-        )}
+      <Box className='p-4 bg-[#f7f7f7] rounded-[8px]'>
+        <Box
+          sx={{
+            bgcolor: 'white',
+            borderRadius: '8px',
+            p: { xs: 3, md: 4 },
+            minHeight: '600px',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: "#fff",
 
-        {/* Step 1 — Nivel de Asignación */}
-        {activeStep === 1 && (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Nivel de Asignación
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Seleccione el alcance de la asignación.
-            </Typography>
-            <AssignmentLevelPicker
-              selectedLevel={formState.selectedLevel}
-              onLevelChange={handleLevelChange}
-              campName={campName}
-              disabled={isSubmitting}
-            />
-          </Box>
-        )}
+          }}
+        >
+          <Stepper
+            activeStep={activeStep}
+            connector={<CustomConnector />}
+            sx={{
+              mb: 5,
+              pb: 4,
+              borderBottom: '1px solid #F3F4F6',
+              '& .MuiStepLabel-label': {
+                fontWeight: 500,
+                fontSize: '14px',
+              },
+              '& .MuiStepLabel-label.Mui-active': {
+                color: '#111827',
+                fontWeight: 600,
+              },
+            }}
+          >
+            {STEPS.map((label) => (
+              <Step key={label}>
+                <StepLabel StepIconComponent={CustomStepIcon}>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
 
-        {/* Step 2 — Objetivo (conditional by level) */}
-        {activeStep === 2 && (
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Objetivo
-            </Typography>
-
-            {formState.selectedLevel === 'camp' && (
-              <Alert severity="info" icon={<InfoIcon />}>
-                Se asignarán{' '}
-                <strong>{formState.selectedOperators.length}</strong> operario
-                {formState.selectedOperators.length !== 1 ? 's' : ''} a{' '}
-                <strong>TODAS</strong> las habitaciones del campamento{' '}
-                <strong>{campName}</strong>. No es necesario seleccionar un
-                objetivo adicional.
-              </Alert>
-            )}
-
-            {formState.selectedLevel === 'block' && (
+          <Box sx={{ flex: 1, mb: 4 }}>
+            {activeStep === 0 && (
               <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Seleccione los pisos del pabellón que se asignarán a los operarios.
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
+                  Seleccionar Operarios
                 </Typography>
-                <BlockFloorSelector
+                <Typography variant="body2" sx={{ color: '#6B7280', mb: 3 }}>
+                  Busque y agregue los operarios que recibirán esta asignación.
+                </Typography>
+                <OperatorMultiSelector
                   campId={campIdStr}
-                  selectedRooms={formState.selectedRooms}
-                  onRoomsChange={(rooms) =>
-                    setFormState((prev) => ({
-                      ...prev,
-                      selectedRooms: rooms,
-                      // Keep selectedBlockName in sync with the first room's block (for confirmation step)
-                      selectedBlockName: rooms.length > 0 ? rooms[0].blockName : '',
-                    }))
+                  selectedOperators={formState.selectedOperators}
+                  onOperatorsChange={(operators) =>
+                    setFormState((prev) => ({ ...prev, selectedOperators: operators }))
                   }
                   disabled={isSubmitting}
                 />
               </Box>
             )}
 
-            {formState.selectedLevel === 'rooms' && (
+            {activeStep === 1 && (
               <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Seleccione las habitaciones individuales para esta asignación.
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
+                  Nivel de Asignación
                 </Typography>
-                <RoomSelectorWithFilters
-                  campId={campIdStr}
-                  selectedRooms={formState.selectedRooms}
-                  onRoomsChange={(rooms) =>
-                    setFormState((prev) => ({ ...prev, selectedRooms: rooms }))
-                  }
+                <Typography variant="body2" sx={{ color: '#6B7280', mb: 3 }}>
+                  Seleccione el alcance de la asignación.
+                </Typography>
+                <AssignmentLevelPicker
+                  selectedLevel={formState.selectedLevel}
+                  onLevelChange={handleLevelChange}
+                  campName={campName}
                   disabled={isSubmitting}
                 />
               </Box>
             )}
+
+            {activeStep === 2 && (
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
+                  Objetivo
+                </Typography>
+
+                {formState.selectedLevel === 'camp' && (
+                  <Alert severity="info" icon={<InfoIcon />}>
+                    Se asignarán{' '}
+                    <strong>{formState.selectedOperators.length}</strong> operario
+                    {formState.selectedOperators.length !== 1 ? 's' : ''} a{' '}
+                    <strong>TODAS</strong> las habitaciones del campamento{' '}
+                    <strong>{campName}</strong>. No es necesario seleccionar un
+                    objetivo adicional.
+                  </Alert>
+                )}
+
+                {formState.selectedLevel === 'block' && (
+                  <Box>
+                    <Typography variant="body2" sx={{ color: '#6B7280', mb: 3 }}>
+                      Seleccione los pisos del pabellón que se asignarán a los operarios.
+                    </Typography>
+                    <BlockFloorSelector
+                      campId={campIdStr}
+                      selectedRooms={formState.selectedRooms}
+                      onRoomsChange={(rooms) =>
+                        setFormState((prev) => ({
+                          ...prev,
+                          selectedRooms: rooms,
+                          selectedBlockName: rooms.length > 0 ? rooms[0].blockName : '',
+                        }))
+                      }
+                      disabled={isSubmitting}
+                    />
+                  </Box>
+                )}
+
+                {formState.selectedLevel === 'rooms' && (
+                  <Box>
+                    <Typography variant="body2" sx={{ color: '#6B7280', mb: 3 }}>
+                      Seleccione las habitaciones individuales para esta asignación.
+                    </Typography>
+                    <RoomSelectorWithFilters
+                      campId={campIdStr}
+                      selectedRooms={formState.selectedRooms}
+                      onRoomsChange={(rooms) =>
+                        setFormState((prev) => ({ ...prev, selectedRooms: rooms }))
+                      }
+                      disabled={isSubmitting}
+                    />
+                  </Box>
+                )}
+              </Box>
+            )}
+
+            {activeStep === 3 && (
+              <ConfirmAssignmentSummary
+                operators={formState.selectedOperators}
+                level={formState.selectedLevel}
+                campName={campName}
+                blockId={formState.selectedBlockId}
+                blockName={formState.selectedBlockName || undefined}
+                blockRoomCount={formState.selectedBlockRoomCount}
+                rooms={formState.selectedRooms}
+              />
+            )}
           </Box>
-        )}
 
-        {/* Step 3 — Confirmar */}
-        {activeStep === 3 && (
-          <ConfirmAssignmentSummary
-            operators={formState.selectedOperators}
-            level={formState.selectedLevel}
-            campName={campName}
-            blockId={formState.selectedBlockId}
-            blockName={formState.selectedBlockName || undefined}
-            blockRoomCount={formState.selectedBlockRoomCount}
-            rooms={formState.selectedRooms}
-          />
-        )}
-      </Box>
-
-      {/* Sticky bottom navigation — stays visible while page scrolls */}
-      <Box
-        sx={{
-          position: 'sticky',
-          bottom: 0,
-          zIndex: 10,
-          px: 3,
-          py: 2,
-          pb: { xs: 10, sm: 3 },
-          borderTop: 1,
-          borderColor: 'divider',
-          display: 'flex',
-          justifyContent: 'center',
-          gap: 2,
-          bgcolor: 'white',
-        }}
-      >
-        <Button
-          disabled={activeStep === 0 || isSubmitting}
-          onClick={handleBack}
-          variant="outlined"
-        >
-          Anterior
-        </Button>
-
-        <Button
-          variant="outlined"
-          disabled={isSubmitting}
-          onClick={() => window.history.back()}
-        >
-          Cancelar
-        </Button>
-
-        {activeStep < STEPS.length - 1 ? (
-          <Button
-            variant="contained"
-            disabled={!isStepValid(activeStep)}
-            onClick={handleNext}
+          <Box
             sx={{
-              bgcolor: '#415EDE',
-              color: 'white',
-              textTransform: 'none',
-              fontWeight: 600,
-              '&:hover': { bgcolor: '#354bb1' },
-              '&.Mui-disabled': { bgcolor: '#b0b0b0', color: '#fff' },
+              display: 'flex',
+              gap: 2,
+              justifyContent: 'flex-start',
             }}
           >
-            Siguiente
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            disabled={isSubmitting}
-            onClick={() => void handleSubmit()}
-            startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : undefined}
-            sx={{
-              bgcolor: '#415EDE',
-              color: 'white',
-              textTransform: 'none',
-              fontWeight: 600,
-              '&:hover': { bgcolor: '#354bb1' },
-            }}
-          >
-            {isSubmitting ? 'Guardando...' : 'Confirmar Asignación'}
-          </Button>
-        )}
+            <Button
+              disabled={activeStep === 0 || isSubmitting}
+              onClick={handleBack}
+              sx={{
+                bgcolor: '#F3F4F6',
+                color: activeStep === 0 ? '#9CA3AF' : '#4B5563',
+                textTransform: 'none',
+                fontWeight: 500,
+                borderRadius: '8px',
+                px: { xs: 2, sm: 3 },
+                py: 1,
+                boxShadow: 'none',
+                '&:hover': { bgcolor: '#E5E7EB', boxShadow: 'none' },
+                '&.Mui-disabled': { bgcolor: '#F3F4F6', color: '#9CA3AF' },
+              }}
+            >
+              Anterior
+            </Button>
+
+            <Button
+              disabled={isSubmitting}
+              onClick={() => window.history.back()}
+              sx={{
+                bgcolor: '#F3F4F6',
+                color: '#4B5563',
+                textTransform: 'none',
+                fontWeight: 500,
+                borderRadius: '8px',
+                px: { xs: 2, sm: 3 },
+                py: 1,
+                boxShadow: 'none',
+                '&:hover': { bgcolor: '#E5E7EB', boxShadow: 'none' },
+              }}
+            >
+              Cancelar
+            </Button>
+
+            {activeStep < STEPS.length - 1 ? (
+              <Button
+                variant="contained"
+                disabled={!isStepValid(activeStep)}
+                onClick={handleNext}
+                sx={{
+                  bgcolor: '#415EDE',
+                  color: 'white',
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  borderRadius: '8px',
+                  px: { xs: 2, sm: 3 },
+                  py: 1,
+                  boxShadow: 'none',
+                  '&:hover': { bgcolor: '#354BB1', boxShadow: 'none' },
+                  '&.Mui-disabled': { bgcolor: '#9CA3AF', color: '#F3F4F6' },
+                }}
+              >
+                Siguiente
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                disabled={isSubmitting}
+                onClick={() => void handleSubmit()}
+                startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : undefined}
+                sx={{
+                  bgcolor: '#415EDE',
+                  color: 'white',
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  borderRadius: '8px',
+                  px: { xs: 2, sm: 3 },
+                  py: 1,
+                  boxShadow: 'none',
+                  '&:hover': { bgcolor: '#354BB1', boxShadow: 'none' },
+                }}
+              >
+                {isSubmitting ? 'Guardando...' : 'Confirmar Asignación'}
+              </Button>
+            )}
+          </Box>
+        </Box>
       </Box>
 
-      {/* Success / error snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}

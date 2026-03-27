@@ -186,7 +186,7 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
           alignItems: 'flex-end',
         }}
       >
-        <FormControl size="small" sx={{ 
+        <FormControl size="small" sx={{
           minWidth: 180,
           '& .MuiInputLabel-root.Mui-focused': {
             color: '#415EDE',
@@ -198,7 +198,7 @@ const RoomSelectorWithFilters: React.FC<RoomSelectorWithFiltersProps> = ({
             value={filterBlockId}
             label="Pabellón"
             onChange={(e: SelectChangeEvent<string>) => setFilterBlockId(e.target.value)}
-            sx={{ 
+            sx={{
               bgcolor: 'white',
               '&:hover .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#415EDE',

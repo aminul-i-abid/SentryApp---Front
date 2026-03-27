@@ -8,7 +8,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { genericService } from '@/utils/apiService';
 import type { OperatorOption } from '@/store/housekeeping/housekeepingTypes';
 
@@ -170,25 +171,27 @@ const OperatorMultiSelector: React.FC<OperatorMultiSelectorProps> = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Buscar operario por RUT"
-            placeholder="Ingrese RUT o nombre..."
-            size="small"
+            placeholder="Buscar operario por RUT"
+            size="medium"
             fullWidth
             error={Boolean(searchError)}
             helperText={searchError ?? undefined}
             sx={{
-              bgcolor: 'white',
+              bgcolor: '#F9FAFB',
+              borderRadius: '8px',
               '& .MuiOutlinedInput-root': {
-                bgcolor: 'white',
+                bgcolor: '#F9FAFB',
+                borderRadius: '8px',
+                '& fieldset': {
+                  borderColor: 'transparent',
+                },
                 '&:hover fieldset': {
-                  borderColor: '#415EDE',
+                  borderColor: '#E5E7EB',
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: '#415EDE',
+                  borderColor: '#E5E7EB',
+                  borderWidth: '1px',
                 },
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: '#415EDE',
               },
             }}
             InputProps={{
@@ -206,7 +209,8 @@ const OperatorMultiSelector: React.FC<OperatorMultiSelectorProps> = ({
           paper: {
             sx: {
               bgcolor: 'white',
-              border: '6px solid #f3f4f6',
+              border: '1px solid #f3f4f6',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
             },
           },
         }}
@@ -229,25 +233,45 @@ const OperatorMultiSelector: React.FC<OperatorMultiSelectorProps> = ({
         <Box
           sx={{
             display: 'flex',
+            alignItems: 'center',
             flexWrap: 'wrap',
-            gap: 1,
-            mt: 2,
+            gap: 1.5,
+            mt: 3,
           }}
         >
+          <Box
+            sx={{
+              width: '2px',
+              height: '36px',
+              bgcolor: '#E5E7EB',
+              borderRadius: '2px',
+              mr: 0.5,
+            }}
+          />
           {selectedOperators.map((op) => (
             <Chip
               key={op.id}
               label={op.fullName}
-              avatar={
-                <Avatar>
-                  <PersonIcon fontSize="small" />
-                </Avatar>
-              }
+              icon={<PersonOutlineIcon style={{ color: '#000000ff', fontSize: '22px', marginLeft: '10px', backgroundColor: "#fff", padding: 2, borderRadius: "4px", marginRight: "2px" }} />}
+              deleteIcon={<img src="./assets/icons/cancel-circle.png" className='ml-1 mr-2' alt="" />}
               onDelete={disabled ? undefined : () => handleRemoveOperator(op.id)}
               disabled={disabled}
-              size="medium"
-              color="primary"
-              variant="outlined"
+              sx={{
+                bgcolor: '#FAFAFA',
+                border: '1px solid #E5E7EB',
+                color: '#000',
+                fontWeight: 400,
+                borderRadius: '8px',
+                height: '36px',
+                '& .MuiChip-label': {
+                  px: 1,
+                },
+                '& .MuiChip-deleteIcon': {
+                  '&:hover': {
+                    color: '#6B7280',
+                  }
+                }
+              }}
             />
           ))}
         </Box>

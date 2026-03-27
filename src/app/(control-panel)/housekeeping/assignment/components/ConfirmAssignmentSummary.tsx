@@ -115,17 +115,17 @@ const ConfirmAssignmentSummary: React.FC<ConfirmAssignmentSummaryProps> = ({
     level === 'camp'
       ? `Campamento completo: ${campName}`
       : level === 'block'
-      ? rooms.length > 0
-        ? `${blockFloorSummaries.length} pabellón${blockFloorSummaries.length !== 1 ? 'es' : ''} seleccionado${blockFloorSummaries.length !== 1 ? 's' : ''}`
-        : `Pabellón: ${blockName ?? blockId ?? '—'}`
-      : `${rooms.length} habitación${rooms.length !== 1 ? 'es' : ''} específica${rooms.length !== 1 ? 's' : ''}`;
+        ? rooms.length > 0
+          ? `${blockFloorSummaries.length} pabellón${blockFloorSummaries.length !== 1 ? 'es' : ''} seleccionado${blockFloorSummaries.length !== 1 ? 's' : ''}`
+          : `Pabellón: ${blockName ?? blockId ?? '—'}`
+        : `${rooms.length} habitación${rooms.length !== 1 ? 'es' : ''} específica${rooms.length !== 1 ? 's' : ''}`;
 
   return (
     <Stack spacing={2}>
       <Typography variant="h6">Resumen de Asignación</Typography>
 
       {/* Operators */}
-      <Paper variant="outlined" sx={{ p: 2 }}>
+      <Paper variant="outlined" sx={{ p: 2, backgroundColor: "#fff", borderRadius: "10px", border: "6px solid #f7f7f7" }}>
         <Typography variant="subtitle2" color="text.secondary" gutterBottom>
           Operarios seleccionados ({operators.length})
         </Typography>
@@ -153,7 +153,7 @@ const ConfirmAssignmentSummary: React.FC<ConfirmAssignmentSummaryProps> = ({
       </Paper>
 
       {/* Level */}
-      <Paper variant="outlined" sx={{ p: 2 }}>
+      <Paper variant="outlined" sx={{ p: 2, backgroundColor: "#fff", borderRadius: "10px", border: "6px solid #f7f7f7" }}>
         <Typography variant="subtitle2" color="text.secondary" gutterBottom>
           Nivel de asignación
         </Typography>
@@ -166,7 +166,7 @@ const ConfirmAssignmentSummary: React.FC<ConfirmAssignmentSummaryProps> = ({
       </Paper>
 
       {/* Room count */}
-      <Paper variant="outlined" sx={{ p: 2 }}>
+      <Paper variant="outlined" sx={{ p: 2, backgroundColor: "#fff", borderRadius: "10px", border: "6px solid #f7f7f7" }}>
         <Typography variant="subtitle2" color="text.secondary" gutterBottom>
           Total habitaciones afectadas
         </Typography>
@@ -182,7 +182,7 @@ const ConfirmAssignmentSummary: React.FC<ConfirmAssignmentSummaryProps> = ({
 
       {/* Block + floor breakdown — only for 'block' level */}
       {level === 'block' && blockFloorSummaries.length > 0 && (
-        <Paper variant="outlined" sx={{ p: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2, backgroundColor: "#fff", borderRadius: "10px", border: "6px solid #f7f7f7" }}>
           <Typography variant="subtitle2" color="text.secondary" gutterBottom>
             Detalle por pabellón y piso
           </Typography>

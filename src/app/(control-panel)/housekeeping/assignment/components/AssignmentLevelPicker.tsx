@@ -67,6 +67,10 @@ const AssignmentLevelPicker: React.FC<AssignmentLevelPickerProps> = ({
         display: 'flex',
         flexDirection: { xs: 'column', sm: 'row' },
         gap: 2,
+        border: '8px solid #f7f7f7',
+        borderRadius: "6px",
+        backgroundColor: "#f7f7f7",
+        padding: 1
       }}
     >
       {LEVEL_CARDS.map((card) => {
@@ -77,13 +81,16 @@ const AssignmentLevelPicker: React.FC<AssignmentLevelPickerProps> = ({
             key={card.value}
             sx={{
               flex: 1,
-              border: '2px solid',
-              borderColor: isSelected ? 'primary.main' : 'divider',
-              bgcolor: isSelected
-                ? alpha(theme.palette.primary.main, 0.08)
-                : 'background.paper',
+              bgcolor: "#fff",
               transition: 'border-color 0.2s, background-color 0.2s',
               opacity: disabled ? 0.6 : 1,
+              boxShadow: "none",
+              borderRadius: "6px",
+              border: isSelected ? "2px solid #415EDE" : "2px solid #f7f7f7",
+              "&:hover": {
+                bgcolor: "#f7f7f7",
+                cursor: "pointer",
+              }
             }}
           >
             <CardActionArea

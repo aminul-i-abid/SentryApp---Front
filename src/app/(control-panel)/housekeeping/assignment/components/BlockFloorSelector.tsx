@@ -345,7 +345,7 @@ const BlockFloorSelector: React.FC<BlockFloorSelectorProps> = ({
       )}
 
       {/* Block sections */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, }}>
         {groupsByBlock.map(({ blockId, blockName, floors }) => (
           <Box key={blockId}>
             {/* Block header */}
@@ -359,7 +359,7 @@ const BlockFloorSelector: React.FC<BlockFloorSelectorProps> = ({
             <Divider sx={{ mb: 1.5 }} />
 
             {/* Floor cards row */}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, }}>
               {floors.map((fg) => {
                 const selected = isFloorSelected(fg);
 
@@ -369,13 +369,17 @@ const BlockFloorSelector: React.FC<BlockFloorSelectorProps> = ({
                     variant="outlined"
                     sx={{
                       width: 150,
-                      border: '2px solid',
-                      borderColor: selected ? 'primary.main' : 'divider',
                       bgcolor: selected
                         ? alpha(theme.palette.primary.main, 0.08)
                         : 'background.paper',
                       position: 'relative',
                       transition: 'border-color 0.15s, background-color 0.15s',
+                      backgroundColor: "#fff",
+                      borderRadius: "10px",
+                      border: "6px solid #f7f7f7",
+                      "&:hover": {
+                        backgroundColor: "#f7f7f7 !important"
+                      }
                     }}
                   >
                     <CardActionArea
