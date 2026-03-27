@@ -684,14 +684,14 @@ const TareasListScreen: React.FC = () => {
                     <CardActions sx={{ p: 2.5, pt: 0, gap: 1.5 }}>
                       <Button
                         size="small"
-                        startIcon={<EditOutlinedIcon sx={{ fontSize: '18px !important' }} />}
+                        endIcon={<img src="/assets/icons/pencil-edit-01.png" alt="Edit" />}
                         onClick={() => handleEdit(tarea)}
                         fullWidth
                         sx={{
                           bgcolor: '#F7F7F7',
                           color: '#4F46E5',
                           textTransform: 'none',
-                          fontWeight: 500,
+                          fontWeight: 600,
                           borderRadius: '8px',
                           py: 0.75,
                           boxShadow: 'none',
@@ -703,14 +703,14 @@ const TareasListScreen: React.FC = () => {
                       </Button>
                       <Button
                         size="small"
-                        startIcon={<DeleteOutlineIcon sx={{ fontSize: '18px !important' }} />}
+                        endIcon={<img src="/assets/icons/delete.png" alt="Delete" />}
                         onClick={() => handleDeleteOpen(tarea)}
                         fullWidth
                         sx={{
                           bgcolor: '#FEF2F2',
                           color: '#EF4444',
                           textTransform: 'none',
-                          fontWeight: 500,
+                          fontWeight: 600,
                           borderRadius: '8px',
                           py: 0.75,
                           boxShadow: 'none',
