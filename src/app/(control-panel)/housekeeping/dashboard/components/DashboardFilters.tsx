@@ -6,7 +6,6 @@ import {
   Box,
   Stack,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Switch,
@@ -17,16 +16,17 @@ import {
   IconButton,
   Tooltip,
   SelectChangeEvent,
+  Divider,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import BusinessIcon from '@mui/icons-material/Business';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 
 export interface DashboardFiltersData {
   dateFrom: Date | null;
@@ -78,13 +78,6 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
     });
   };
 
-  const handleDateToChange = (date: Date | null) => {
-    onFiltersChange({
-      ...filters,
-      dateTo: date,
-    });
-  };
-
   const handleCampChange = (event: SelectChangeEvent) => {
     onFiltersChange({
       ...filters,
@@ -127,7 +120,6 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
 
   const getLastRefreshText = () => {
     if (!lastRefresh) return 'Nunca';
-
     const now = new Date();
     const diff = now.getTime() - lastRefresh.getTime();
     const seconds = Math.floor(diff / 1000);
@@ -142,30 +134,37 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
     });
   };
 
+  // The custom input background color mapped to target design "#F7F7F7" or '#FAFAFA'
+  const inputBgColor = '#f7f7f7';
+
   return (
-    <Card sx={{ backgroundColor: "white" }}>
-      <CardContent>
+    <Card sx={{
+      backgroundColor: "#f7f7f7",
+      borderRadius: 3,
+      border: '1px solid',
+      borderColor: 'grey.200',
+      boxShadow: 'none'
+    }}>
+      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            mb: 3,
+            mb: 2,
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <FilterListIcon color="action" />
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            <img src="./assets/icons/filter-vertical.png" className='mr-0.5' alt="" />
+            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.25rem', display: 'flex', alignItems: 'center' }}>
               Filtros
             </Typography>
-            {hasActiveFilters && (
-              <Chip
-                label="Activos"
-                size="small"
-                color="primary"
-                sx={{ ml: 1 }}
-              />
-            )}
+            <Chip
+              label="Assets"
+              size="small"
+              color="primary"
+              sx={{ fontWeight: 600, borderRadius: 1.5, fontSize: '0.75rem', height: 24 }}
+            />
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -189,39 +188,61 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
 
             {hasActiveFilters && (
               <Tooltip title="Limpiar filtros">
-                <IconButton
-                  size="small"
-                  onClick={handleClearFilters}
-                  disabled={loading}
+                <Box
+                  onClick={!loading ? handleClearFilters : undefined}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: loading ? 'default' : 'pointer',
+                    '&:hover': {
+                      backgroundColor: loading ? "#fff" : 'grey.200',
+                    },
+                    backgroundColor: "#fff",
+                    borderRadius: "6px"
+                  }}
                 >
-                  <ClearIcon fontSize="small" />
-                </IconButton>
+                  <img src="./assets/icons/cancel-circle.png" alt="" />
+                </Box>
               </Tooltip>
             )}
 
             <Tooltip title="Actualizar ahora">
-              <span>
-                <IconButton
-                  size="small"
-                  onClick={handleManualRefresh}
-                  disabled={loading || isRefreshing}
-                  sx={{
-                    animation:
-                      isRefreshing || loading ? 'spin 1s linear infinite' : 'none',
-                    '@keyframes spin': {
-                      '0%': { transform: 'rotate(0deg)' },
-                      '100%': { transform: 'rotate(360deg)' },
-                    },
-                  }}
-                >
-                  <RefreshIcon fontSize="small" />
-                </IconButton>
-              </span>
+              <Box
+                onClick={(!loading && !isRefreshing) ? handleManualRefresh : undefined}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: (loading || isRefreshing) ? 'default' : 'pointer',
+                  '&:hover': {
+                    backgroundColor: (loading || isRefreshing) ? "#fff" : 'grey.200',
+                  },
+                  backgroundColor: "#fff",
+                  borderRadius: "6px",
+                  animation:
+                    isRefreshing || loading ? 'spin 1s linear infinite' : 'none',
+                  '@keyframes spin': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' },
+                  },
+                }}
+              >
+                <img src="./assets/icons/refresh-01.png" alt="" />
+              </Box>
             </Tooltip>
           </Box>
         </Box>
 
-        <Stack spacing={2.5}>
+        <Stack spacing={3} sx={{
+          padding: 2,
+          backgroundColor: "white",
+          borderRadius: "8px"
+        }}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box
               sx={{
@@ -230,190 +251,132 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                 gap: 2,
               }}
             >
-              <DatePicker
-                label="Fecha Desde"
-                value={filters.dateFrom}
-                onChange={handleDateFromChange}
-                disabled={loading}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size: 'small',
-                    sx: {
-                      backgroundColor: 'white',
-                      '& .MuiInputBase-root': { backgroundColor: 'white' },
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: 'rgba(0, 0, 0, 0.23)',
-                        },
-                        '&:hover fieldset': {
-                          borderColor: '#415EDE',
-                        },
-                        '&.Mui-focused fieldset': {
-                          borderColor: '#415EDE',
-                        },
-                      },
-                      '& .MuiInputLabel-root.Mui-focused': {
-                        color: '#415EDE',
-                      },
-                    },
-                    InputProps: {
-                      startAdornment: (
-                        <CalendarTodayIcon
-                          sx={{
-                            fontSize: 20,
-                            color: theme.palette.action.active,
-                            mr: 1,
-                          }}
-                        />
-                      ),
-                    },
-                  },
-                  popper: {
-                    sx: {
-                      '& .MuiPaper-root': { backgroundColor: 'white !important' }
-                    }
-                  },
-                  desktopPaper: {
-                    sx: { backgroundColor: 'white !important' }
-                  },
-                  mobilePaper: {
-                    sx: { backgroundColor: 'white !important' }
-                  },
-                  dialog: {
-                    sx: {
-                      '& .MuiPaper-root': { backgroundColor: 'white !important' }
-                    }
-                  }
-                }}
-              />
-
-              {/* <DatePicker
-                label="Fecha Hasta"
-                value={filters.dateTo}
-                onChange={handleDateToChange}
-                disabled={loading}
-                minDate={filters.dateFrom || undefined}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size: 'small',
-                    InputProps: {
-                      startAdornment: (
-                        <CalendarTodayIcon
-                          sx={{
-                            fontSize: 20,
-                            color: theme.palette.action.active,
-                            mr: 1,
-                          }}
-                        />
-                      ),
-                    },
-                  },
-                }}
-              /> */}
-              <FormControl fullWidth size="small">
-                <InputLabel 
-                  id="camp-select-label" 
-                  sx={{ 
-                    backgroundColor: 'white', 
-                    pr: 1,
-                    '&.Mui-focused': { color: '#415EDE' }
-                  }}
-                >
-                  Campamento
-                </InputLabel>
-                <Select
-                  labelId="camp-select-label"
-                  id="camp-select"
-                  value={filters.campId}
-                  label="Campamento"
-                  onChange={handleCampChange}
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: 'text.primary', fontSize: '0.875rem' }}>
+                  Fecha Desde
+                </Typography>
+                <DatePicker
+                  value={filters.dateFrom}
+                  onChange={handleDateFromChange}
                   disabled={loading}
-                  sx={{
-                    backgroundColor: 'white',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      backgroundColor: 'transparent',
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      size: 'small',
+                      sx: {
+                        '& .MuiInputBase-root': { backgroundColor: inputBgColor, borderRadius: 1.5, height: 44 },
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'transparent',
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: "#415EDE",
+                        },
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: "#415EDE",
+                        },
+                      },
+                      InputProps: {
+                        endAdornment: (
+                          <img src="./assets/icons/calendar-02.png" alt="" />
+                        ),
+                      },
                     },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#415EDE',
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#415EDE',
-                    },
-                    '& .MuiSelect-select': {
-                      backgroundColor: 'white',
-                    }
                   }}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: { backgroundColor: 'white !important' }
-                    }
-                  }}
-                  startAdornment={
-                    <BusinessIcon
-                      sx={{
-                        fontSize: 20,
-                        color: theme.palette.action.active,
-                        ml: 1,
-                        mr: -0.5,
-                      }}
-                    />
-                  }
-                >
-                  {camps.map((camp) => (
-                    <MenuItem key={camp.id} value={camp.id}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography>{camp.name}</Typography>
-                        {camp.code && (
-                          <Chip
-                            label={camp.code}
-                            size="small"
-                            sx={{
-                              height: 20,
-                              fontSize: '0.65rem',
-                            }}
-                          />
-                        )}
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                />
+              </Box>
+
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: 'text.primary', fontSize: '0.875rem' }}>
+                  Campamento
+                </Typography>
+                <FormControl fullWidth size="small">
+                  <Select
+                    value={filters.campId}
+                    onChange={handleCampChange}
+                    disabled={loading}
+                    displayEmpty
+                    renderValue={(selected) => {
+                      if (!selected) {
+                        return <Typography color="text.secondary">Seleccionar</Typography>;
+                      }
+                      const camp = camps.find((c) => c.id === selected);
+                      if (camp) {
+                        return (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography>{camp.name}</Typography>
+                          </Box>
+                        );
+                      }
+                      return selected;
+                    }}
+                    sx={{
+                      backgroundColor: inputBgColor,
+                      borderRadius: 1.5,
+                      height: 44,
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'transparent',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: "#415EDE",
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: "#415EDE",
+                      },
+                      '& .MuiSelect-select': {
+                        display: 'flex',
+                        alignItems: 'center',
+                        backgroundColor: 'transparent',
+                      }
+                    }}
+                  >
+                    {camps.map((camp) => (
+                      <MenuItem key={camp.id} value={camp.id}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography>{camp.name}</Typography>
+                          {camp.code && (
+                            <Chip
+                              label={camp.code}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: '0.65rem',
+                              }}
+                            />
+                          )}
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
             </Box>
           </LocalizationProvider>
-
 
           <Box
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              p: 1.5,
-              borderRadius: 1,
-              backgroundColor: 'white',
-              border: `1px solid ${filters.autoRefresh
-                ? alpha(theme.palette.primary.main, 0.2)
-                : theme.palette.divider
-                }`,
+              backgroundColor: "#f7f7f7",
+              padding: 2,
+              borderRadius: "8px",
               transition: 'all 0.3s ease-in-out',
             }}
           >
             <Box>
               <Typography
-                variant="body2"
+                variant="body1"
                 sx={{
                   fontWeight: 600,
-                  color: filters.autoRefresh
-                    ? theme.palette.primary.main
-                    : theme.palette.text.primary,
+                  color: 'text.primary',
+                  fontSize: '1rem'
                 }}
               >
                 Actualización Automática
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="body2" color="text.secondary">
                 {filters.autoRefresh
-                  ? `Cada ${filters.refreshInterval || 30} segundos`
+                  ? `Activada`
                   : 'Desactivada'}
               </Typography>
             </Box>
@@ -438,10 +401,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
-                p: 1,
-                borderRadius: 1,
-                backgroundColor: 'white',
-                border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`, // Adding a light border for contrast on white
+                mt: -1,
               }}
             >
               <Box

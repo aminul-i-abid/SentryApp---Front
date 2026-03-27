@@ -26,6 +26,8 @@ import {
   Typography,
   useTheme,
   useMediaQuery,
+  Card,
+  CardContent,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import FusePageSimple from '@fuse/core/FusePageSimple';
@@ -414,12 +416,12 @@ const DashboardHome: React.FC = () => {
       header={
         <Box
           sx={{
-            p: 3,
-            backgroundColor: theme.palette.background.paper,
-            borderBottom: `1px solid ${theme.palette.divider}`,
+            py: 3,
+            px: 4,
+            backgroundColor: "white",
           }}
         >
-          <Typography variant="h4" fontWeight={700}>
+          <Typography variant="h5" fontWeight={700}>
             Housekeeping Dashboard
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -428,23 +430,8 @@ const DashboardHome: React.FC = () => {
         </Box>
       }
       content={
-        <Box sx={{ py: 3, px: 3, width: '100%' }}>
+        <Box sx={{ py: 3, px: 3, width: '100%', backgroundColor: "white" }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {/* Filters Section */}
-            <DashboardFilters
-              filters={filters}
-              onFiltersChange={handleFiltersChange}
-              onRefreshToggle={handleAutoRefreshToggle}
-              onManualRefresh={handleForceRefresh}
-              camps={camps.map(camp => ({
-                id: String(camp.id),
-                name: camp.name,
-                code: camp.name.substring(0, 3).toUpperCase(), // Generate code from first 3 letters
-              }))}
-              lastRefresh={lastUpdate || undefined}
-              loading={isDashboardLoading || isDashboardRefetching || isRefreshing || loadingCamps}
-            />
-
             {/* Error Alert */}
             {hasError && (
               <Alert
@@ -457,22 +444,14 @@ const DashboardHome: React.FC = () => {
               </Alert>
             )}
 
-            {/* Estado de Habitaciones */}
-            <Grid item xs={12}>
-              <RoomStatusBreakdownCard
-                totalRooms={dailySummary?.occupancy.totalRooms ?? 0}
-                roomsCompleted={dailySummary?.occupancy.roomsCompleted ?? 0}
-                roomsInProgress={dailySummary?.occupancy.roomsInProgress ?? 0}
-                roomsNotStarted={dailySummary?.occupancy.roomsNotStarted ?? 0}
-                roomsNotAssigned={dailySummary?.occupancy.roomsNotAssigned ?? 0}
-                loading={isDashboardLoading}
-              />
-            </Grid>
-
-            {/* Main Content */}
-            <Grid container spacing={3}>
-              {/* KPI Cards Row */}
-              <Grid item xs={12}>
+            <Card sx={{
+              backgroundColor: "white",
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: 'grey.200',
+              boxShadow: 'none'
+            }}>
+              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                 <Grid container spacing={2}>
                   {isDashboardLoading ? (
                     // Skeleton count matches expected visible cards
@@ -480,7 +459,7 @@ const DashboardHome: React.FC = () => {
                       <Grid item {...kpiColSpan} key={`skeleton-${index}`}>
                         <Skeleton
                           variant="rectangular"
-                          height={180}
+                          height={140}
                           sx={{ borderRadius: 2 }}
                         />
                       </Grid>
@@ -488,8 +467,7 @@ const DashboardHome: React.FC = () => {
                   ) : (
                     // Only visible KPI cards — filtered by HIDDEN_KPI_TITLES above
                     visibleKpis.map((kpi, index) => (
-                      <Grid item {...kpiColSpan} key={`kpi-${index}`}
-                      >
+                      <Grid item {...kpiColSpan} key={`kpi-${index}`}>
                         <KPICard
                           title={kpi.title}
                           value={
@@ -511,8 +489,37 @@ const DashboardHome: React.FC = () => {
                     ))
                   )}
                 </Grid>
-              </Grid>
+              </CardContent>
+            </Card>
 
+            {/* Filters Section */}
+            <DashboardFilters
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+              onRefreshToggle={handleAutoRefreshToggle}
+              onManualRefresh={handleForceRefresh}
+              camps={camps.map(camp => ({
+                id: String(camp.id),
+                name: camp.name,
+                code: camp.name.substring(0, 3).toUpperCase(), // Generate code from first 3 letters
+              }))}
+              lastRefresh={lastUpdate || undefined}
+              loading={isDashboardLoading || isDashboardRefetching || isRefreshing || loadingCamps}
+            />
+
+            {/* Estado de Habitaciones */}
+            <Box>
+              <RoomStatusBreakdownCard
+                totalRooms={dailySummary?.occupancy.totalRooms ?? 0}
+                roomsCompleted={dailySummary?.occupancy.roomsCompleted ?? 0}
+                roomsInProgress={dailySummary?.occupancy.roomsInProgress ?? 0}
+                roomsNotStarted={dailySummary?.occupancy.roomsNotStarted ?? 0}
+                roomsNotAssigned={dailySummary?.occupancy.roomsNotAssigned ?? 0}
+                loading={isDashboardLoading}
+              />
+            </Box>
+
+            <Grid container spacing={3}>
               {/* Variance Chart Row */}
               {/* <Grid item xs={12}>
                 <VarianceChart

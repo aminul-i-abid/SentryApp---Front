@@ -46,21 +46,25 @@ const RoomStatusBreakdownCard: React.FC<RoomStatusBreakdownCardProps> = ({
       label: 'Completadas',
       value: roomsCompleted,
       color: theme.palette.success.main,
+      outerColor: "#34A85314",
     },
     {
       label: 'En Progreso',
       value: roomsInProgress,
       color: theme.palette.info.main,
+      outerColor: "#415EDE14",
     },
     {
       label: 'Sin Iniciar',
       value: roomsNotStarted,
       color: theme.palette.warning.main,
+      outerColor: "#F0622514",
     },
     {
       label: 'Sin Asignar',
       value: roomsNotAssigned,
-      color: theme.palette.grey[400],
+      color: theme.palette.grey[600],
+      outerColor: "#68686814",
     },
   ];
 
@@ -105,10 +109,15 @@ const RoomStatusBreakdownCard: React.FC<RoomStatusBreakdownCardProps> = ({
   }
 
   return (
-    <Card>
-      <CardContent sx={{
-        backgroundColor: "white"
-      }}>
+    <Card sx={{
+      backgroundColor: "#f7f7f7",
+      borderRadius: "8px",
+      border: '1px solid',
+      borderColor: 'grey.200',
+      boxShadow: 'none',
+      padding: 2,
+    }}>
+      <CardContent sx={{ backgroundColor: "#fff", borderRadius: "8px" }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
           <Box>
@@ -123,12 +132,19 @@ const RoomStatusBreakdownCard: React.FC<RoomStatusBreakdownCardProps> = ({
             label={`Total: ${totalRooms.toLocaleString('es-ES')}`}
             size="small"
             variant="outlined"
+            sx={{
+              backgroundColor: "#f7f7f7",
+              borderRadius: "6px",
+              fontWeight: 500,
+              borderColor: "#EAEAEA",
+              fontSize: "13px"
+            }}
           />
         </Box>
 
         {/* Alert for unmanaged rooms */}
         {roomsNotAssigned > 0 && (
-          <Alert severity="warning" sx={{ mb: 2 }}>
+          <Alert severity="warning" sx={{ mb: 2, backgroundColor: "#F0622514", color: "#F06225" }}>
             {`${roomsNotAssigned.toLocaleString('es-ES')} de ${totalRooms.toLocaleString('es-ES')} habitaciones sin gestionar hoy (${getPct(roomsNotAssigned)}%)`}
           </Alert>
         )}
@@ -150,7 +166,7 @@ const RoomStatusBreakdownCard: React.FC<RoomStatusBreakdownCardProps> = ({
                 key={item.label}
                 sx={{
                   width: getSegmentWidth(item.value),
-                  backgroundColor: item.color,
+                  background: "linear-gradient(91.77deg, #2661EB 54.66%, #F06225 113.08%)",
                   flexShrink: 0,
                   transition: 'width 0.6s ease',
                 }}
@@ -163,26 +179,43 @@ const RoomStatusBreakdownCard: React.FC<RoomStatusBreakdownCardProps> = ({
         <Grid container spacing={2}>
           {statusItems.map((item) => (
             <Grid item xs={6} sm={3} key={item.label}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                <Box
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    backgroundColor: item.color,
-                    flexShrink: 0,
-                  }}
-                />
-                <Typography variant="body2" fontWeight={500} color="text.secondary">
-                  {item.label}
+              <Box
+                sx={{
+                  border: 'none',
+                  borderRadius: 3,
+                  p: 2,
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  backgroundColor: '#F7F7F7',
+                }}
+              >
+                <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}>
+                  {item.value.toLocaleString('es-ES')}
                 </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  {getPct(item.value)}%
+                </Typography>
+
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 'auto', backgroundColor: "white", width: "fit-content", padding: 1, borderRadius: "100px" }}>
+                  <div className={`p-1.5 rounded-full`} style={{
+                    backgroundColor: item.outerColor
+                  }}>
+                    <Box
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        backgroundColor: item.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                  </div>
+                  <Typography variant="body2" fontWeight={500} color={item.color}>
+                    {item.label === 'Completadas' ? 'Camas Ocupadas' : item.label}
+                  </Typography>
+                </Box>
               </Box>
-              <Typography variant="h5" fontWeight={700}>
-                {item.value.toLocaleString('es-ES')}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {getPct(item.value)}%
-              </Typography>
             </Grid>
           ))}
         </Grid>
