@@ -1,26 +1,17 @@
 import React from 'react';
 import {
   Box,
-  Grid,
-  TextField,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  FormHelperText,
   Typography,
-  Stack,
-  Paper,
-  Divider,
 } from '@mui/material';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import LoginIcon from '@mui/icons-material/Login';
-import ScheduleIcon from '@mui/icons-material/Schedule';
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
+import CloudQueueOutlinedIcon from '@mui/icons-material/CloudQueueOutlined';
+
 import type { TriggerType, TriggerCondition } from '../types/ruleConfiguratorTypes';
 
-/**
- * Props for TriggerConditionEditor component
- */
 interface TriggerConditionEditorProps {
   triggerType: TriggerType;
   daysInterval?: number;
@@ -30,95 +21,68 @@ interface TriggerConditionEditorProps {
   errors?: Record<string, string>;
 }
 
-/**
- * Trigger type configuration
- */
 interface TriggerTypeOption {
   type: TriggerType;
   label: string;
   description: string;
   icon: React.ReactNode;
   requiresInterval: boolean;
+  summaryText: string;
 }
 
-/**
- * Available trigger types with their configurations
- */
 const TRIGGER_TYPES: TriggerTypeOption[] = [
   {
     type: 'manual',
-    label: 'Manual',
-    description: 'La regla se ejecuta solo cuando se dispara manualmente',
-    icon: <ScheduleIcon sx={{ fontSize: 24 }} />,
+    label: 'Manual.',
+    description: 'Selecciona esto cuando la regla de limpieza deba ejecutarse de forma manual.',
+    icon: <img src="./assets/icons/time-quarter.png" alt="" />,
     requiresInterval: false,
+    summaryText: 'Se ejecutará solo cuando se dispare manualmente.',
   },
   {
     type: 'checkout',
-    label: 'Al Realizar Checkout',
-    description: 'La regla se ejecuta automáticamente cuando un huésped realiza checkout',
-    icon: <ExitToAppIcon sx={{ fontSize: 24 }} />,
+    label: 'Al Realizar Checkout.',
+    description: 'La regla se ejecuta automáticamente cuando un huésped realiza el checkout.',
+    icon: <img src="./assets/icons/shopping-basket-check-in-03.png" alt="" />,
     requiresInterval: false,
+    summaryText: 'Al realizar checkout del huésped.',
   },
   {
     type: 'checkin',
-    label: 'Al Realizar Checkin',
-    description: 'La regla se ejecuta automáticamente cuando un huésped realiza checkin',
-    icon: <LoginIcon sx={{ fontSize: 24 }} />,
+    label: 'Al Realizar Checkin.',
+    description: 'La regla se ejecuta automáticamente cuando un huésped realiza checkin.',
+    icon: <img src="./assets/icons/shopping-basket-check-out-03.png" alt="" />,
     requiresInterval: false,
+    summaryText: 'Al realizar check-in del huésped.',
   },
   {
     type: 'interval',
-    label: 'Por Intervalo de Días',
-    description: 'La regla se ejecuta periódicamente cada X días especificados',
-    icon: <AccessTimeIcon sx={{ fontSize: 24 }} />,
+    label: 'Por Intervalo de Días.',
+    description: 'La regla se ejecuta periódicamente cada X días especificados.',
+    icon: <img src="./assets/icons/sun-cloud-01.png" alt="" />,
     requiresInterval: true,
+    summaryText: 'Periódicamente según el intervalo.',
   },
 ];
 
-/**
- * TriggerConditionEditor - Visual editor for trigger conditions
- * Allows selection of trigger type and configuration of trigger parameters
- *
- * @component
- * @example
- * const [trigger, setTrigger] = React.useState({
- *   type: 'checkout',
- *   onCheckout: true,
- *   onCheckin: false,
- * });
- * return (
- *   <TriggerConditionEditor
- *     triggerType={trigger.type}
- *     onCheckout={trigger.onCheckout}
- *     onCheckin={trigger.onCheckin}
- *     onTriggerChange={setTrigger}
- *   />
- * );
- */
 const TriggerConditionEditor: React.FC<TriggerConditionEditorProps> = ({
   triggerType,
   daysInterval,
-  onCheckout,
-  onCheckin,
   onTriggerChange,
   errors = {},
 }) => {
-  const handleTriggerTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newType = event.target.value as TriggerType;
-
+  const handleTriggerTypeChange = (newType: TriggerType) => {
     const newTrigger: TriggerCondition = {
       type: newType,
       onCheckout: newType === 'checkout',
       onCheckin: newType === 'checkin',
       ...(newType === 'interval' && { daysInterval: daysInterval || 7 }),
     };
-
     onTriggerChange(newTrigger);
   };
 
   const handleDaysIntervalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10);
-
     if (!isNaN(value) && value >= 1 && value <= 30) {
       onTriggerChange({
         type: 'interval',
@@ -132,86 +96,115 @@ const TriggerConditionEditor: React.FC<TriggerConditionEditorProps> = ({
   const currentTriggerOption = TRIGGER_TYPES.find((t) => t.type === triggerType);
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-        Condición de Activación
-      </Typography>
+    <Box>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
+          Condición de Activación.
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#6B7280' }}>
+          Selecciona cuándo se debe ejecutar automáticamente esta regla de limpieza.
+        </Typography>
+      </Box>
 
-      <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-        Selecciona cuándo se debe ejecutar automáticamente esta regla de limpieza
-      </Typography>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 2, alignItems: 'stretch' }}>
 
-      <RadioGroup
-        value={triggerType}
-        onChange={handleTriggerTypeChange}
-        sx={{ mb: 3 }}
-      >
-        <Grid container spacing={2}>
-          {TRIGGER_TYPES.map((option) => (
-            <Grid item xs={12} sm={6} md={3} key={option.type}>
-              <Paper
+        {/* Left Side: Cards */}
+        <Box sx={{ flex: 1, display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(auto-fit, minmax(200px, 1fr))' }, gap: 1 }}>
+          {TRIGGER_TYPES.map((option) => {
+            const isSelected = triggerType === option.type;
+            return (
+              <Box
+                key={option.type}
+                onClick={() => handleTriggerTypeChange(option.type)}
                 sx={{
-                  p: 2,
+                  p: 2.5,
+                  borderRadius: '12px',
+                  bgcolor: 'white',
+                  border: '1px solid',
+                  borderColor: isSelected ? '#415EDE' : '#E5E7EB',
                   cursor: 'pointer',
-                  border: '2px solid',
-                  borderColor: triggerType === option.type ? '#415EDE' : 'divider',
-                  backgroundColor:
-                    triggerType === option.type ? 'rgba(65, 94, 222, 0.05)' : 'background.paper',
-                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  transition: 'all 0.2s',
+                  boxShadow: isSelected ? '0px 0px 0px 1px #415EDE' : 'none',
                   '&:hover': {
                     borderColor: '#415EDE',
-                    boxShadow: '0 4px 12px rgba(65, 94, 222, 0.1)',
-                  },
+                  }
                 }}
               >
-                <FormControlLabel
-                  value={option.type}
-                  control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
-                  label={
-                    <Box sx={{ width: '100%' }}>
-                      <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ mb: 1 }}>
-                        <Box sx={{ color: 'primary.main', display: 'flex', pt: 0.5 }}>
-                          {option.icon}
-                        </Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {option.label}
-                        </Typography>
-                      </Stack>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'text.secondary',
-                          display: 'block',
-                          lineHeight: 1.4,
-                          mb: 1,
-                        }}
-                      >
-                        {option.description}
-                      </Typography>
-                    </Box>
-                  }
-                  sx={{ width: '100%', m: 0, alignItems: 'flex-start' }}
-                />
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      </RadioGroup>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Box sx={{
+                    color: isSelected ? '#415EDE' : '#6B7280',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {option.icon}
+                  </Box>
+                  {isSelected ? (
+                    <RadioButtonCheckedIcon sx={{ color: '#415EDE', fontSize: 20 }} />
+                  ) : (
+                    <RadioButtonUncheckedIcon sx={{ color: '#D1D5DB', fontSize: 20 }} />
+                  )}
+                </Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#111827', mb: 1 }}>
+                  {option.label}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#686868', lineHeight: 1.4 }}>
+                  {option.description}
+                </Typography>
+              </Box>
+            );
+          })}
+        </Box>
 
-      {/* Divider */}
-      <Divider sx={{ my: 3 }} />
+        {/* Right Side: Current Configuration Card */}
+        <Box sx={{
+          width: {
+            xs: '100%',
+            lg: '450px'
+          }
+        }}>
+          <Box
+            sx={{
+              p: 3,
+              borderRadius: '12px',
+              bgcolor: 'white',
+              border: '1px solid #E5E7EB',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+              <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#415EDE' }} />
+              <Typography variant="body1" sx={{ fontWeight: 600, color: '#415EDE' }}>
+                Configuración Actual
+              </Typography>
+            </Box>
 
-      {/* Conditional Fields - Days Interval Input */}
-      {triggerType === 'interval' && (
-        <Box>
-          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-            Configuración del Intervalo
-          </Typography>
-
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={4}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
               <Box>
-                <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: '#111827', display: 'block', mb: 0.5, fontSize: '13px' }}>
+                  Tipo de Activación
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#686868' }}>
+                  {currentTriggerOption?.label?.replace('.', '') || 'Manual'}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: '#111827', display: 'block', mb: 0.5, fontSize: '13px' }}>
+                  Se ejecutará
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#686868' }}>
+                  {currentTriggerOption?.summaryText}
+                </Typography>
+              </Box>
+            </Box>
+
+            {triggerType === 'interval' && (
+              <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid #E5E7EB' }}>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#374151' }}>
                   Días de Intervalo
                 </Typography>
                 <Box
@@ -224,92 +217,29 @@ const TriggerConditionEditor: React.FC<TriggerConditionEditorProps> = ({
                   onChange={handleDaysIntervalChange}
                   sx={{
                     width: '100%',
-                    height: 44,
+                    height: 48,
                     px: 2,
-                    borderRadius: 2,
+                    borderRadius: '8px',
                     border: '1px solid',
-                    borderColor: errors.daysInterval ? 'error.main' : '#E2E8F0',
+                    borderColor: errors.daysInterval ? 'error.main' : '#E5E7EB',
                     bgcolor: 'white',
                     fontSize: '0.9375rem',
                     outline: 'none',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:focus': {
                       borderColor: '#415EDE',
-                      boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
                     },
-                    '&:hover:not(:focus)': {
-                      borderColor: '#415EDE',
-                    }
                   }}
                 />
-                <Typography variant="caption" sx={{ color: errors.daysInterval ? 'error.main' : 'text.disabled', mt: 0.5, display: 'block' }}>
-                  {errors.daysInterval || 'Intervalo entre 1 y 30 días. La regla se ejecutará cada X días'}
+                <Typography variant="caption" sx={{ color: errors.daysInterval ? 'error.main' : '#9CA3AF', mt: 0.5, display: 'block' }}>
+                  {errors.daysInterval || 'La regla se ejecutará cada X días'}
                 </Typography>
               </Box>
-            </Grid>
+            )}
 
-            <Grid item xs={12} sm={6} md={8}>
-              <Box
-                sx={{
-                  p: 2,
-                  backgroundColor: '#F0F9FF',
-                  border: '1px solid',
-                  borderColor: '#BAE6FD',
-                  borderRadius: 2,
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#0369A1', textTransform: 'uppercase' }}>
-                    Información
-                  </Typography>
-                  <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 500 }}>
-                    {daysInterval === 1
-                      ? 'La regla se ejecutará diariamente'
-                      : daysInterval === 7
-                        ? 'La regla se ejecutará semanalmente'
-                        : `La regla se ejecutará cada ${daysInterval} días`}
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
-          </Grid>
+          </Box>
         </Box>
-      )}
-
-      {/* Current Selection Summary */}
-      {currentTriggerOption && (
-        <Box sx={{ mt: 3, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
-          <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-            CONFIGURACIÓN ACTUAL
-          </Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            <strong>Tipo de Activación:</strong> {currentTriggerOption.label}
-          </Typography>
-          {triggerType === 'interval' && (
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
-              <strong>Intervalo:</strong> Cada {daysInterval || 7} días
-            </Typography>
-          )}
-          {triggerType === 'checkout' && (
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
-              <strong>Se ejecutará:</strong> Al realizar checkout de habitación
-            </Typography>
-          )}
-          {triggerType === 'checkin' && (
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
-              <strong>Se ejecutará:</strong> Al realizar checkin de huésped
-            </Typography>
-          )}
-          {triggerType === 'manual' && (
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
-              <strong>Se ejecutará:</strong> Solo cuando se dispare manualmente
-            </Typography>
-          )}
-        </Box>
-      )}
+      </Box>
     </Box>
   );
 };

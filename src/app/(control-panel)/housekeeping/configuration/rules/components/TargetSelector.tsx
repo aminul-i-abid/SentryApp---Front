@@ -16,6 +16,7 @@ import {
   CircularProgress,
   Alert,
   Pagination,
+  Divider,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -106,9 +107,9 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
   const handleSelectAllRooms = () => {
     const filteredRooms = appliesTo === 'room'
       ? availableRooms.filter((r) =>
-          r.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          r.blockName.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        r.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.blockName.toLowerCase().includes(searchTerm.toLowerCase())
+      )
       : availableRooms;
     onTargetsChange(filteredRooms.map((r) => r.id));
   };
@@ -194,415 +195,255 @@ const TargetSelector: React.FC<TargetSelectorProps> = ({
   const totalPages = Math.ceil(filteredRooms.length / ROOMS_PER_PAGE);
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <span>Objetivos de Aplicación</span>
-        {appliesTo !== 'camp' && selectedTargets.length > 0 && (
-          <Chip
-            size="small"
-            icon={<CheckCircleIcon />}
-            label={`${selectedTargets.length} seleccionado${selectedTargets.length !== 1 ? 's' : ''}`}
-            color="success"
-            variant="outlined"
-          />
-        )}
+    <Box>
+      <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 3 }}>
+        Objetivos de Aplicación.
       </Typography>
 
-      {/* Scope Selection */}
-      <RadioGroup value={appliesTo} onChange={handleScopeChange}>
-        <FormControlLabel
-          value="camp"
-          control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
-          label={
-            <Box>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                Todo el campamento
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                La regla se aplicará a todas las habitaciones
-              </Typography>
-            </Box>
-          }
-          sx={{ mb: 2 }}
-        />
-        <FormControlLabel
-          value="block"
-          control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
-          label={
-            <Box>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                Pabellones específicos
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                Selecciona uno o más pabellones
-              </Typography>
-            </Box>
-          }
-          sx={{ mb: 2 }}
-        />
-        <FormControlLabel
-          value="room"
-          control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
-          label={
-            <Box>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                Habitaciones específicas
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                Selecciona habitaciones individuales
-              </Typography>
-            </Box>
-          }
-          sx={{ mb: 2 }}
-        />
-        <FormControlLabel
-          value="jobTag"
-          control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
-          label={
-            <Box>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                Por categoría de habitación
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                La regla se aplicará a todas las habitaciones de la categoría seleccionada
-              </Typography>
-            </Box>
-          }
-          sx={{ mb: 2 }}
-        />
-      </RadioGroup>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, alignItems: 'flex-start' }}>
 
-      {/* Error message for target selection */}
-      {errors?.targetIds && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {errors.targetIds}
-        </Alert>
-      )}
+        {/* Left Side: Scope Options */}
+        <Box sx={{ minWidth: { md: '320px' }, width: { xs: '100%', md: 'auto' }, display: 'flex', flexDirection: 'column', gap: 2 }}>
 
-      {/* Block Selection */}
-      {appliesTo === 'block' && (
-        <Box sx={{ mt: 3, p: 2, backgroundColor: 'background.default', borderRadius: 1 }}>
-          <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              Pabellones Disponibles
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button size="small" variant="outlined" onClick={handleSelectAllBlocks}>
-                Seleccionar Todos
-              </Button>
-              <Button size="small" variant="outlined" onClick={handleDeselectAllBlocks}>
-                Deseleccionar Todos
-              </Button>
-            </Box>
-          </Box>
-
-          {isLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-              <CircularProgress size={40} />
-            </Box>
-          ) : availableBlocks.length === 0 ? (
-            <Alert severity="info">No hay pabellones disponibles</Alert>
-          ) : (
-            <FormGroup>
-              {availableBlocks.map((block) => {
-                const roomCount = getBlockRoomCount(block.id);
-                const isSelected = selectedTargets.includes(block.id);
-
-                return (
-                  <FormControlLabel
-                    key={block.id}
-                    control={
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={() => handleBlockToggle(block.id)}
-                        sx={{ '&.Mui-checked': { color: '#415EDE' } }}
-                      />
-                    }
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-                        <Typography variant="body2">{block.name}</Typography>
-                        <Chip
-                          label={`${roomCount} habitaciones`}
-                          size="small"
-                          variant="outlined"
-                          sx={{ ml: 'auto' }}
-                        />
-                      </Box>
-                    }
-                    sx={{
-                      mb: 1,
-                      p: 1.5,
-                      backgroundColor: isSelected ? 'success.lighter' : 'transparent',
-                      borderRadius: 1,
-                      border: isSelected ? '1px solid' : 'none',
-                      borderColor: 'success.light',
-                      transition: 'all 0.2s ease',
-                    }}
-                  />
-                );
-              })}
-            </FormGroup>
-          )}
-
-          {/* Summary for blocks */}
-          {selectedTargets.length > 0 && (
-            <Paper sx={{ mt: 2, p: 2, backgroundColor: 'info.lighter', border: '1px solid', borderColor: 'info.light' }}>
-              <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                PABELLONES SELECCIONADOS
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                {getSelectedBlockNames()}
-              </Typography>
-            </Paper>
-          )}
+          {[
+            { value: 'camp', label: 'Todo el campamento.', desc: 'La regla se aplicará a todas las habitaciones.' },
+            { value: 'block', label: 'Pabellones específicos.', desc: 'Selecciona uno o más pabellones.' },
+            { value: 'room', label: 'Habitaciones específicas.', desc: 'Selecciona habitaciones individuales.' },
+            { value: 'jobTag', label: 'Por categoría de habitación.', desc: 'La regla aplicará a la categoría seleccionada.' }
+          ].map((option) => {
+            const isSelected = appliesTo === option.value;
+            return (
+              <Box
+                key={option.value}
+                onClick={() => handleScopeChange({ target: { value: option.value } } as any)}
+                sx={{
+                  p: 2.5,
+                  borderRadius: '12px',
+                  bgcolor: 'white',
+                  border: '1px solid',
+                  borderColor: isSelected ? '#415EDE' : '#E5E7EB',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  transition: 'all 0.2s',
+                  boxShadow: isSelected ? '0px 0px 0px 1px #415EDE' : 'none',
+                  '&:hover': { borderColor: '#415EDE' }
+                }}
+              >
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
+                    {option.label}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#6B7280' }}>
+                    {option.desc}
+                  </Typography>
+                </Box>
+                <Radio
+                  checked={isSelected}
+                  sx={{ p: 0, '&.Mui-checked': { color: '#415EDE' }, color: '#D1D5DB' }}
+                />
+              </Box>
+            );
+          })}
         </Box>
-      )}
 
-      {/* Room Selection */}
-      {appliesTo === 'room' && (
-        <Box sx={{ mt: 3, p: 2, backgroundColor: 'background.default', borderRadius: 1 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-            Habitaciones Disponibles
-          </Typography>
 
-          {/* Search Field */}
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Buscar por número de habitación o pabellón..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setRoomsPage(1);
-            }}
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-            }}
-            sx={{
-              mb: 2,
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: 'white',
-                '&:hover fieldset': {
-                  borderColor: '#415EDE',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#415EDE',
-                  borderWidth: '2px',
-                }
-              }
-            }}
-          />
+        <Divider orientation="vertical" flexItem />
 
-          {/* Select All / Deselect All Buttons */}
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-            <Button size="small" variant="outlined" onClick={handleSelectAllRooms}>
-              Seleccionar Visibles
-            </Button>
-            <Button size="small" variant="outlined" onClick={handleDeselectAllRooms}>
-              Deseleccionar Todos
-            </Button>
-          </Box>
-
-          {/* Room Count Info */}
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 2 }}>
-            Mostrando {paginatedRooms.length} de {filteredRooms.length} habitaciones
-          </Typography>
-
-          {/* Room Selection */}
-          {isLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-              <CircularProgress size={40} />
-            </Box>
-          ) : paginatedRooms.length === 0 ? (
-            <Alert severity="info">
-              {filteredRooms.length === 0
-                ? 'No hay habitaciones disponibles'
-                : 'No hay habitaciones que coincidan con la búsqueda'}
+        {/* Right Side: Selected Scope Content */}
+        <Box sx={{ flex: 1, width: '100%' }}>
+          {errors?.targetIds && (
+            <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
+              {errors.targetIds}
             </Alert>
-          ) : (
-            <FormGroup>
-              {paginatedRooms.map((room) => {
-                const isSelected = selectedTargets.includes(room.id);
-
-                return (
-                  <FormControlLabel
-                    key={room.id}
-                    control={
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={() => handleRoomToggle(room.id)}
-                        sx={{ '&.Mui-checked': { color: '#415EDE' } }}
-                      />
-                    }
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-                        <Typography variant="body2">
-                          Habitación {room.number} - {room.blockName}
-                        </Typography>
-                        <Chip
-                          label={`${room.bedCount} camas`}
-                          size="small"
-                          variant="outlined"
-                          sx={{ ml: 'auto' }}
-                        />
-                      </Box>
-                    }
-                    sx={{
-                      mb: 1,
-                      p: 1.5,
-                      backgroundColor: isSelected ? 'success.lighter' : 'transparent',
-                      borderRadius: 1,
-                      border: isSelected ? '1px solid' : 'none',
-                      borderColor: 'success.light',
-                      transition: 'all 0.2s ease',
-                    }}
-                  />
-                );
-              })}
-            </FormGroup>
           )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-              <Pagination
-                count={totalPages}
-                page={roomsPage}
-                onChange={(_, page) => setRoomsPage(page)}
-                color="primary"
+          {appliesTo === 'camp' && (
+            <Box sx={{ p: 3, borderRadius: '12px', bgcolor: 'white', border: '1px solid #E5E7EB' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: '#111827' }}>
+                Alcance Completo.
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#6B7280' }}>
+                Al seleccionar todo el campamento, no es necesario configurar opciones adicionales.
+                La regla se aplicará automáticamente a todas las habitaciones del sistema.
+              </Typography>
+            </Box>
+          )}
+
+          {appliesTo === 'block' && (
+            <Box sx={{ p: 3, borderRadius: '12px', bgcolor: 'white', border: '1px solid #E5E7EB' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#111827' }}>
+                  Pabellones Disponibles.
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#6B7280' }}>
+                  {selectedTargets.length} seleccionado(s)
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
+                <Button size="small" variant="outlined" onClick={handleSelectAllBlocks} sx={{ textTransform: 'none', borderRadius: '6px', color: '#374151', borderColor: '#E5E7EB' }}>
+                  Seleccionar Todos
+                </Button>
+                <Button size="small" variant="outlined" onClick={handleDeselectAllBlocks} sx={{ textTransform: 'none', borderRadius: '6px', color: '#374151', borderColor: '#E5E7EB' }}>
+                  Deseleccionar
+                </Button>
+              </Box>
+
+              {isLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress size={30} /></Box>
+              ) : availableBlocks.length === 0 ? (
+                <Alert severity="info" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', '& .MuiAlert-icon': { color: '#2563EB' } }}>No hay pabellones disponibles.</Alert>
+              ) : (
+                <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                  <FormGroup>
+                    {availableBlocks.map((block) => {
+                      const roomCount = getBlockRoomCount(block.id);
+                      const isSelected = selectedTargets.includes(block.id);
+                      return (
+                        <FormControlLabel
+                          key={block.id}
+                          control={
+                            <Checkbox checked={isSelected} onChange={() => handleBlockToggle(block.id)} sx={{ '&.Mui-checked': { color: '#415EDE' } }} />
+                          }
+                          label={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                              <Typography variant="body2" sx={{ color: '#374151' }}>{block.name}</Typography>
+                              <Typography variant="caption" sx={{ color: '#9CA3AF', ml: 'auto' }}>
+                                {roomCount} habitaciones
+                              </Typography>
+                            </Box>
+                          }
+                          sx={{ mb: 0.5, p: 0.5, borderRadius: 1, '&:hover': { bgcolor: '#F9FAFB' } }}
+                        />
+                      );
+                    })}
+                  </FormGroup>
+                </Box>
+              )}
+            </Box>
+          )}
+
+          {appliesTo === 'room' && (
+            <Box sx={{ p: 3, borderRadius: '12px', bgcolor: 'white', border: '1px solid #E5E7EB' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#111827' }}>
+                  Habitaciones Disponibles.
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#6B7280' }}>
+                  Mostrando {paginatedRooms.length} de {filteredRooms.length}
+                </Typography>
+              </Box>
+
+              <Box
+                component="input"
+                type="text"
+                placeholder="Buscar habitación o pabellón..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setRoomsPage(1);
+                }}
+                sx={{
+                  width: '100%', height: 44, px: 4, mb: 2,
+                  borderRadius: '8px', border: '1px solid #E5E7EB',
+                  bgcolor: '#F9FAFB', fontSize: '0.9375rem', outline: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat', backgroundPosition: 'left 12px center',
+                  '&:focus': { borderColor: '#415EDE', bgcolor: 'white' }
+                }}
               />
+
+              <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
+                <Button size="small" variant="outlined" onClick={handleSelectAllRooms} sx={{ textTransform: 'none', borderRadius: '6px', color: '#374151', borderColor: '#E5E7EB' }}>
+                  Seleccionar Visibles
+                </Button>
+                <Button size="small" variant="outlined" onClick={handleDeselectAllRooms} sx={{ textTransform: 'none', borderRadius: '6px', color: '#374151', borderColor: '#E5E7EB' }}>
+                  Deseleccionar Todos
+                </Button>
+              </Box>
+
+              {isLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress size={30} /></Box>
+              ) : paginatedRooms.length === 0 ? (
+                <Alert severity="info" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', '& .MuiAlert-icon': { color: '#2563EB' } }}>
+                  {filteredRooms.length === 0 ? 'No hay habitaciones disponibles.' : 'No hay resultados que coincidan.'}
+                </Alert>
+              ) : (
+                <Box>
+                  <FormGroup>
+                    {paginatedRooms.map((room) => {
+                      const isSelected = selectedTargets.includes(room.id);
+                      return (
+                        <FormControlLabel
+                          key={room.id}
+                          control={
+                            <Checkbox checked={isSelected} onChange={() => handleRoomToggle(room.id)} sx={{ '&.Mui-checked': { color: '#415EDE' } }} />
+                          }
+                          label={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                              <Typography variant="body2" sx={{ color: '#374151', fontWeight: 500 }}>
+                                Hab. {room.number}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: '#9CA3AF' }}>
+                                - {room.blockName}
+                              </Typography>
+                            </Box>
+                          }
+                          sx={{ mb: 0.5, p: 0.5, borderRadius: 1, '&:hover': { bgcolor: '#F9FAFB' } }}
+                        />
+                      );
+                    })}
+                  </FormGroup>
+                  {totalPages > 1 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                      <Pagination count={totalPages} page={roomsPage} onChange={(_, page) => setRoomsPage(page)} color="primary" />
+                    </Box>
+                  )}
+                </Box>
+              )}
             </Box>
           )}
 
-          {/* Summary for rooms */}
-          {selectedTargets.length > 0 && (
-            <Paper sx={{ mt: 2, p: 2, backgroundColor: 'info.lighter', border: '1px solid', borderColor: 'info.light' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CheckCircleIcon sx={{ color: 'success.main' }} />
-                <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', display: 'block' }}>
-                    HABITACIONES SELECCIONADAS
-                  </Typography>
-                  <Typography variant="body2" sx={{ mt: 0.5 }}>
-                    {getSelectedRoomCount()} habitación{getSelectedRoomCount() !== 1 ? 's' : ''}
-                  </Typography>
-                </Box>
-              </Box>
-            </Paper>
-          )}
-        </Box>
-      )}
-
-      {/* JobTag Selection */}
-      {appliesTo === 'jobTag' && (
-        <Box sx={{ mt: 3, p: 2, backgroundColor: 'background.default', borderRadius: 1 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-            Seleccionar categoría:
-          </Typography>
-          {errors?.targetJobTag && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {errors.targetJobTag}
-            </Alert>
-          )}
-          <RadioGroup
-            value={selectedJobTag || ''}
-            onChange={(e) => {
-              if (onJobTagChange) {
-                const rawValue = e.target.value;
-                onJobTagChange(rawValue ? (rawValue as JobTagValue) : null);
-              }
-            }}
-          >
-            <FormControlLabel
-              value="CategoriaA"
-              control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
-              label={
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    Gerente
-                  </Typography>
-                </Box>
-              }
-              sx={{ mb: 1 }}
-            />
-            <FormControlLabel
-              value="CategoriaB"
-              control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
-              label={
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    Supervisor
-                  </Typography>
-                </Box>
-              }
-              sx={{ mb: 1 }}
-            />
-            <FormControlLabel
-              value="CategoriaC"
-              control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
-              label={
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    Trabajador
-                  </Typography>
-                </Box>
-              }
-              sx={{ mb: 1 }}
-            />
-          </RadioGroup>
-          {selectedJobTag && (
-            <Paper
-              sx={{
-                mt: 2,
-                p: 2,
-                backgroundColor: 'info.lighter',
-                border: '1px solid',
-                borderColor: 'info.light',
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CheckCircleIcon sx={{ color: 'success.main' }} />
-                <Box>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', display: 'block' }}>
-                    CATEGORÍA SELECCIONADA
-                  </Typography>
-                  <Typography variant="body2" sx={{ mt: 0.5 }}>
-                    {selectedJobTag === 'CategoriaA' && 'Gerente'}
-                    {selectedJobTag === 'CategoriaB' && 'Supervisor'}
-                    {selectedJobTag === 'CategoriaC' && 'Trabajador'}
-                  </Typography>
-                </Box>
-              </Box>
-            </Paper>
-          )}
-        </Box>
-      )}
-
-      {/* Camp scope info */}
-      {appliesTo === 'camp' && (
-        <Paper
-          sx={{
-            mt: 3,
-            p: 2,
-            backgroundColor: 'warning.lighter',
-            border: '1px solid',
-            borderColor: 'warning.light',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-            <CancelIcon sx={{ color: 'warning.main', mt: 0.5 }} />
-            <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                Alcance Completo
+          {appliesTo === 'jobTag' && (
+            <Box sx={{ p: 3, borderRadius: '12px', bgcolor: 'white', border: '1px solid #E5E7EB' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#111827', mb: 3 }}>
+                Categorías Disponibles.
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Esta regla se aplicará a todas las habitaciones del campamento. Usa esta opción con cuidado ya que
-                impactará en todas las operaciones de aseo.
-              </Typography>
+              {errors?.targetJobTag && (
+                <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>
+                  {errors.targetJobTag}
+                </Alert>
+              )}
+              <RadioGroup
+                value={selectedJobTag || ''}
+                onChange={(e) => {
+                  if (onJobTagChange) {
+                    const rawValue = e.target.value;
+                    onJobTagChange(rawValue ? (rawValue as JobTagValue) : null);
+                  }
+                }}
+              >
+                {[
+                  { val: 'CategoriaA', label: 'General / Gerente (Categoría A)' },
+                  { val: 'CategoriaB', label: 'Especializada / Supervisor (Categoría B)' },
+                  { val: 'CategoriaC', label: 'Básica / Trabajador (Categoría C)' }
+                ].map(opt => (
+                  <FormControlLabel
+                    key={opt.val}
+                    value={opt.val}
+                    control={<Radio sx={{ '&.Mui-checked': { color: '#415EDE' } }} />}
+                    label={<Typography variant="body2" sx={{ color: '#374151' }}>{opt.label}</Typography>}
+                    sx={{ mb: 1, p: 1, borderRadius: 1, '&:hover': { bgcolor: '#F9FAFB' } }}
+                  />
+                ))}
+              </RadioGroup>
             </Box>
-          </Box>
-        </Paper>
-      )}
+          )}
+
+        </Box>
+      </Box>
     </Box>
   );
 };

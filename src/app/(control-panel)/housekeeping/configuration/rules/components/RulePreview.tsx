@@ -1,19 +1,10 @@
 import React from 'react';
 import {
   Box,
-  Card,
-  CardContent,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
+  Typography,
   Chip,
   Alert,
-  Typography,
-  Divider,
   Grid,
-  Stack,
-  Paper,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -24,9 +15,6 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import InfoIcon from '@mui/icons-material/Info';
 import type { RuleListItem } from '../types/ruleConfiguratorTypes';
 
-/**
- * Props for RulePreview component
- */
 interface RulePreviewProps {
   rule: RuleListItem | {
     name: string;
@@ -44,32 +32,16 @@ interface RulePreviewProps {
   estimatedTasksPerDay?: number;
 }
 
-/**
- * Helper function to get trigger icon and color
- */
 const getTriggerConfig = (triggerType: string): { icon: React.ReactNode; color: 'error' | 'warning' | 'info' | 'success' } => {
   const configs: Record<string, { icon: React.ReactNode; color: 'error' | 'warning' | 'info' | 'success' }> = {
-    manual: { icon: <TaskAltIcon />, color: 'info' },
-    checkout: { icon: <CheckCircleIcon />, color: 'error' },
-    checkin: { icon: <CheckCircleIcon />, color: 'success' },
-    interval: { icon: <AutoAwesomeIcon />, color: 'warning' },
+    manual: { icon: <TaskAltIcon fontSize="small" />, color: 'info' },
+    checkout: { icon: <CheckCircleIcon fontSize="small" />, color: 'error' },
+    checkin: { icon: <CheckCircleIcon fontSize="small" />, color: 'success' },
+    interval: { icon: <AutoAwesomeIcon fontSize="small" />, color: 'warning' },
   };
-  return configs[triggerType] || { icon: <InfoIcon />, color: 'info' };
+  return configs[triggerType] || { icon: <InfoIcon fontSize="small" />, color: 'info' };
 };
 
-/**
- * Helper function to get priority color
- */
-const getPriorityColor = (priority: number): 'error' | 'warning' | 'info' | 'success' => {
-  if (priority >= 5) return 'error';
-  if (priority >= 4) return 'warning';
-  if (priority >= 3) return 'info';
-  return 'success';
-};
-
-/**
- * Helper function to format application scope
- */
 const formatScope = (scope: string): string => {
   const scopes: Record<string, string> = {
     camp: 'Todo el campamento',
@@ -79,21 +51,6 @@ const formatScope = (scope: string): string => {
   return scopes[scope] || scope;
 };
 
-/**
- * RulePreview - Shows a summary of rule configuration
- * Displays rule details with visual indicators and warnings
- *
- * @component
- * @example
- * const rule = {
- *   name: 'Limpieza post-checkout',
- *   templateName: 'Limpieza Estándar',
- *   triggerDescription: 'Al hacer checkout',
- *   targetDescription: 'Todas las habitaciones',
- *   priority: 4,
- * };
- * return <RulePreview rule={rule} estimatedAffectedRooms={120} />;
- */
 const RulePreview: React.FC<RulePreviewProps> = ({
   rule,
   templateName,
@@ -101,7 +58,6 @@ const RulePreview: React.FC<RulePreviewProps> = ({
   estimatedAffectedRooms = 0,
   estimatedTasksPerDay = 0,
 }) => {
-  // Normalize rule data
   const ruleName = rule.name || '';
   const template = templateName || rule.templateName || 'No especificado';
   const triggerDesc = (rule as any).triggerDescription || 'Trigger manual';
@@ -110,213 +66,157 @@ const RulePreview: React.FC<RulePreviewProps> = ({
   const priority = rule.priority || 0;
   const isActive = (rule as any).isActive ?? true;
 
-  // Determine if rule is too broad (>100 rooms)
   const isTooBoard = estimatedAffectedRooms > 100;
-
-  // Get trigger configuration
   const triggerConfig = getTriggerConfig((rule as any).triggerType || 'manual');
-  const priorityColor = getPriorityColor(priority);
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-        Vista Previa de la Regla
-      </Typography>
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827' }}>
+          Vista Previa de la Regla.
+        </Typography>
+        <Chip
+          label={isActive ? 'Activa' : 'Borrador'}
+          sx={{
+            bgcolor: isActive ? '#DCFCE7' : '#F3F4F6',
+            color: isActive ? '#166534' : '#4B5563',
+            fontWeight: 600,
+            borderRadius: '6px'
+          }}
+          size="small"
+        />
+      </Box>
 
-      {/* Wide impact warning */}
       {isTooBoard && (
         <Alert
           severity="warning"
-          icon={<WarningIcon />}
-          sx={{ mb: 3 }}
+          icon={<WarningIcon fontSize="small" />}
+          sx={{ mb: 3, borderRadius: '8px', alignItems: 'center', bgcolor: '#FEF3C7', color: '#92400E', '& .MuiAlert-icon': { color: '#D97706' } }}
           action={
-            <Chip label={`Afectará ${estimatedAffectedRooms} habitaciones`} size="small" color="warning" />
+            <Typography variant="body2" sx={{ fontWeight: 600, color: '#D97706', px: 2 }}>
+              Afectará {estimatedAffectedRooms} habs
+            </Typography>
           }
         >
-          Esta regla tiene un alcance muy amplio y afectará a muchas habitaciones. Verifica que sea intencional antes
-          de activarla.
+          Esta regla tiene un alcance muy amplio. Verifica que sea intencional antes de activarla.
         </Alert>
       )}
 
-      {/* Main rule card */}
-      <Card sx={{ mb: 3, border: `2px solid ${isActive ? '#4caf50' : '#bdbdbd'}` }}>
-        <CardContent sx={{ p: 3 }}>
-          {/* Rule Name and Status */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-                {ruleName}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                Regla de limpieza automática
-              </Typography>
-            </Box>
-            <Chip
-              label={isActive ? 'Activa' : 'Inactiva'}
-              color={isActive ? 'success' : 'default'}
-              variant={isActive ? 'filled' : 'outlined'}
-              size="small"
-            />
-          </Box>
-
-          <Divider sx={{ my: 2 }} />
-
-          {/* Configuration Details */}
-          <List sx={{ p: 0 }}>
-            {/* Template */}
-            <ListItem sx={{ px: 0, py: 1.5 }}>
-              <ListItemIcon sx={{ minWidth: 40 }}>
-                <TaskAltIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Template"
-                secondary={template}
-                primaryTypographyProps={{ variant: 'caption', sx: { fontWeight: 600 } }}
-                secondaryTypographyProps={{ variant: 'body2', sx: { mt: 0.5 } }}
-              />
-            </ListItem>
-
-            {/* Trigger */}
-            <ListItem sx={{ px: 0, py: 1.5 }}>
-              <ListItemIcon sx={{ minWidth: 40 }}>
-                {triggerConfig.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary="Disparador"
-                secondary={triggerDesc}
-                primaryTypographyProps={{ variant: 'caption', sx: { fontWeight: 600 } }}
-                secondaryTypographyProps={{ variant: 'body2', sx: { mt: 0.5 } }}
-              />
-              <Chip label={(rule as any).triggerType || 'manual'} size="small" color={triggerConfig.color} />
-            </ListItem>
-
-            {/* Application Scope */}
-            <ListItem sx={{ px: 0, py: 1.5 }}>
-              <ListItemIcon sx={{ minWidth: 40 }}>
-                <LocationOnIcon color="info" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Alcance"
-                secondary={`${formatScope(scope)} - ${targetDesc}`}
-                primaryTypographyProps={{ variant: 'caption', sx: { fontWeight: 600 } }}
-                secondaryTypographyProps={{ variant: 'body2', sx: { mt: 0.5 } }}
-              />
-            </ListItem>
-
-            {/* Priority */}
-            <ListItem sx={{ px: 0, py: 1.5 }}>
-              <ListItemIcon sx={{ minWidth: 40 }}>
-                <PriorityHighIcon color={priorityColor} />
-              </ListItemIcon>
-              <ListItemText
-                primary="Prioridad"
-                secondary={`Nivel ${priority} de 5`}
-                primaryTypographyProps={{ variant: 'caption', sx: { fontWeight: 600 } }}
-                secondaryTypographyProps={{ variant: 'body2', sx: { mt: 0.5 } }}
-              />
-              <Stack direction="row" spacing={0.5}>
-                {[1, 2, 3, 4, 5].map((p) => (
-                  <Box
-                    key={p}
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      backgroundColor: p <= priority ? getPriorityColor(priority) : 'action.disabled',
-                    }}
-                  />
-                ))}
-              </Stack>
-            </ListItem>
-          </List>
-        </CardContent>
-      </Card>
-
-      {/* Impact Metrics */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        {/* Affected Rooms */}
-        <Grid item xs={12} sm={6}>
-          <Paper
-            sx={{
-              p: 2,
-              backgroundColor: 'info.lighter',
-              border: '1px solid',
-              borderColor: 'info.light',
-              textAlign: 'center',
-            }}
-          >
-            <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', display: 'block', mb: 1 }}>
-              HABITACIONES AFECTADAS
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: 'info.main' }}>
-              {estimatedAffectedRooms}
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              habitaciones {isTooBoard ? '(muy amplio)' : '(estimado)'}
-            </Typography>
-          </Paper>
-        </Grid>
-
-        {/* Tasks Per Day */}
-        <Grid item xs={12} sm={6}>
-          <Paper
-            sx={{
-              p: 2,
-              backgroundColor: 'success.lighter',
-              border: '1px solid',
-              borderColor: 'success.light',
-              textAlign: 'center',
-            }}
-          >
-            <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', display: 'block', mb: 1 }}>
-              TAREAS POR DÍA
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: 'success.main' }}>
-              {estimatedTasksPerDay}
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              tareas que se crearían diariamente
-            </Typography>
-          </Paper>
-        </Grid>
-      </Grid>
-
-      {/* Additional Information */}
-      <Paper
-        sx={{
-          p: 2,
-          backgroundColor: 'background.default',
-          border: '1px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-          <InfoIcon sx={{ color: 'info.main', mt: 0.5, flexShrink: 0 }} />
-          <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
-              Información Importante
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-              • La regla se procesará automáticamente basándose en el disparador configurado
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-              • El {template} se aplicará a todas las habitaciones que cumplan los criterios
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              • Los cambios entrarán en vigor inmediatamente después de guardar la regla
-            </Typography>
-          </Box>
-        </Box>
-      </Paper>
-
-      {/* Deactivation Notice */}
       {!isActive && (
-        <Alert severity="info" icon={<InfoIcon />} sx={{ mt: 3 }}>
+        <Alert severity="info" icon={<InfoIcon fontSize="small" />} sx={{ mb: 3, borderRadius: '8px', bgcolor: '#EFF6FF', color: '#1E40AF', '& .MuiAlert-icon': { color: '#3B82F6' } }}>
           Esta regla está <strong>desactivada</strong>. No se aplicará automáticamente hasta que la actives.
         </Alert>
       )}
+
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
+          <Box sx={{ p: 3, borderRadius: '12px', bgcolor: 'white', border: '1px solid #E5E7EB', height: '100%' }}>
+            
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#111827', mb: 0.5 }}>
+                {ruleName || 'Regla sin nombre'}
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#6B7280' }}>
+                Resumen de configuración
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 2, borderRadius: '8px', bgcolor: '#F9FAFB' }}>
+                <Box sx={{ color: '#415EDE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <TaskAltIcon />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#6B7280', display: 'block' }}>TEMPLATE</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500, color: '#111827' }}>{template}</Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 2, borderRadius: '8px', bgcolor: '#F9FAFB' }}>
+                <Box sx={{ color: triggerConfig.color === 'error' ? '#EF4444' : triggerConfig.color === 'warning' ? '#F59E0B' : triggerConfig.color === 'success' ? '#10B981' : '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {triggerConfig.icon}
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#6B7280', display: 'block' }}>DISPARADOR</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500, color: '#111827' }}>{triggerDesc}</Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 2, borderRadius: '8px', bgcolor: '#F9FAFB' }}>
+                <Box sx={{ color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <LocationOnIcon />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#6B7280', display: 'block' }}>ALCANCE</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500, color: '#111827' }}>{formatScope(scope)} - {targetDesc}</Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 2, borderRadius: '8px', bgcolor: '#F9FAFB' }}>
+                <Box sx={{ color: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <PriorityHighIcon />
+                </Box>
+                <Box sx={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: '#6B7280', display: 'block' }}>PRIORIDAD</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500, color: '#111827' }}>Nivel {priority} de 5</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 0.5 }}>
+                    {[1, 2, 3, 4, 5].map((p) => (
+                      <Box key={p} sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: p <= priority ? '#8B5CF6' : '#D1D5DB' }} />
+                    ))}
+                  </Box>
+                </Box>
+              </Box>
+              
+            </Box>
+          </Box>
+        </Grid>
+
+        <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          
+          <Box sx={{ p: 3, borderRadius: '12px', bgcolor: 'white', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <Typography variant="caption" sx={{ fontWeight: 600, color: '#6B7280', mb: 1, display: 'block' }}>
+              HABITACIONES AFECTADAS
+            </Typography>
+            <Typography variant="h3" sx={{ fontWeight: 700, color: '#111827', mb: 0.5 }}>
+              {estimatedAffectedRooms}
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#9CA3AF' }}>
+              habitaciones {isTooBoard ? '(muy amplio)' : '(estimado)'}
+            </Typography>
+          </Box>
+
+          <Box sx={{ p: 3, borderRadius: '12px', bgcolor: 'white', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <Typography variant="caption" sx={{ fontWeight: 600, color: '#6B7280', mb: 1, display: 'block' }}>
+              TAREAS POR DÍA
+            </Typography>
+            <Typography variant="h3" sx={{ fontWeight: 700, color: '#415EDE', mb: 0.5 }}>
+              {estimatedTasksPerDay}
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#9CA3AF' }}>
+              estimado de tareas diarias
+            </Typography>
+          </Box>
+
+          <Box sx={{ p: 3, borderRadius: '12px', bgcolor: '#F9FAFB', border: '1px solid #E5E7EB' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+              <InfoIcon sx={{ color: '#3B82F6', fontSize: 20 }} />
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#111827' }}>
+                Nota
+              </Typography>
+            </Box>
+            <Typography variant="caption" sx={{ color: '#6B7280', display: 'block', lineHeight: 1.5 }}>
+              • El {template} se aplicará a todas las habitaciones que cumplan con la configuración seleccionada.<br />
+              • Los cambios aplicarán inmediatamente al guardar.
+            </Typography>
+          </Box>
+
+        </Grid>
+      </Grid>
     </Box>
   );
 };
 
-export default React.memo(RulePreview);
+export default RulePreview;

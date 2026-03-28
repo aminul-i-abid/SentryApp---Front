@@ -88,16 +88,12 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
   };
 
   return (
-    <Box sx={{ p: 3, backgroundColor: "#f3f4f6", borderRadius: "12px" }}>
-      <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-        Información Básica de la Regla
-      </Typography>
-
-      <Grid container spacing={3}>
+    <Box>
+      <Grid container spacing={4}>
         {/* Rule Name Field */}
         <Grid item xs={12} sm={6}>
           <Box>
-            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#374151' }}>
               Nombre de la Regla <Box component="span" sx={{ color: 'error.main' }}>*</Box>
             </Typography>
             <Box
@@ -109,25 +105,21 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
               maxLength={100}
               sx={{
                 width: '100%',
-                height: 44,
+                height: 48,
                 px: 2,
-                borderRadius: 2,
+                borderRadius: '8px',
                 border: '1px solid',
-                borderColor: errors.name ? 'error.main' : '#E2E8F0',
+                borderColor: errors.name ? 'error.main' : '#E5E7EB',
                 bgcolor: 'white',
                 fontSize: '0.9375rem',
                 outline: 'none',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:focus': {
                   borderColor: '#415EDE',
-                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
                 },
-                '&:hover:not(:focus)': {
-                  borderColor: '#415EDE',
-                }
               }}
             />
-            <Typography variant="caption" sx={{ color: errors.name ? 'error.main' : 'text.disabled', mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: errors.name ? 'error.main' : '#9CA3AF', mt: 0.5, display: 'block' }}>
               {errors.name || 'Asigne un nombre descriptivo para la regla'}
             </Typography>
           </Box>
@@ -136,47 +128,50 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
         {/* Priority Field */}
         <Grid item xs={12} sm={6}>
           <Box>
-            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#374151' }}>
               Prioridad
             </Typography>
             <Box
-              component="input"
-              type="number"
-              placeholder="1-5"
+              component="select"
               value={priority}
-              min={1}
-              max={5}
-              onChange={handlePriorityChange}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePriorityChange(e as any)}
               sx={{
                 width: '100%',
-                height: 44,
+                height: 48,
                 px: 2,
-                borderRadius: 2,
+                borderRadius: '8px',
                 border: '1px solid',
-                borderColor: errors.priority ? 'error.main' : '#E2E8F0',
+                borderColor: errors.priority ? 'error.main' : '#E5E7EB',
                 bgcolor: 'white',
                 fontSize: '0.9375rem',
                 outline: 'none',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 16px center',
+                backgroundSize: '16px',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:focus': {
                   borderColor: '#415EDE',
-                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
                 },
-                '&:hover:not(:focus)': {
-                  borderColor: '#415EDE',
-                }
               }}
-            />
-            <Typography variant="caption" sx={{ color: errors.priority ? 'error.main' : 'text.disabled', mt: 0.5, display: 'block' }}>
+            >
+              <option value={1}>1 - Muy Baja</option>
+              <option value={2}>2 - Baja</option>
+              <option value={3}>3 - Media</option>
+              <option value={4}>4 - Alta</option>
+              <option value={5}>5 - Muy Alta</option>
+            </Box>
+            <Typography variant="caption" sx={{ color: errors.priority ? 'error.main' : '#9CA3AF', mt: 0.5, display: 'block' }}>
               {errors.priority || 'Prioridad relativa de la regla (1=muy baja, 5=muy alta)'}
             </Typography>
           </Box>
         </Grid>
 
         {/* Template Selection */}
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} sm={6}>
           <Box>
-            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#374151' }}>
               Template de Checklist <Box component="span" sx={{ color: 'error.main' }}>*</Box>
             </Typography>
             <Box
@@ -185,27 +180,23 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange('templateId', e.target.value)}
               sx={{
                 width: '100%',
-                height: 44,
+                height: 48,
                 px: 2,
-                borderRadius: 2,
+                borderRadius: '8px',
                 border: '1px solid',
-                borderColor: errors.templateId ? 'error.main' : '#E2E8F0',
+                borderColor: errors.templateId ? 'error.main' : '#E5E7EB',
                 bgcolor: 'white',
                 fontSize: '0.9375rem',
                 outline: 'none',
                 appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                 backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 12px center',
+                backgroundPosition: 'right 16px center',
                 backgroundSize: '16px',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:focus': {
                   borderColor: '#415EDE',
-                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
                 },
-                '&:hover:not(:focus)': {
-                  borderColor: '#415EDE',
-                }
               }}
             >
               <option value="">Seleccionar un template...</option>
@@ -223,53 +214,10 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
           </Box>
         </Grid>
 
-        {/* Template Description */}
-        {selectedTemplate && (
-          <Grid item xs={12} md={4}>
-            <Box
-              sx={{
-                p: 2,
-                backgroundColor: '#F0F9FF',
-                border: '1px solid',
-                borderColor: '#BAE6FD',
-                borderRadius: 2,
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center'
-              }}
-            >
-              <Typography variant="caption" sx={{ fontWeight: 600, color: '#0369A1', textTransform: 'uppercase' }}>
-                Template Seleccionado
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 600 }}>
-                {selectedTemplate.name}
-              </Typography>
-              <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
-                <Chip
-                  label={`${selectedTemplate.items.length} items`}
-                  size="small"
-                  variant="outlined"
-                  sx={{ borderColor: '#BAE6FD', color: '#0369A1' }}
-                />
-                <Chip
-                  label={`Prioridad: ${selectedTemplate.priority}`}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    borderColor: selectedTemplate.priority >= 4 ? '#FECACA' : '#BAE6FD',
-                    color: selectedTemplate.priority >= 4 ? '#B91C1C' : '#0369A1'
-                  }}
-                />
-              </Stack>
-            </Box>
-          </Grid>
-        )}
-
         {/* TargetJobTag Selector */}
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} sm={6}>
           <Box>
-            <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#374151' }}>
               Categoría de Habitación (TAG)
             </Typography>
             <Box
@@ -281,27 +229,23 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
               }}
               sx={{
                 width: '100%',
-                height: 44,
+                height: 48,
                 px: 2,
-                borderRadius: 2,
+                borderRadius: '8px',
                 border: '1px solid',
-                borderColor: '#E2E8F0',
+                borderColor: '#E5E7EB',
                 bgcolor: 'white',
                 fontSize: '0.9375rem',
                 outline: 'none',
                 appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                 backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 12px center',
+                backgroundPosition: 'right 16px center',
                 backgroundSize: '16px',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:focus': {
                   borderColor: '#415EDE',
-                  boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
                 },
-                '&:hover:not(:focus)': {
-                  borderColor: '#415EDE',
-                }
               }}
             >
               <option value="">Todos (sin filtro)</option>
@@ -309,56 +253,48 @@ const RuleBasicInfo: React.FC<RuleBasicInfoProps> = ({
               <option value="CategoriaB">CategoriaB — Supervisor</option>
               <option value="CategoriaC">CategoriaC — Trabajador</option>
             </Box>
-            <Typography variant="caption" sx={{ color: 'text.disabled', mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: '#9CA3AF', mt: 0.5, display: 'block' }}>
               {errors.targetJobTag || 'Define a qué categoría de habitación aplica esta regla'}
             </Typography>
           </Box>
         </Grid>
 
-        {/* Active Status Toggle */}
+        {/* Active Status Toggle Container */}
         <Grid item xs={12}>
           <Box
             sx={{
-              p: 2.5,
-              border: '1px solid',
-              borderColor: '#E2E8F0',
-              borderRadius: 3,
+              p: 3,
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
               backgroundColor: "white",
               display: 'flex',
               alignItems: 'center',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                borderColor: '#415EDE',
-              }
+              justifyContent: 'space-between',
             }}
           >
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={isActive}
-                  onChange={handleActiveChange}
-                  sx={{
-                    '& .MuiSwitch-switchBase.Mui-checked': {
-                      color: '#415EDE',
-                    },
-                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                      backgroundColor: '#415EDE',
-                    },
-                  }}
-                />
-              }
-              label={
-                <Box sx={{ ml: 1 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                    Regla Activa
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    {isActive
-                      ? 'La regla está activa y se aplicará automáticamente'
-                      : 'La regla está inactiva. Puedes activarla cuando esté lista'}
-                  </Typography>
-                </Box>
-              }
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#111827' }}>
+                Actualización Automática.
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#6B7280', mt: 0.5 }}>
+                {isActive
+                  ? 'La regla está activa y se aplicará automáticamente.'
+                  : 'La regla está inactiva y debe ser aplicada manualmente.'}
+              </Typography>
+            </Box>
+            
+            <Switch
+              checked={isActive}
+              onChange={handleActiveChange}
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': {
+                  color: '#415EDE',
+                },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                  backgroundColor: '#415EDE',
+                  opacity: 0.5,
+                },
+              }}
             />
           </Box>
         </Grid>
