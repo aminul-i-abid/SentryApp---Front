@@ -158,7 +158,7 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
                 disabled={disabled}
                 sx={{
                   bgcolor: '#415EDE', textTransform: 'none', borderRadius: '8px',
-                  fontWeight: 500, boxShadow: 'none',
+                  fontWeight: 500, boxShadow: 'none', color: "white",
                   '&:hover': { bgcolor: '#354BB1', boxShadow: 'none' },
                 }}
               >
