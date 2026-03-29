@@ -1,37 +1,16 @@
 /**
- * ChecklistItemsEditor Component
- *
- * Advanced drag & drop editor for checklist items
- * - Reorder items via react-beautiful-dnd with automatic displayOrder update
- * - Real-time validation with min 1 item, at least 1 mandatory requirement
- * - Visual feedback for drag operations and validation states
- * - Empty state handling with helpful CTA button
- * - Performance optimized with memoization
- * - Accessibility features (ARIA labels, keyboard navigation)
- *
- * @component
- * @example
- * <ChecklistItemsEditor
- *   items={checklistItems}
- *   onItemsChange={handleItemsChange}
- *   onAddItem={handleAddItem}
- *   errors={validationErrors}
- * />
+ * ChecklistItemsEditor Component - Redesigned to match Image 3
+ * Horizontal card grid layout for items, validation summary, progress bar
  */
 
 import React, { useMemo, useCallback, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import {
   Box,
-  Paper,
   Button,
   Typography,
   Alert,
-  AlertTitle,
-  Icon,
-  Divider,
   Chip,
-  Stack,
   LinearProgress,
   Dialog,
   DialogTitle,
@@ -41,46 +20,28 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Grid,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import WarningIcon from '@mui/icons-material/Warning';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoIcon from '@mui/icons-material/Info';
-import ErrorIcon from '@mui/icons-material/Error';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import ChecklistItemForm from './ChecklistItemForm';
 import type { ChecklistItemEditor } from '../types/templateEditorTypes';
 import type { HousekeepingTarea } from '@/store/housekeeping/housekeepingTypes';
 import { useAppSelector } from '@/store/hooks';
 
 interface ChecklistItemsEditorProps {
-  /** Array of checklist items in the template */
   items: ChecklistItemEditor[];
-  /** Callback when items order or state changes */
   onItemsChange: (items: ChecklistItemEditor[]) => void;
-  /** Callback to add a new item */
   onAddItem: () => void;
-  /** Validation errors map for the entire list */
   errors?: Record<string, string>;
-  /** Optional disabled state (prevents all interactions) */
   disabled?: boolean;
-  /** Optional callback for item-specific changes */
   onItemChange?: (index: number, fieldName: string, value: any) => void;
-  /** Optional callback for item removal */
   onRemoveItem?: (index: number) => void;
-  /** Optional callback for item duplication */
   onDuplicateItem?: (index: number) => void;
-  /** Optional callback to add an item pre-populated from a Tarea maestra */
   onAddItemFromTarea?: (tarea: HousekeepingTarea) => void;
 }
 
-/**
- * ChecklistItemsEditor Component
- *
- * Provides a drag-and-drop interface for reordering checklist items
- * with real-time validation and visual feedback.
- * Memoized for performance optimization.
- */
 const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
   ({
     items,
@@ -93,119 +54,69 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
     onDuplicateItem,
     onAddItemFromTarea,
   }) => {
-    // State for Tareas selection dialog
     const [openTareasDialog, setOpenTareasDialog] = useState(false);
-
-    // Read tareas maestras from Redux store
     const tareas = useAppSelector((state) => state.housekeeping.tareas);
 
-    // Compute validation state for the list
     const validationState = useMemo(() => {
       const activeItems = items.filter((item) => !item.isDeleted);
       const mandatoryItems = activeItems.filter((item) => item.isMandatory);
-      const hasMinItems = activeItems.length >= 1;
-      const hasMandatoryItem = mandatoryItems.length >= 1;
-
       return {
-        hasMinItems,
-        hasMandatoryItem,
-        isValid: hasMinItems && hasMandatoryItem,
+        hasMinItems: activeItems.length >= 1,
+        hasMandatoryItem: mandatoryItems.length >= 1,
+        isValid: activeItems.length >= 1 && mandatoryItems.length >= 1,
         itemCount: activeItems.length,
         mandatoryCount: mandatoryItems.length,
       };
     }, [items]);
 
-    // Compute warning messages
-    const warnings = useMemo(() => {
-      const w: string[] = [];
-      if (!validationState.hasMinItems) {
-        w.push('Se requiere al menos 1 elemento en la lista');
-      }
-      if (!validationState.hasMandatoryItem) {
-        w.push('Se requiere al menos 1 elemento obligatorio');
-      }
-      return w;
-    }, [validationState]);
-
-    // Handle drag end event
     const handleDragEnd = useCallback(
       (result: DropResult) => {
-        const { source, destination, draggableId } = result;
-
-        // If dropped outside a valid zone, do nothing
-        if (!destination) return;
-
-        // If dropped in the same position, do nothing
-        if (
-          source.index === destination.index &&
-          source.droppableId === destination.droppableId
-        ) {
-          return;
-        }
-
-        // Create new array with reordered items
+        if (!result.destination) return;
+        if (result.source.index === result.destination.index) return;
         const newItems = Array.from(items);
-        const [draggedItem] = newItems.splice(source.index, 1);
-        newItems.splice(destination.index, 0, draggedItem);
-
-        // Update order for all items after reorder
+        const [draggedItem] = newItems.splice(result.source.index, 1);
+        newItems.splice(result.destination.index, 0, draggedItem);
         const updatedItems = newItems.map((item, index) => ({
           ...item,
           order: index + 1,
           isModified: item.isNew ? item.isModified : true,
         }));
-
-        // Call the change handler
         onItemsChange(updatedItems);
       },
       [items, onItemsChange]
     );
 
-    // Handle item change (for form field updates)
     const handleItemChange = useCallback(
       (index: number, fieldName: string, value: any) => {
         if (onItemChange) {
           onItemChange(index, fieldName, value);
         } else {
-          // Fallback: update items directly
           const updatedItems = [...items];
-          updatedItems[index] = {
-            ...updatedItems[index],
-            [fieldName]: value,
-            isModified: true,
-          };
+          updatedItems[index] = { ...updatedItems[index], [fieldName]: value, isModified: true };
           onItemsChange(updatedItems);
         }
       },
       [items, onItemsChange, onItemChange]
     );
 
-    // Handle item removal (mark as deleted)
     const handleRemoveItem = useCallback(
       (index: number) => {
         if (onRemoveItem) {
           onRemoveItem(index);
         } else {
-          // Fallback: mark as deleted
           const updatedItems = [...items];
-          updatedItems[index] = {
-            ...updatedItems[index],
-            isDeleted: true,
-            isModified: true,
-          };
+          updatedItems[index] = { ...updatedItems[index], isDeleted: true, isModified: true };
           onItemsChange(updatedItems);
         }
       },
       [items, onItemsChange, onRemoveItem]
     );
 
-    // Handle item duplication
     const handleDuplicateItem = useCallback(
       (index: number) => {
         if (onDuplicateItem) {
           onDuplicateItem(index);
         } else {
-          // Fallback: create a copy
           const itemToDuplicate = items[index];
           const dupTempId = `temp_${crypto.randomUUID()}`;
           const newItem: ChecklistItemEditor = {
@@ -213,112 +124,76 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
             id: dupTempId,
             tempId: dupTempId,
             order: items.filter((i) => !i.isDeleted).length + 1,
-            isNew: true,
-            isModified: true,
-            isDeleted: false,
-            errors: {},
+            isNew: true, isModified: true, isDeleted: false, errors: {},
           };
-          const updatedItems = [...items, newItem];
-          onItemsChange(updatedItems);
+          onItemsChange([...items, newItem]);
         }
       },
       [items, onItemsChange, onDuplicateItem]
     );
 
-    // Empty state UI
-    if (items.length === 0 || items.every((item) => item.isDeleted)) {
+    const activeItems = items.filter((item) => !item.isDeleted);
+
+    // Empty state
+    if (activeItems.length === 0) {
       return (
         <Box>
-          <Paper
+          <Box
             sx={{
-              p: 4,
-              textAlign: 'center',
-              backgroundColor: 'action.hover',
-              border: '2px dashed',
-              borderColor: 'divider',
-              borderRadius: 2,
+              p: 6, textAlign: 'center', borderRadius: '12px',
+              border: '2px dashed #E5E7EB', bgcolor: 'white',
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                mb: 2,
-                opacity: 0.5,
-              }}
-            >
-              <Icon sx={{ fontSize: 48 }}>list_alt</Icon>
-            </Box>
-            <Typography variant="h6" gutterBottom color="textSecondary">
+            <Typography variant="h6" sx={{ mb: 1, color: '#6B7280' }}>
               Sin elementos de verificación
             </Typography>
-            <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
-              Comienza agregando elementos a tu plantilla de verificación. Cada elemento
-              puede ser obligatorio u opcional.
+            <Typography variant="body2" sx={{ color: '#9CA3AF', mb: 3 }}>
+              Comienza agregando elementos a tu plantilla de verificación.
             </Typography>
-            <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
-              {onAddItemFromTarea && (
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  startIcon={<AddIcon />}
-                  onClick={() => setOpenTareasDialog(true)}
-                  disabled={disabled}
-                  size="large"
-                  sx={{
-                    backgroundColor: "#415EDE",
-                    color: "white"
-                  }}
-                >
-                  Agregar desde Tareas
-                </Button>
-              )}
-            </Stack>
-          </Paper>
+            {onAddItemFromTarea && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setOpenTareasDialog(true)}
+                disabled={disabled}
+                sx={{
+                  bgcolor: '#415EDE', textTransform: 'none', borderRadius: '8px',
+                  fontWeight: 500, boxShadow: 'none',
+                  '&:hover': { bgcolor: '#354BB1', boxShadow: 'none' },
+                }}
+              >
+                Agregar desde Tareas
+              </Button>
+            )}
+          </Box>
 
-          {/* Tareas Selection Dialog (shared — rendered here for empty state) */}
+          {/* Tareas Dialog */}
           {onAddItemFromTarea && (
-            <Dialog
-              open={openTareasDialog}
-              onClose={() => setOpenTareasDialog(false)}
-              maxWidth="sm"
-              fullWidth
-              PaperProps={{
-                sx: { backgroundColor: 'white' }
-              }}
+            <Dialog open={openTareasDialog} onClose={() => setOpenTareasDialog(false)} maxWidth="sm" fullWidth
+              PaperProps={{ sx: { bgcolor: 'white', borderRadius: '12px' } }}
             >
-              <DialogTitle sx={{ backgroundColor: 'white' }}>Seleccionar Tarea</DialogTitle>
-              <DialogContent sx={{ p: 0, backgroundColor: 'white' }}>
+              <DialogTitle sx={{ bgcolor: 'white' }}>Seleccionar Tarea</DialogTitle>
+              <DialogContent sx={{ p: 0, bgcolor: 'white' }}>
                 {tareas.length === 0 ? (
                   <Box sx={{ p: 3, textAlign: 'center' }}>
                     <Typography variant="body2" color="text.secondary">
-                      No hay tareas de limpieza configuradas. Crea tareas en la sección de Configuración &gt; Tareas.
+                      No hay tareas configuradas.
                     </Typography>
                   </Box>
                 ) : (
                   <List disablePadding>
                     {tareas.map((tarea) => (
                       <ListItem key={tarea.id} disablePadding divider>
-                        <ListItemButton
-                          onClick={() => {
-                            onAddItemFromTarea(tarea);
-                            setOpenTareasDialog(false);
-                          }}
-                        >
-                          <ListItemText
-                            primary={tarea.nombre}
-                            secondary={tarea.descripcion || undefined}
-                          />
+                        <ListItemButton onClick={() => { onAddItemFromTarea(tarea); setOpenTareasDialog(false); }}>
+                          <ListItemText primary={tarea.nombre} secondary={tarea.descripcion || undefined} />
                         </ListItemButton>
                       </ListItem>
                     ))}
                   </List>
                 )}
               </DialogContent>
-              <DialogActions sx={{ backgroundColor: 'white' }}>
-                <Button onClick={() => setOpenTareasDialog(false)}>
-                  Cancelar
-                </Button>
+              <DialogActions sx={{ bgcolor: 'white' }}>
+                <Button onClick={() => setOpenTareasDialog(false)}>Cancelar</Button>
               </DialogActions>
             </Dialog>
           )}
@@ -326,271 +201,183 @@ const ChecklistItemsEditor = React.memo<ChecklistItemsEditorProps>(
       );
     }
 
-    // Active items (not deleted)
-    const activeItems = items.filter((item) => !item.isDeleted);
-    const deletedItems = items.filter((item) => item.isDeleted);
-
     return (
       <Box>
         {/* Validation Summary */}
-        <Paper
+        <Box
           sx={{
-            p: 2,
-            mb: 3,
-            backgroundColor: validationState.isValid ? 'success.lighter' : 'warning.lighter',
-            borderLeft: '4px solid',
-            borderColor: validationState.isValid ? 'success.main' : 'warning.main',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            mb: 3, gap: 2, flexWrap: 'wrap',
+            bgcolor: "white",
+            p: 1,
+            borderRadius: "10px"
           }}
         >
-          <Box display="flex" alignItems="center" gap={2}>
-            {validationState.isValid ? (
-              <CheckCircleIcon color="success" />
-            ) : (
-              <WarningIcon color="warning" />
-            )}
-            <Box flex={1}>
-              <Typography variant="body2" fontWeight={600}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box className="bg-[#FAFAFA] border-1 border-[#F2F2F2] p-1.5 rounded-[6px]">
+              <CheckCircleIcon sx={{ color: validationState.isValid ? '#10B981' : '#F59E0B', fontSize: 22 }} />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827' }}>
                 {validationState.itemCount} elemento{validationState.itemCount !== 1 ? 's' : ''}
                 {validationState.mandatoryCount > 0 && (
-                  <>
-                    {' '}
-                    ({validationState.mandatoryCount} obligatorio
-                    {validationState.mandatoryCount !== 1 ? 's' : ''})
-                  </>
+                  <> ({validationState.mandatoryCount} obligatorio{validationState.mandatoryCount !== 1 ? 's' : ''})</>
                 )}
               </Typography>
-              {validationState.isValid ? (
-                <Typography variant="caption" color="success.dark">
-                  ✓ Cumple los requisitos mínimos
-                </Typography>
-              ) : (
-                <Typography variant="caption" color="warning.dark">
-                  ⚠ Faltan elementos requeridos
-                </Typography>
-              )}
-            </Box>
-            <Stack direction="row" spacing={1}>
-              <Chip
-                label={`Total: ${validationState.itemCount}`}
-                size="small"
-                variant="outlined"
-              />
-              {validationState.mandatoryCount > 0 && (
-                <Chip
-                  label={`Requeridos: ${validationState.mandatoryCount}`}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-            </Stack>
-          </Box>
-        </Paper>
-
-        {/* Validation Warnings */}
-        {warnings.length > 0 && (
-          <Alert severity="warning" icon={<WarningIcon />} sx={{ mb: 2 }}>
-            <AlertTitle>Validación incompleta</AlertTitle>
-            {warnings.map((warning, index) => (
-              <Typography key={index} variant="body2" sx={{ mt: index > 0 ? 1 : 0 }}>
-                • {warning}
+              <Typography variant="caption" sx={{ color: validationState.isValid ? '#686868' : '#D97706' }}>
+                {validationState.isValid ? '• Cumple los requisitos mínimos' : '• Faltan elementos requeridos'}
               </Typography>
-            ))}
-          </Alert>
-        )}
+            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+            <Typography className='bg-[#FAFAFA] border-1 border-[#F7F7F7] p-1.5 rounded-[6px]' variant="body2" sx={{ color: '#6B7280', fontWeight: 600 }}>Total: {validationState.itemCount}</Typography>
+            <Typography className='bg-white border-1 border-[#415EDE1F] p-1.5 rounded-[6px]' variant="body2" sx={{ color: '#415EDE', fontWeight: 600 }}>Requeridos: {validationState.mandatoryCount}</Typography>
+          </Box>
+        </Box>
 
-        {/* Info Alert - Drag & Drop Instructions */}
-        <Alert severity="info" icon={<InfoIcon />} sx={{ mb: 3 }}>
-          <Typography variant="body2">
-            <strong>Instrucciones:</strong> Arrastra los elementos usando el ícono de
-            {' '}
-            <DragIndicatorIcon sx={{ fontSize: '1rem', verticalAlign: 'middle' }} />
-            {' '}
-            para reordenarlos. El orden se actualizará automáticamente.
+        {/* Instructions */}
+        <Box
+          sx={{
+            mb: 3, p: 2, borderRadius: '8px',
+            bgcolor: '#415EDE14', border: '1px solid #F2F2F2',
+            display: 'flex', alignItems: 'center', gap: 1.5,
+          }}
+        >
+          <img src="./assets/icons/information-diamond.png" alt="" />
+          <Typography variant="body2" sx={{ color: '#686868' }}>
+            <strong className='text-black'>Instrucciones:</strong> Arrastra los elementos usando el ícono para reordenarlos. El orden se actualizará automáticamente.
           </Typography>
-        </Alert>
+        </Box>
 
-        {/* Drag & Drop List */}
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="checklist-items" type="ITEM">
-            {(provided, snapshot) => (
-              <Box
-                ref={provided.innerRef}
-                {...provided.droppableProps}
+        {/* Section Title + Add Button */}
+        <Box className="bg-white px-4 py-6 rounded-[12px]">
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827' }}>
+              {validationState.itemCount} elemento{validationState.itemCount !== 1 ? 's' : ''}
+              {validationState.mandatoryCount > 0 && (
+                <> ({validationState.mandatoryCount} obligatorio{validationState.mandatoryCount !== 1 ? 's' : ''})</>
+              )}
+            </Typography>
+            {onAddItemFromTarea && (
+              <Button
+                variant="outlined"
+                endIcon={<img src="./assets/icons/add-01.png" alt="" />}
+                onClick={() => setOpenTareasDialog(true)}
+                disabled={disabled}
+                className='bg-[#F7F7F7]'
                 sx={{
-                  backgroundColor: snapshot.isDraggingOver
-                    ? 'action.hover'
-                    : 'transparent',
-                  borderRadius: 1,
-                  transition: 'background-color 0.2s ease',
-                  minHeight: '200px',
+                  textTransform: 'none', borderRadius: '8px', fontWeight: 500,
+                  color: '#415EDE', borderColor: '#F0F0F0',
+                  '&:hover': { borderColor: '#D1D5DB' },
                 }}
               >
-                {activeItems.map((item, index) => (
-                  <Draggable
-                    key={item.tempId || item.id}
-                    draggableId={item.tempId || item.id}
-                    index={index}
-                    isDragDisabled={disabled}
-                  >
-                    {(provided, snapshot) => (
-                      <Box
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        sx={{
-                          opacity: snapshot.isDragging ? 0.5 : 1,
-                          transition: 'opacity 0.2s ease',
-                          mb: 2,
-                        }}
-                      >
-                        <div {...provided.dragHandleProps}>
-                          <ChecklistItemForm
-                            item={item}
-                            index={index}
-                            onItemChange={(fieldName, value) =>
-                              handleItemChange(index, fieldName, value)
-                            }
-                            onRemoveItem={() => handleRemoveItem(index)}
-                            onDuplicate={() => handleDuplicateItem(index)}
-                            errors={errors}
-                            disabled={disabled}
-                          />
-                        </div>
-                      </Box>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </Box>
+                Agregar desde Tareas
+              </Button>
             )}
-          </Droppable>
-        </DragDropContext>
+          </Box>
 
-        {/* Add Item Buttons */}
-        <Box display="flex" justifyContent="center" gap={2} sx={{ mt: 3, mb: 2, flexWrap: 'wrap' }}>
-          {onAddItemFromTarea && (
-            <Button
-              variant="outlined"
-              color="secondary"
-              startIcon={<AddIcon />}
-              onClick={() => setOpenTareasDialog(true)}
-              disabled={disabled}
-              size="large"
-              sx={{
-                backgroundColor: "#415EDE",
-                color: "white"
-              }}
-            >
-              Agregar desde Tareas
-            </Button>
+          {/* Items Grid (3 columns like Image 3) */}
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="checklist-items" type="ITEM" direction="horizontal">
+              {(provided) => (
+                <Grid
+                  container
+                  spacing={3}
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {activeItems.map((item, index) => (
+                    <Draggable
+                      key={item.tempId || item.id}
+                      draggableId={item.tempId || item.id}
+                      index={index}
+                      isDragDisabled={disabled}
+                    >
+                      {(provided, snapshot) => (
+                        <Grid
+                          item
+                          xs={12}
+                          sm={6}
+                          md={4}
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <Box sx={{ opacity: snapshot.isDragging ? 0.6 : 1 }}>
+                            <ChecklistItemForm
+                              item={item}
+                              index={index}
+                              onItemChange={(fieldName, value) => handleItemChange(index, fieldName, value)}
+                              onRemoveItem={() => handleRemoveItem(index)}
+                              onDuplicate={() => handleDuplicateItem(index)}
+                              errors={errors}
+                              disabled={disabled}
+                            />
+                          </Box>
+                        </Grid>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </Grid>
+              )}
+            </Droppable>
+          </DragDropContext>
+
+          {/* Progress Bar */}
+          {validationState.itemCount > 0 && (
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#111827', mb: 1 }}>
+                Progreso de validación:
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={validationState.isValid ? 100 : 50}
+                sx={{
+                  height: 10,
+                  borderRadius: 5,
+                  bgcolor: '#FEE2E2',
+                  '& .MuiLinearProgress-bar': {
+                    borderRadius: 5,
+                    background: validationState.isValid
+                      ? 'linear-gradient(91.77deg, #2661EB 54.66%, #F06225 113.08%)'
+                      : 'linear-gradient(90deg, #415EDE 0%, #EF4444 100%)',
+                  },
+                }}
+              />
+            </Box>
           )}
         </Box>
 
-        {/* Tareas Selection Dialog */}
+        {/* Tareas Dialog */}
         {onAddItemFromTarea && (
-          <Dialog
-            open={openTareasDialog}
-            onClose={() => setOpenTareasDialog(false)}
-            maxWidth="sm"
-            fullWidth
-            PaperProps={{
-              sx: { backgroundColor: 'white' }
-            }}
+          <Dialog open={openTareasDialog} onClose={() => setOpenTareasDialog(false)} maxWidth="sm" fullWidth
+            PaperProps={{ sx: { bgcolor: 'white', borderRadius: '12px' } }}
           >
-            <DialogTitle sx={{ backgroundColor: 'white' }}>Seleccionar Tarea</DialogTitle>
-            <DialogContent sx={{ p: 0, backgroundColor: 'white' }}>
+            <DialogTitle sx={{ bgcolor: 'white' }}>Seleccionar Tarea</DialogTitle>
+            <DialogContent sx={{ p: 0, bgcolor: 'white' }}>
               {tareas.length === 0 ? (
                 <Box sx={{ p: 3, textAlign: 'center' }}>
                   <Typography variant="body2" color="text.secondary">
-                    No hay tareas de limpieza configuradas. Crea tareas en la sección de Configuración &gt; Tareas.
+                    No hay tareas configuradas.
                   </Typography>
                 </Box>
               ) : (
                 <List disablePadding>
                   {tareas.map((tarea) => (
                     <ListItem key={tarea.id} disablePadding divider>
-                      <ListItemButton
-                        onClick={() => {
-                          onAddItemFromTarea(tarea);
-                          setOpenTareasDialog(false);
-                        }}
-                      >
-                        <ListItemText
-                          primary={tarea.nombre}
-                          secondary={tarea.descripcion || undefined}
-                        />
+                      <ListItemButton onClick={() => { onAddItemFromTarea(tarea); setOpenTareasDialog(false); }}>
+                        <ListItemText primary={tarea.nombre} secondary={tarea.descripcion || undefined} />
                       </ListItemButton>
                     </ListItem>
                   ))}
                 </List>
               )}
             </DialogContent>
-            <DialogActions sx={{ backgroundColor: 'white' }}>
-              <Button onClick={() => setOpenTareasDialog(false)}>
-                Cancelar
-              </Button>
+            <DialogActions sx={{ bgcolor: 'white' }}>
+              <Button onClick={() => setOpenTareasDialog(false)}>Cancelar</Button>
             </DialogActions>
           </Dialog>
-        )}
-
-        {/* Deleted Items Section */}
-        {deletedItems.length > 0 && (
-          <>
-            <Divider sx={{ my: 3 }} />
-            <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-              Elementos marcados para eliminar ({deletedItems.length})
-            </Typography>
-            <Alert severity="error" icon={<ErrorIcon />} sx={{ mb: 2 }}>
-              <Typography variant="body2">
-                Los siguientes elementos serán eliminados cuando guardes la plantilla:
-              </Typography>
-            </Alert>
-            {deletedItems.map((item, index) => (
-              <Paper
-                key={item.tempId || item.id}
-                sx={{
-                  p: 2,
-                  mb: 1,
-                  opacity: 0.6,
-                  backgroundColor: 'error.lighter',
-                  border: '1px dashed',
-                  borderColor: 'error.light',
-                }}
-              >
-                <Box display="flex" alignItems="center" gap={2}>
-                  <ErrorIcon color="error" fontSize="small" />
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      textDecoration: 'line-through',
-                      color: 'textSecondary',
-                      flex: 1,
-                    }}
-                  >
-                    #{index + 1} - {item.description || '(Elemento vacío)'}
-                  </Typography>
-                  <Chip label="Eliminado" size="small" color="error" />
-                </Box>
-              </Paper>
-            ))}
-          </>
-        )}
-
-        {/* Progress Indicator */}
-        {validationState.itemCount > 0 && (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="caption" color="textSecondary" display="block" mb={1}>
-              Progreso de validación
-            </Typography>
-            <LinearProgress
-              variant="determinate"
-              value={validationState.isValid ? 100 : 50}
-              sx={{
-                height: 8,
-                borderRadius: 4,
-              }}
-            />
-          </Box>
         )}
       </Box>
     );

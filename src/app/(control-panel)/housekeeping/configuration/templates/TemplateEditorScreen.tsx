@@ -1,32 +1,13 @@
 /**
  * Template Editor Screen
- * FASE 5.3.7 - Housekeeping Configuration
- *
- * Main editor screen for creating/editing checklist templates
- * Features:
- * - Vertical tab navigation: Basic, Items, Preview, Export
- * - Auto-save every 2 seconds with debounce
- * - Unsaved changes warning on navigate away
- * - Validation before save
- * - Success/error notifications
- * - Back button to list
- *
- * Tabs:
- * - Basic: Template name, category, priority, active status
- * - Items: Checklist items with drag-and-drop reordering
- * - Preview: Visual preview of template with statistics
- * - Export: Import/Export functionality
+ * Redesigned to match modern UI (Images 2, 3, 4)
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
-  Container,
   Typography,
-  Tabs,
-  Tab,
   Button,
-  Paper,
   Breadcrumbs,
   Link,
   Alert,
@@ -43,8 +24,12 @@ import {
 import {
   ArrowBack as ArrowBackIcon,
   Save as SaveIcon,
+  Close as CloseIcon,
+  Settings as SettingsIcon,
   Check as CheckIcon,
   Warning as WarningIcon,
+  Notifications as NotificationsIcon,
+  Description as DescriptionIcon,
 } from '@mui/icons-material';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -62,26 +47,37 @@ import {
   TemplateActions,
 } from './components';
 import type { TemplateEditorState, ChecklistItemEditor } from './types/templateEditorTypes';
+import TabButtonComp from './components/TabButtonComp';
+import TopbarHeader from '@/components/TopbarHeader';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }) => {
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`template-tabpanel-${index}`}
-      aria-labelledby={`template-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
-    </div>
-  );
-};
+// ─── Pill Tab Button ─────────────────────────────
+const TabButton: React.FC<{ active: boolean; label: string; onClick: () => void }> = ({ active, label, onClick }) => (
+  <Button
+    onClick={onClick}
+    sx={{
+      borderRadius: '24px',
+      px: 3,
+      py: 1,
+      minWidth: 'auto',
+      bgcolor: active ? '#415EDE' : 'transparent',
+      color: active ? 'white' : '#4B5563',
+      border: '1px solid',
+      borderColor: active ? '#415EDE' : '#E5E7EB',
+      textTransform: 'none',
+      fontWeight: 500,
+      fontSize: '0.875rem',
+      boxShadow: 'none',
+      whiteSpace: 'nowrap',
+      '&:hover': {
+        bgcolor: active ? '#354BB1' : '#F9FAFB',
+        borderColor: active ? '#354BB1' : '#D1D5DB',
+        boxShadow: 'none',
+      }
+    }}
+  >
+    {label}
+  </Button>
+);
 
 const TemplateEditorScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -94,17 +90,12 @@ const TemplateEditorScreen: React.FC = () => {
   const campId = user?.companyId || '1';
   const isEditMode = !!templateId && templateId !== 'new';
 
-  // Tareas maestras from Redux store (for "Agregar desde Tareas" dialog)
   const tareas = useAppSelector((state) => state.housekeeping.tareas);
 
-  // Active tab state
   const [activeTab, setActiveTab] = useState(0);
-
-  // Unsaved changes dialog
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
 
-  // Template editor hook
   const {
     state,
     setState,
@@ -116,15 +107,12 @@ const TemplateEditorScreen: React.FC = () => {
     lastSaved,
   } = useTemplateEditor({ templateId, campId });
 
-  // Categories hook
   const { categories, isLoading: loadingCategories } = useCategoriesData({ campId });
 
-  // Auto-save ref
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [autoSaveError, setAutoSaveError] = useState<string | null>(null);
 
-  // Set campId on mount
   useEffect(() => {
     if (campId && !state.template.campId) {
       setState((prev) => ({
@@ -134,72 +122,39 @@ const TemplateEditorScreen: React.FC = () => {
     }
   }, [campId, state.template.campId, setState]);
 
-  // Load tareas maestras for the "Agregar desde Tareas" dialog
   useEffect(() => {
     if (campId) {
       dispatch(fetchTareas({ campId: String(campId) }));
     }
   }, [dispatch, campId]);
 
-  // Auto-save with debounce (2 seconds)
   useEffect(() => {
-    if (!hasUnsavedChanges || !isEditMode) {
-      return;
-    }
-
-    // Clear existing timer
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-    }
-
-    // Set new timer
+    if (!hasUnsavedChanges || !isEditMode) return;
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     autoSaveTimerRef.current = setTimeout(async () => {
       try {
         setIsSaving(true);
         setAutoSaveError(null);
-        await handleSave(true); // silent save
-        console.log('[Auto-save] Template saved successfully');
+        await handleSave(true);
       } catch (err: unknown) {
-        console.error('[Auto-save] Error:', err);
         setAutoSaveError(err instanceof Error ? err.message : 'Error al guardar automáticamente');
       } finally {
         setIsSaving(false);
       }
     }, 2000);
-
-    // Cleanup
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
+    return () => { if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current); };
   }, [hasUnsavedChanges, state, isEditMode]);
 
-  // Prevent navigation if unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
+      if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = ''; }
     };
-
     window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges]);
 
-  // Tab change handler
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
-
-  // Save handler
   const handleSave = async (silent = false) => {
     try {
-      // Validate
       const validation = validateTemplate(state);
       if (!validation.isValid) {
         if (!silent) {
@@ -208,8 +163,6 @@ const TemplateEditorScreen: React.FC = () => {
         }
         return;
       }
-
-      // Prepare items payload
       const itemsPayload = state.items
         .filter((item) => !item.isDeleted)
         .map((item, index) => ({
@@ -222,47 +175,35 @@ const TemplateEditorScreen: React.FC = () => {
           tareaId: item.tareaId ? Number(item.tareaId) : undefined,
         }));
 
-      // Dispatch thunk
       let result;
       if (isEditMode) {
-        const updateRequest: UpdateTemplateRequest = {
+        result = await dispatch(updateTemplate({
           id: templateId!,
           name: state.template.name,
           categoryId: state.template.categoryId,
           priority: state.template.priority,
           isActive: state.template.isActive,
           items: itemsPayload,
-        };
-        result = await dispatch(updateTemplate(updateRequest)).unwrap();
+        })).unwrap();
       } else {
-        const createRequest: CreateTemplateRequest = {
+        result = await dispatch(createTemplate({
           name: state.template.name,
           campId: state.template.campId,
           categoryId: state.template.categoryId,
           priority: state.template.priority,
           items: itemsPayload,
-        };
-        result = await dispatch(createTemplate(createRequest)).unwrap();
+        })).unwrap();
       }
 
-      // Success feedback
       if (!silent) {
         enqueueSnackbar(
           isEditMode ? 'Template actualizado exitosamente' : 'Template creado exitosamente',
           { variant: 'success' }
         );
-
-        // Navigate back to list
         window.history.back();
       }
 
-      // Update local state to mark as saved
-      setState((prev) => ({
-        ...prev,
-        hasUnsavedChanges: false,
-        lastSaved: new Date(),
-      }));
-
+      setState((prev) => ({ ...prev, hasUnsavedChanges: false, lastSaved: new Date() }));
       return result;
     } catch (err: unknown) {
       if (!silent) {
@@ -273,7 +214,6 @@ const TemplateEditorScreen: React.FC = () => {
     }
   };
 
-  // Back handler with unsaved changes check
   const handleBack = () => {
     if (hasUnsavedChanges) {
       setPendingNavigation('/housekeeping/templates');
@@ -283,24 +223,17 @@ const TemplateEditorScreen: React.FC = () => {
     }
   };
 
-  // Unsaved dialog handlers
   const handleDiscardChanges = () => {
     setShowUnsavedDialog(false);
-    if (pendingNavigation) {
-      navigate(pendingNavigation);
-    }
+    if (pendingNavigation) navigate(pendingNavigation);
   };
 
   const handleSaveAndContinue = async () => {
     try {
       await handleSave();
       setShowUnsavedDialog(false);
-      if (pendingNavigation) {
-        navigate(pendingNavigation);
-      }
-    } catch (err) {
-      // Error already handled in handleSave
-    }
+      if (pendingNavigation) navigate(pendingNavigation);
+    } catch (err) { /* handled */ }
   };
 
   const handleCancelNavigation = () => {
@@ -308,7 +241,6 @@ const TemplateEditorScreen: React.FC = () => {
     setPendingNavigation(null);
   };
 
-  // Update template basic info
   const handleUpdateBasicInfo = useCallback(
     (field: string, value: string | number | boolean | null) => {
       setState((prev) => ({
@@ -320,276 +252,231 @@ const TemplateEditorScreen: React.FC = () => {
     [setState]
   );
 
-  // Update items
   const handleUpdateItems = useCallback(
     (updatedItems: TemplateEditorState['items']) => {
-      setState((prev) => ({
-        ...prev,
-        items: updatedItems,
-        hasUnsavedChanges: true,
-      }));
+      setState((prev) => ({ ...prev, items: updatedItems, hasUnsavedChanges: true }));
     },
     [setState]
   );
 
-  // Add new item
   const handleAddItem = useCallback(() => {
     const newTempId = `temp_${crypto.randomUUID()}`;
     const newItem: ChecklistItemEditor = {
-      id: newTempId,
-      tempId: newTempId,
-      description: '',
-      inputType: 'checkbox',
-      isMandatory: false,
-      order: state.items.length + 1,
-      requiresPhoto: false,
-      requiresComment: false,
-      isNew: true,
-      isModified: false,
-      isDeleted: false,
-      errors: {},
+      id: newTempId, tempId: newTempId, description: '', inputType: 'checkbox',
+      isMandatory: false, order: state.items.length + 1,
+      requiresPhoto: false, requiresComment: false,
+      isNew: true, isModified: false, isDeleted: false, errors: {},
     };
-    setState((prev) => ({
-      ...prev,
-      items: [...prev.items, newItem],
-      hasUnsavedChanges: true,
-    }));
+    setState((prev) => ({ ...prev, items: [...prev.items, newItem], hasUnsavedChanges: true }));
   }, [setState, state.items.length]);
 
-  // Add item pre-populated from a HousekeepingTarea maestra
   const handleAddItemFromTarea = useCallback(
     (tarea: HousekeepingTarea) => {
       const newTempId = `temp_${crypto.randomUUID()}`;
       const newItem: ChecklistItemEditor = {
-        id: newTempId,
-        tempId: newTempId,
-        tareaId: tarea.id,
-        description: tarea.nombre,
-        inputType: 'checkbox',
-        isMandatory: true,
+        id: newTempId, tempId: newTempId, tareaId: tarea.id,
+        description: tarea.nombre, inputType: 'checkbox', isMandatory: true,
         order: state.items.filter((i) => !i.isDeleted).length + 1,
-        requiresPhoto: false,
-        requiresComment: false,
-        isNew: true,
-        isModified: false,
-        isDeleted: false,
-        errors: {},
+        requiresPhoto: false, requiresComment: false,
+        isNew: true, isModified: false, isDeleted: false, errors: {},
       };
-      setState((prev) => ({
-        ...prev,
-        items: [...prev.items, newItem],
-        hasUnsavedChanges: true,
-      }));
+      setState((prev) => ({ ...prev, items: [...prev.items, newItem], hasUnsavedChanges: true }));
     },
     [setState, state.items]
   );
 
-  // Get category name
   const getCategoryName = (categoryId: string) => {
     const category = categories.find((c) => c.id === categoryId);
     return category?.name || 'Sin categoría';
   };
 
-  // Loading state
   if (isLoading || loadingCategories) {
     return (
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-          <CircularProgress />
-        </Box>
-      </Container>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+        <CircularProgress />
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        {/* Breadcrumbs */}
-        <Breadcrumbs sx={{ mb: 2 }}>
+    <Box sx={{ minHeight: '100%', bgcolor: 'white' }}>
+      {/* ─── Top Bar ─── */}
+      <TopbarHeader />
+
+      {/* ─── Breadcrumbs ─── */}
+      <Box sx={{ px: { xs: 2, md: 4 }, pt: 2, pb: 1.5, bgcolor: 'white' }}>
+        <Breadcrumbs separator="›" sx={{ fontSize: '0.85rem' }}>
           <Link
-            component="button"
-            variant="body2"
-            onClick={handleBack}
-            sx={{ cursor: 'pointer', textDecoration: 'none' }}
+            underline="hover"
+            href="/housekeeping"
+            onClick={(e) => { e.preventDefault(); navigate('/housekeeping'); }}
+            sx={{ color: '#A1A1A1!important', fontWeight: 500, '&:hover': { color: '#415EDE' } }}
           >
-            Templates
+            Housekeeping
           </Link>
-          <Typography variant="body2" color="text.primary">
+          <Link
+            underline="hover"
+            href="/housekeeping/templates"
+            onClick={(e) => { e.preventDefault(); handleBack(); }}
+            sx={{ color: '#A1A1A1!important', fontWeight: 500, '&:hover': { color: '#415EDE' } }}
+          >
+            Plantillas
+          </Link>
+          <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#415EDE' }}>
             {isEditMode ? 'Editar Template' : 'Nuevo Template'}
           </Typography>
         </Breadcrumbs>
-
-        {/* Title and actions */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Box>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <IconButton onClick={handleBack}>
-                <ArrowBackIcon />
-              </IconButton>
-              <Box>
-                <Typography variant="h4">
-                  {isEditMode ? 'Editar Template' : 'Nuevo Template'}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {state.template.name || 'Sin nombre'}
-                  {state.template.categoryId && ` • ${getCategoryName(state.template.categoryId)}`}
-                </Typography>
-              </Box>
-            </Stack>
-          </Box>
-
-          {/* Save status indicator */}
-          <Stack direction="row" spacing={2} alignItems="center">
-            {isSaving && (
-              <Chip
-                icon={<CircularProgress size={16} />}
-                label="Guardando..."
-                size="small"
-                color="default"
-              />
-            )}
-            {!isSaving && hasUnsavedChanges && (
-              <Chip
-                icon={<WarningIcon />}
-                label="Cambios sin guardar"
-                size="small"
-                color="warning"
-              />
-            )}
-            {!isSaving && !hasUnsavedChanges && lastSaved && (
-              <Chip
-                icon={<CheckIcon />}
-                label={`Guardado ${lastSaved.toLocaleTimeString()}`}
-                size="small"
-                color="success"
-              />
-            )}
-            {autoSaveError && (
-              <Chip
-                icon={<WarningIcon />}
-                label="Error al auto-guardar"
-                size="small"
-                color="error"
-              />
-            )}
-          </Stack>
-        </Stack>
       </Box>
 
-      {/* Error Alert */}
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+      {/* ─── Main Content Zone (#f7f7f7) ─── */}
+      <Box sx={{ bgcolor: '#f7f7f7', minHeight: 'calc(100vh - 160px)' }}>
+        {/* ─── Page Header ─── */}
+        <Box
+          sx={{
+            px: { xs: 2, md: 4 }, py: 2,
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            flexWrap: 'wrap', gap: 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <IconButton onClick={handleBack} sx={{ border: '1px solid #E5E7EB', borderRadius: '50%', padding: '6px', bgcolor: '#F7F7F7' }}>
+              <img src="./assets/icons/arrow-left-01.png" alt="" />
+            </IconButton>
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: '#111827' }}>
+                {isEditMode ? 'Editar Template' : 'Nuevo Template'}{' '}
+                <Typography component="span" sx={{ fontWeight: 400, color: '#6B7280', fontSize: '0.9rem' }}>
+                  ({state.template.name || 'Sin nombre'})
+                </Typography>
+              </Typography>
+            </Box>
+          </Box>
 
-      {/* Main Content */}
-      <Paper sx={{ minHeight: 600, backgroundColor: "white" }}>
-        {/* Tabs */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            aria-label="template editor tabs"
-          >
-            <Tab label="Información Básica" id="template-tab-0" />
-            <Tab label="Items del Checklist" id="template-tab-1" />
-            <Tab label="Vista Previa" id="template-tab-2" />
-            {/* <Tab label="Importar/Exportar" id="template-tab-3" /> */}
-          </Tabs>
+          <Stack direction="row" spacing={2} alignItems="center">
+            {isSaving && <Chip icon={<CircularProgress size={14} />} label="Guardando..." size="small" />}
+            {!isSaving && hasUnsavedChanges && <Chip icon={<WarningIcon />} label="Sin guardar" size="small" color="warning" variant="outlined" />}
+            {!isSaving && !hasUnsavedChanges && lastSaved && <Chip icon={<CheckIcon />} label="Guardado" size="small" color="success" variant="outlined" />}
+
+            <Button
+              variant="outlined"
+              startIcon={<img src="./assets/icons/projector-01.png" alt="" />}
+
+              sx={{
+                borderColor: '#E5E7EB', color: '#374151', textTransform: 'none',
+                fontWeight: 500, borderRadius: '8px', bgcolor: 'white',
+                '&:hover': { bgcolor: '#F9FAFB', borderColor: '#D1D5DB' }
+              }}
+            >
+              Probar
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => handleSave(false)}
+              disabled={isSaving}
+              endIcon={isSaving ? <CircularProgress size={16} /> : <img src="./assets/icons/save.png" alt="" />}
+              sx={{
+                bgcolor: '#415EDE', color: 'white', textTransform: 'none',
+                fontWeight: 500, borderRadius: '8px', boxShadow: 'none',
+                '&:hover': { bgcolor: '#354BB1', boxShadow: 'none' }
+              }}
+            >
+              Guardar
+            </Button>
+          </Stack>
         </Box>
 
-        {/* Tab Panels */}
-        <Box sx={{ px: 3 }}>
-          {/* Basic Info Tab */}
-          <TabPanel value={activeTab} index={0}>
+        {error && (
+          <Box sx={{ px: { xs: 2, md: 4 } }}>
+            <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>{error}</Alert>
+          </Box>
+        )}
+
+        <Box sx={{ px: { xs: 2, md: 4 }, pb: 4 }}>
+          {/* ─── Horizontal Tabs ─── */}
+          <Box sx={{ display: 'flex', gap: 1.5, mb: 4, overflowX: 'auto', pb: 1, '&::-webkit-scrollbar': { height: 4 } }}>
+            <TabButtonComp active={activeTab === 0} label="Información Básica" onClick={() => setActiveTab(0)} />
+            <TabButtonComp active={activeTab === 1} label="Items del Checklist" onClick={() => setActiveTab(1)} />
+            <TabButtonComp active={activeTab === 2} label="Vista Previa" onClick={() => setActiveTab(2)} />
+          </Box>
+
+          {/* ─── Tab Content ─── */}
+          <Box sx={{ display: activeTab === 0 ? 'block' : 'none' }}>
             <TemplateBasicInfo
               template={state.template}
               categories={categories}
               onChange={handleUpdateBasicInfo}
               errors={state.errors}
             />
-          </TabPanel>
+          </Box>
 
-          {/* Items Tab */}
-          <TabPanel value={activeTab} index={1}>
+          <Box sx={{ display: activeTab === 1 ? 'block' : 'none' }}>
             <ChecklistItemsEditor
               items={state.items}
               onItemsChange={handleUpdateItems}
               onAddItem={handleAddItem}
               onAddItemFromTarea={handleAddItemFromTarea}
             />
-          </TabPanel>
+          </Box>
 
-          {/* Preview Tab */}
-          <TabPanel value={activeTab} index={2}>
+          <Box sx={{ display: activeTab === 2 ? 'block' : 'none' }}>
             <TemplatePreview
               template={state.template}
               items={state.items}
               categoryName={getCategoryName(state.template.categoryId)}
             />
-          </TabPanel>
+          </Box>
 
-          {/* Import/Export Tab */}
-          {/* <TabPanel value={activeTab} index={3}>
-            <TemplateImportExport
-              template={state.template}
-              items={state.items}
-              onImport={async (importedTemplate) => {
-                setState((prev) => ({
-                  ...prev,
-                  template: {
-                    ...prev.template,
-                    name: importedTemplate.template.name,
-                    categoryId: importedTemplate.template.categoryId,
-                    priority: importedTemplate.template.priority,
-                  },
-                  items: importedTemplate.template.items.map((item, index) => {
-                    const tempId = `temp_${crypto.randomUUID()}`;
-                    return {
-                      id: tempId,
-                      tempId,
-                      description: item.description,
-                      inputType: item.inputType,
-                      isMandatory: item.isMandatory,
-                      order: item.order ?? index,
-                      requiresPhoto: false,
-                      requiresComment: false,
-                      isNew: true,
-                      isModified: false,
-                      isDeleted: false,
-                      errors: {},
-                    };
-                  }),
-                  hasUnsavedChanges: true,
-                }));
-                enqueueSnackbar('Template importado exitosamente', { variant: 'success' });
-              }}
-            />
-          </TabPanel> */}
+          {/* ─── Footer Action Bar ─── */}
+          <Box
+            sx={{
+              mt: 4, pt: 2, borderTop: '1px solid #E5E7EB',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              flexWrap: 'wrap', gap: 2,
+            }}
+          >
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                variant="outlined" color="error" onClick={handleBack}
+                endIcon={<img src="./assets/icons/cancel-circle-red.png" alt="" />}
+                sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 500, border: "1px solid #D6454514", backgroundColor: "white", "&:hover": { bgcolor: "#F9FAFB" } }}
+              >
+                Cancelar
+              </Button>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => handleSave(true)}
+                disabled={isSaving}
+                startIcon={<img src="./assets/icons/projector-01.png" alt="" />}
+                sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 500, color: '#6B7280', borderColor: '#E5E7EB', bgcolor: "white", "&:hover": { bgcolor: "#F9FAFB" } }}
+              >
+                Borrador
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => handleSave(false)}
+                disabled={isSaving}
+                endIcon={<img src="./assets/icons/save.png" alt="" />}
+                sx={{
+                  bgcolor: '#415EDE',
+                  color: 'white',
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  borderRadius: '8px',
+                  boxShadow: 'none',
+                  '&:hover': { bgcolor: '#354BB1', boxShadow: 'none' }
+                }}
+              >
+                Guardar
+              </Button>
+            </Box>
+          </Box>
         </Box>
+      </Box>
 
-        {/* Actions Footer */}
-        <Box sx={{ p: 3, borderTop: 1, borderColor: 'divider' }}>
-          <TemplateActions
-            onSave={async () => handleSave(false)}
-            onSaveDraft={async () => handleSave(true)}
-            onCancel={handleBack}
-            onExport={() => setActiveTab(3)}
-            onImport={() => setActiveTab(3)}
-            isSaving={isSaving}
-            hasUnsavedChanges={hasUnsavedChanges}
-            isValid={validateTemplate(state).isValid}
-          />
-        </Box>
-      </Paper>
-
-      {/* Unsaved Changes Dialog */}
-      <Dialog
-        open={showUnsavedDialog}
-        onClose={handleCancelNavigation}
-      >
+      {/* ─── Unsaved Changes Dialog ─── */}
+      <Dialog open={showUnsavedDialog} onClose={handleCancelNavigation}>
         <DialogTitle>Cambios sin guardar</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -597,18 +484,16 @@ const TemplateEditorScreen: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelNavigation}>
-            Cancelar
-          </Button>
-          <Button onClick={handleDiscardChanges} color="error">
-            Descartar cambios
-          </Button>
-          <Button onClick={handleSaveAndContinue} variant="contained" startIcon={<SaveIcon />}>
+          <Button onClick={handleCancelNavigation}>Cancelar</Button>
+          <Button onClick={handleDiscardChanges} color="error">Descartar cambios</Button>
+          <Button onClick={handleSaveAndContinue} variant="contained" startIcon={<SaveIcon />}
+            sx={{ bgcolor: '#415EDE', '&:hover': { bgcolor: '#354BB1' } }}
+          >
             Guardar y continuar
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Box>
   );
 };
 

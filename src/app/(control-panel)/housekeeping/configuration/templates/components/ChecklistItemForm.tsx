@@ -1,72 +1,54 @@
 /**
- * ChecklistItemForm Component
- *
- * Form component for editing a single checklist item within a template
- * - Item description with validation
- * - Input type selection (checkbox, text, number)
- * - Mandatory flag toggle
- * - Drag handle for reordering
- * - Action buttons (duplicate, delete)
- * - Real-time validation errors
- *
- * @component
- * @example
- * <ChecklistItemForm
- *   item={checklistItem}
- *   index={0}
- *   onItemChange={handleChange}
- *   onRemoveItem={handleRemove}
- *   onDuplicate={handleDuplicate}
- *   errors={validationErrors}
- * />
+ * ChecklistItemForm Component - Redesigned to match Image 3
+ * Card-based layout: Entry Type + Mandatory on top, Description below, actions at bottom
  */
 
 import React, { useMemo } from 'react';
 import {
   Box,
-  Grid,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Checkbox,
-  FormControlLabel,
   IconButton,
-  Paper,
-  Chip,
   Typography,
   Tooltip,
 } from '@mui/material';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import SettingsIcon from '@mui/icons-material/Settings';
 import type { ChecklistItemEditor } from '../types/templateEditorTypes';
 
 interface ChecklistItemFormProps {
-  /** The checklist item data */
   item: ChecklistItemEditor;
-  /** Index of the item in the list */
   index: number;
-  /** Callback for item field changes: (fieldName, value) */
   onItemChange: (fieldName: string, value: any) => void;
-  /** Callback when item is deleted */
   onRemoveItem: () => void;
-  /** Callback to duplicate the item */
   onDuplicate: () => void;
-  /** Validation errors map for this item */
   errors?: Record<string, string>;
-  /** Optional disabled state */
   disabled?: boolean;
 }
 
-/**
- * ChecklistItemForm Component
- *
- * Displays a form for editing a single checklist item.
- * Memoized for performance to prevent unnecessary re-renders
- * when sibling items change.
- */
+const selectSx = {
+  width: '100%',
+  height: 40,
+  px: 2,
+  borderRadius: '8px',
+  border: '1px solid #E5E7EB',
+  bgcolor: 'white',
+  fontSize: '0.875rem',
+  fontFamily: 'inherit',
+  outline: 'none',
+  color: '#111827',
+  appearance: 'none' as const,
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'right 12px center',
+  pr: 4,
+  transition: 'all 0.2s ease',
+  '&:focus': {
+    borderColor: '#415EDE',
+    boxShadow: '0 0 0 3px rgba(65, 94, 222, 0.1)',
+  },
+};
+
 const ChecklistItemForm = React.memo<ChecklistItemFormProps>(
   ({
     item,
@@ -77,308 +59,135 @@ const ChecklistItemForm = React.memo<ChecklistItemFormProps>(
     errors = {},
     disabled = false,
   }) => {
-    // Determine visual status based on item state
-    const itemStatus = useMemo(() => {
-      if (item.isDeleted) return 'deleted';
-      if (item.isNew) return 'new';
-      if (item.isModified) return 'modified';
-      return 'saved';
-    }, [item.isDeleted, item.isNew, item.isModified]);
-
-    // Get status badge color
-    const statusColor = useMemo(() => {
-      switch (itemStatus) {
-        case 'new':
-          return 'success';
-        case 'modified':
-          return 'warning';
-        case 'deleted':
-          return 'error';
-        default:
-          return 'default';
-      }
-    }, [itemStatus]);
-
-    // Get status label
-    const statusLabel = useMemo(() => {
-      switch (itemStatus) {
-        case 'new':
-          return 'Nuevo';
-        case 'modified':
-          return 'Modificado';
-        case 'deleted':
-          return 'Eliminado';
-        default:
-          return '';
-      }
-    }, [itemStatus]);
-
     if (item.isDeleted) {
-      return (
-        <Paper
-          sx={{
-            p: 2,
-            mb: 2,
-            opacity: 0.5,
-            backgroundColor: 'action.disabledBackground',
-            border: '1px dashed',
-            borderColor: 'error.light',
-          }}
-        >
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Box display="flex" alignItems="center" gap={1}>
-              <DragIndicatorIcon sx={{ color: 'action.disabled' }} />
-              <Typography
-                variant="body2"
-                sx={{ textDecoration: 'line-through', color: 'textSecondary' }}
-              >
-                {item.description || '(Elemento vacío)'}
-              </Typography>
-            </Box>
-            <Chip label="Marcado para eliminar" size="small" color="error" />
-          </Box>
-        </Paper>
-      );
+      return null;
     }
 
     return (
-      <Paper
+      <Box
+        className="bg-[#F7F7F7] border-1 border-[#F0F0F0]"
         sx={{
-          p: 2,
-          mb: 2,
-          border: itemStatus !== 'saved' ? '1px solid' : '1px solid',
-          borderColor:
-            itemStatus === 'new'
-              ? 'success.light'
-              : itemStatus === 'modified'
-                ? 'warning.light'
-                : 'divider',
-          backgroundColor:
-            itemStatus === 'new'
-              ? 'success.lighter'
-              : itemStatus === 'modified'
-                ? 'warning.lighter'
-                : 'background.paper',
+          p: 3,
+          borderRadius: '12px',
+          border: '1px solid #E5E7EB',
+          bgcolor: 'white',
         }}
       >
-        {/* Header with index and status */}
-        <Box
-          display="flex"
-          alignItems="center"
-          gap={1}
-          mb={2}
-          justifyContent="space-between"
-        >
-          <Box display="flex" alignItems="center" gap={1}>
-            <Tooltip title="Arrastra para reordenar">
-              <DragIndicatorIcon
-                sx={{
-                  cursor: 'grab',
-                  color: 'action.active',
-                  '&:active': { cursor: 'grabbing' },
-                }}
-              />
-            </Tooltip>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ minWidth: '30px' }}>
-              #{index + 1}
-            </Typography>
-            {statusLabel && (
-              <Chip
-                label={statusLabel}
-                size="small"
-                color={statusColor as any}
-                variant="outlined"
-              />
-            )}
-          </Box>
-        </Box>
+        {/* Top row: Entry Type + Mandatory */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Box sx={{ flex: 1 }}>
 
-        {/* Form Fields Grid */}
-        <Grid container spacing={2}>
-          {/* Description Field */}
-          <Grid item xs={12} md={6}>
-            <Box>
-              <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
-                Descripción del Ítem
-              </Typography>
-              <Box
-                component="textarea"
-                placeholder="Ej. Cambiar sábanas"
-                value={item.description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onItemChange('description', e.target.value)}
-                disabled={disabled}
-                maxLength={255}
-                sx={{
-                  width: '100%',
-                  minHeight: 80,
-                  px: 2,
-                  py: 1.5,
-                  borderRadius: 2,
-                  border: '1px solid',
-                  borderColor: errors[`item_${index}_description`] ? 'error.main' : '#E2E8F0',
-                  bgcolor: 'white',
-                  fontSize: '0.9375rem',
-                  fontFamily: 'inherit',
-                  outline: 'none',
-                  resize: 'vertical',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:focus': {
-                    borderColor: '#415EDE',
-                    boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
-                  },
-                  '&:hover:not(:focus)': {
-                    borderColor: '#415EDE',
-                  },
-                  '&:disabled': {
-                    bgcolor: '#F8FAFC',
-                    cursor: 'not-allowed',
-                  }
-                }}
-              />
-              {errors[`item_${index}_description`] && (
-                <Typography variant="caption" sx={{ color: 'error.main', mt: 0.5, display: 'block' }}>
-                  {errors[`item_${index}_description`]}
-                </Typography>
-              )}
-              {!errors[`item_${index}_description`] && (
-                <Typography variant="caption" sx={{ color: 'text.disabled', mt: 0.5, display: 'block' }}>
-                  Máximo 255 caracteres
-                </Typography>
-              )}
-            </Box>
-          </Grid>
-
-          {/* Input Type Selection */}
-          <Grid item xs={12} md={3}>
-            <Box>
-              <Typography variant="body2" sx={{ mb: 0.75, fontWeight: 500, color: 'text.secondary' }}>
+            <Box className="flex justify-between items-center">
+              <Typography variant="caption" sx={{ fontWeight: 600, color: '#000', display: 'block', mb: 0.75 }}>
                 Tipo de Entrada
               </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: '#000' }}>
+                  Obligatorio
+                </Typography>
+                <Checkbox
+                  checked={item.isMandatory}
+                  onChange={(e) => onItemChange('isMandatory', e.target.checked)}
+                  disabled={disabled}
+                  size="small"
+                  sx={{
+                    color: '#415EDE',
+                    '&.Mui-checked': { color: '#415EDE' },
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <img src="./assets/icons/input-short-text.png" alt="" />
               <Box
                 component="select"
                 value={item.inputType}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onItemChange('inputType', e.target.value as any)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onItemChange('inputType', e.target.value)}
                 disabled={disabled}
-                sx={{
-                  width: '100%',
-                  height: 44,
-                  px: 2,
-                  borderRadius: 2,
-                  border: '1px solid',
-                  borderColor: '#E2E8F0',
-                  bgcolor: 'white',
-                  fontSize: '0.9375rem',
-                  outline: 'none',
-                  appearance: 'none',
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 12px center',
-                  backgroundSize: '16px',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:focus': {
-                    borderColor: '#415EDE',
-                    boxShadow: '0 0 0 4px rgba(65, 94, 222, 0.1)',
-                  },
-                  '&:hover:not(:focus)': {
-                    borderColor: '#415EDE',
-                  },
-                  '&:disabled': {
-                    bgcolor: '#F8FAFC',
-                    cursor: 'not-allowed',
-                  }
-                }}
+                sx={selectSx}
+                className='text-[#6B7280]'
               >
-                <option value="checkbox">☑ Casilla de verificación</option>
-                <option value="text">✎ Texto libre</option>
-                <option value="number"># Número</option>
+                <option value="checkbox">Texto Libre</option>
+                <option value="text">Texto Libre</option>
+                <option value="number">Número</option>
               </Box>
             </Box>
-          </Grid>
+          </Box>
 
-          {/* Mandatory Checkbox */}
-          <Grid item xs={12} md={3}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-                minHeight: '56px',
-              }}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={item.isMandatory}
-                    onChange={(e) =>
-                      onItemChange('isMandatory', e.target.checked)
-                    }
-                    disabled={disabled}
-                    aria-label={`Ítem obligatorio ${index + 1}`}
-                    sx={{
-                      "& .MuiSvgIcon-root": {
-                        color: "#415EDE"
-                      }
-                    }}
-                  />
-                }
-                label={
-                  <Box>
-                    <Typography variant="body2" fontWeight={500}>
-                      Obligatorio
-                    </Typography>
-                  </Box>
-                }
-              />
-            </Box>
-          </Grid>
+        </Box>
 
-          {/* Action Buttons Row */}
-          <Grid item xs={12}>
-            <Box
-              display="flex"
-              gap={1}
-              justifyContent="flex-end"
-              alignItems="center"
+        {/* Description */}
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}>
+            <Typography variant="caption" sx={{ fontWeight: 600, color: '#000' }}>
+              Descripción del Ítem
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#9CA3AF' }}>
+              Máximo 255 caracteres
+            </Typography>
+          </Box>
+          <Box
+            component="textarea"
+            placeholder="Escribe una descripción..."
+            value={item.description}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onItemChange('description', e.target.value)}
+            disabled={disabled}
+            maxLength={255}
+            rows={3}
+            sx={{
+              width: '100%',
+              minHeight: 80,
+              px: 2,
+              py: 1.5,
+              borderRadius: '8px',
+              border: '1px solid',
+              borderColor: errors[`item_${index}_description`] ? '#EF4444' : '#E5E7EB',
+              bgcolor: 'white',
+              fontSize: '0.875rem',
+              fontFamily: 'inherit',
+              outline: 'none',
+              resize: 'vertical',
+              color: '#6B7280',
+              transition: 'all 0.2s ease',
+              '&:focus': {
+                borderColor: '#415EDE',
+                boxShadow: '0 0 0 3px rgba(65, 94, 222, 0.1)',
+              },
+              '&::placeholder': { color: '#9CA3AF' },
+            }}
+          />
+          {errors[`item_${index}_description`] && (
+            <Typography variant="caption" sx={{ color: '#EF4444', mt: 0.5, display: 'block' }}>
+              {errors[`item_${index}_description`]}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Bottom action buttons */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          <Tooltip title="Duplicar este ítem">
+            <IconButton
+              size="medium"
+              onClick={onDuplicate}
+              disabled={disabled}
+              sx={{ bgcolor: '#fff', border: '1px solid #E5E7EB', borderRadius: '8px', p: 1 }}
             >
-              {item.isMandatory && (
-                <Chip
-                  label="Requerido"
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-              <Box sx={{ flexGrow: 1 }} />
-              <Tooltip title="Duplicar este ítem">
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={onDuplicate}
-                    disabled={disabled}
-                    aria-label={`Duplicar ítem ${index + 1}`}
-                    color="primary"
-                  >
-                    <FileCopyIcon />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Eliminar este ítem">
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={onRemoveItem}
-                    disabled={disabled}
-                    aria-label={`Eliminar ítem ${index + 1}`}
-                    color="error"
-                  >
-                    <img src="./assets/icons/delete.png" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
-          </Grid>
-        </Grid>
-      </Paper>
+              <img src="./assets/icons/clipboard.png" alt="" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Eliminar este ítem">
+            <IconButton
+              size="medium"
+              onClick={onRemoveItem}
+              disabled={disabled}
+              sx={{ bgcolor: '#fff', border: '1px solid #E5E7EB', borderRadius: '8px', p: 1 }}
+            >
+              <img src="./assets/icons/delete.png" alt="" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Box>
     );
   }
 );
