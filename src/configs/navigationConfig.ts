@@ -142,6 +142,15 @@ const navigationConfig: FuseNavItemType[] = [
     auth: authRoles.admin, // Solo visible para Sentry_Admin
   },
   {
+    id: "user-management-component",
+    title: "GESTIÓN DE USUARIOS",
+    translate: "GESTIÓN_DE_USUARIOS",
+    type: "item",
+    icon: "/assets/icons/nav/guests.png", // Or maybe another icon. For now, use guests.png or similar.
+    url: Routes.USER_MANAGEMENT,
+    auth: authRoles.admin,
+  },
+  {
     id: "activities-component",
     title: "ACTIVIDADES",
     translate: "ACTIVIDADES",

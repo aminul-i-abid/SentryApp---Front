@@ -25,6 +25,7 @@ export enum Routes {
   GUESTS = '/guests',
   AUDITORY = '/auditory',
   USER_MANUAL = '/user-manual',
+  USER_MANAGEMENT = '/user-management',
   PROBLEMS = '/problems',
   NOTIFICATIONS = '/notifications',
   ITEM_UNIT_OF_MEASURE = '/item-unit-of-measure',
