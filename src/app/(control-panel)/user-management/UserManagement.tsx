@@ -22,6 +22,7 @@ import StyledTable, { TableColumnDef } from "@/components/ui/StyledTable";
 import { ConfirmationModal } from "@/components/ConfirmationModal";
 import UserDetailsSidebar, { UserDetailsData } from "./components/UserDetailsSidebar";
 import UserEditSidebar, { UserEditData } from "./components/UserEditSidebar";
+import UserCreateSidebar, { UserCreateData } from "./components/UserCreateSidebar";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -106,6 +107,7 @@ export default function UserManagement() {
   const [selectedUser, setSelectedUser] = useState<UserDetailsData | null>(null);
   const [isViewSidebarOpen, setIsViewSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setIsEditSidebarOpen] = useState(false);
+  const [isCreateSidebarOpen, setIsCreateSidebarOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Popover Menu
@@ -141,6 +143,28 @@ export default function UserManagement() {
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
     setMenuUser(null);
+  };
+
+  // Create action
+  const handleCreateSave = (data: UserCreateData) => {
+    const newUser: UserDetailsData = {
+      id: `U00${users.length + 1}`,
+      rut: data.rut,
+      name: data.name,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      company: data.company,
+      roles: data.roles,
+      lastReservation: "Sin reservas",
+      creationDate: new Date().toLocaleDateString("es-ES"),
+      createdBy: "Sistema Admin",
+      reservations: [],
+    };
+    
+    setUsers((prev) => [newUser, ...prev]);
+    enqueueSnackbar("Usuario creado exitosamente", { variant: "success" });
+    setIsCreateSidebarOpen(false);
   };
 
   // Edit action
@@ -186,6 +210,26 @@ export default function UserManagement() {
               <h2 className="text-2xl font-bold">
                 Gestión de Usuarios
               </h2>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: "#415EDE",
+                  color: "#fff",
+                  borderRadius: "24px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: "0.95rem",
+                  px: 3,
+                  py: 1.5,
+                  "&:hover": {
+                    backgroundColor: "#3347b8",
+                  },
+                }}
+                startIcon={<AddIcon />}
+                onClick={() => setIsCreateSidebarOpen(true)}
+              >
+                Nuevo Usuario
+              </Button>
             </div>
             
             <StyledTable
@@ -288,6 +332,12 @@ export default function UserManagement() {
       />
 
       {/* Sidebars & Modals */}
+      <UserCreateSidebar
+        open={isCreateSidebarOpen}
+        onClose={() => setIsCreateSidebarOpen(false)}
+        onSave={handleCreateSave}
+      />
+      
       <UserDetailsSidebar
         open={isViewSidebarOpen}
         onClose={() => setIsViewSidebarOpen(false)}
