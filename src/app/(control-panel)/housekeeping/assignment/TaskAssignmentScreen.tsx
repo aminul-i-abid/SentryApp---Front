@@ -142,12 +142,12 @@ interface AssignmentFormState {
 }
 
 const initialFormState: AssignmentFormState = {
-  selectedOperators: DUMMY_OPERATORS,
+  selectedOperators: [],
   selectedLevel: 'block',
   selectedBlockId: null,
   selectedBlockName: '',
   selectedBlockRoomCount: 0,
-  selectedRooms: DUMMY_ROOMS,
+  selectedRooms: [],
 };
 
 // ─── Snackbar state ───────────────────────────────────────────────────────────
