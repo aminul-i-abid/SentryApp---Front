@@ -144,9 +144,9 @@ interface AssignmentFormState {
 const initialFormState: AssignmentFormState = {
   selectedOperators: DUMMY_OPERATORS,
   selectedLevel: 'block',
-  selectedBlockId: 'b1',
-  selectedBlockName: 'Pabellón A',
-  selectedBlockRoomCount: 5,
+  selectedBlockId: null,
+  selectedBlockName: '',
+  selectedBlockRoomCount: 0,
   selectedRooms: DUMMY_ROOMS,
 };
 
@@ -282,7 +282,6 @@ const TaskAssignmentScreen: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: "#fff",
-
           }}
         >
           <Stepper
@@ -309,7 +308,7 @@ const TaskAssignmentScreen: React.FC = () => {
             ))}
           </Stepper>
 
-          <Box sx={{ flex: 1, mb: 4 }}>
+          <Box sx={{ flex: 1, mb: activeStep === 2 ? 10 : 4 }}>
             {activeStep === 0 && (
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
@@ -418,7 +417,19 @@ const TaskAssignmentScreen: React.FC = () => {
             sx={{
               display: 'flex',
               gap: 2,
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
+              ...(activeStep === 2 && {
+                position: 'fixed',
+                bottom: 0,
+                left: { xs: 0, lg: '280px' },
+                right: 0,
+                bgcolor: 'rgba(255, 255, 255, 0.15)',
+                backdropFilter: 'blur(4px)',
+                p: 3,
+                borderTop: '1px solid #E5E7EB',
+                zIndex: 1000,
+                boxShadow: '0 -4px 6px -1px rgb(0 0 0 / 0.1)',
+              })
             }}
           >
             <Button
@@ -488,7 +499,7 @@ const TaskAssignmentScreen: React.FC = () => {
                   bgcolor: '#415EDE',
                   color: 'white',
                   textTransform: 'none',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   borderRadius: '8px',
                   px: { xs: 2, sm: 3 },
                   py: 1,
