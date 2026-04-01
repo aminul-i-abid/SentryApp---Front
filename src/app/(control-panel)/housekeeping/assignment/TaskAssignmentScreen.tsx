@@ -3,13 +3,6 @@
  *
  * 4-step MUI Stepper for creating housekeeping assignment groups.
  * Steps: Operarios → Nivel → Objetivo → Confirmar
- *
- * Uses Phase 4 components:
- *   - OperatorMultiSelector
- *   - AssignmentLevelPicker
- *   - BlockSelectorWithCount
- *   - RoomSelectorWithFilters
- *   - ConfirmAssignmentSummary (new, Phase 5)
  */
 
 import React, { useState } from 'react';
@@ -43,7 +36,6 @@ import BlockFloorSelector from './components/BlockFloorSelector';
 import RoomSelectorWithFilters from './components/RoomSelectorWithFilters';
 import ConfirmAssignmentSummary from './components/ConfirmAssignmentSummary';
 
-// ─── Custom Stepper Connector ──────────────────────────────────────────────────
 const CustomConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 10,
@@ -68,7 +60,6 @@ const CustomConnector = styled(StepConnector)(({ theme }) => ({
   },
 }));
 
-// ─── Custom Step Icon ─────────────────────────────────────────────────────────
 import { StepIconProps } from '@mui/material';
 
 const CustomStepIcon = (props: StepIconProps) => {
@@ -107,30 +98,7 @@ const CustomStepIcon = (props: StepIconProps) => {
   );
 };
 
-// ─── Step labels ──────────────────────────────────────────────────────────────
-
 const STEPS = ['Seleccionar Operarios', 'Nivel de Asignación', 'Objetivo', 'Confirmar'];
-
-// ─── Dummy data for demo ──────────────────────────────────────────────────────
-
-const DUMMY_OPERATORS: OperatorOption[] = [
-  { id: 'op-1', fullName: 'Carlos Rodríguez', rut: '12.345.678-9', email: 'carlos@camp.cl' },
-  { id: 'op-2', fullName: 'María González', rut: '14.567.890-1', email: 'maria@camp.cl' },
-  { id: 'op-3', fullName: 'Juan Pérez', rut: '16.789.012-3', email: 'juan@camp.cl' },
-];
-
-const DUMMY_ROOMS: RoomOption[] = [
-  { id: '101', number: '101', blockId: 'b1', blockName: 'Pabellón A', floor: 1, bedCount: 2 },
-  { id: '102', number: '102', blockId: 'b1', blockName: 'Pabellón A', floor: 1, bedCount: 3 },
-  { id: '103', number: '103', blockId: 'b1', blockName: 'Pabellón A', floor: 1, bedCount: 2 },
-  { id: '201', number: '201', blockId: 'b1', blockName: 'Pabellón A', floor: 2, bedCount: 2 },
-  { id: '202', number: '202', blockId: 'b1', blockName: 'Pabellón A', floor: 2, bedCount: 4 },
-  { id: '301', number: '301', blockId: 'b2', blockName: 'Pabellón B', floor: 1, bedCount: 4 },
-  { id: '302', number: '302', blockId: 'b2', blockName: 'Pabellón B', floor: 1, bedCount: 2 },
-  { id: '401', number: '401', blockId: 'b2', blockName: 'Pabellón B', floor: 2, bedCount: 3 },
-];
-
-// ─── Form state ───────────────────────────────────────────────────────────────
 
 interface AssignmentFormState {
   selectedOperators: OperatorOption[];
@@ -150,15 +118,11 @@ const initialFormState: AssignmentFormState = {
   selectedRooms: [],
 };
 
-// ─── Snackbar state ───────────────────────────────────────────────────────────
-
 interface SnackbarState {
   open: boolean;
   message: string;
   severity: 'success' | 'error';
 }
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 const TaskAssignmentScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -261,6 +225,7 @@ const TaskAssignmentScreen: React.FC = () => {
         minHeight: '100%',
         bgcolor: '#fff',
         p: { xs: 2, md: 4 },
+        pb: 15, // Space for the fixed pill footer
       }}
     >
       <Box sx={{ mb: 3 }}>
@@ -281,7 +246,6 @@ const TaskAssignmentScreen: React.FC = () => {
             minHeight: '600px',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: "#fff",
           }}
         >
           <Stepper
@@ -308,7 +272,7 @@ const TaskAssignmentScreen: React.FC = () => {
             ))}
           </Stepper>
 
-          <Box sx={{ flex: 1, mb: activeStep === 2 ? 10 : 4 }}>
+          <Box sx={{ flex: 1 }}>
             {activeStep === 0 && (
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
@@ -412,106 +376,100 @@ const TaskAssignmentScreen: React.FC = () => {
               />
             )}
           </Box>
+        </Box>
+      </Box>
 
-          <Box
+      {/* FLYING FOOTER PILL */}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'center',
+          position: 'fixed',
+          bottom: 40, // Floating above the bottom
+          left: { xs: '50%', lg: 'calc(50% + 140px)' }, // Offset for 280px sidebar
+          transform: 'translateX(-50%)',
+          bgcolor: '#fff',
+          p: 2.5,
+          px: 5,
+          borderRadius: '50px',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
+          zIndex: 2000,
+          border: '1px solid #E5E7EB',
+        }}
+      >
+        <Button
+          disabled={activeStep === 0 || isSubmitting}
+          onClick={handleBack}
+          sx={{
+            bgcolor: '#F3F4F6',
+            color: activeStep === 0 ? '#9CA3AF' : '#4B5563',
+            textTransform: 'none',
+            fontWeight: 600,
+            borderRadius: '24px',
+            px: 4,
+            py: 1,
+            '&:hover': { bgcolor: '#E5E7EB' },
+          }}
+        >
+          Anterior
+        </Button>
+
+        <Button
+          disabled={isSubmitting}
+          onClick={() => window.history.back()}
+          sx={{
+            bgcolor: '#F3F4F6',
+            color: '#4B5563',
+            textTransform: 'none',
+            fontWeight: 600,
+            borderRadius: '24px',
+            px: 4,
+            py: 1,
+            '&:hover': { bgcolor: '#E5E7EB' },
+          }}
+        >
+          Cancelar
+        </Button>
+
+        {activeStep < STEPS.length - 1 ? (
+          <Button
+            variant="contained"
+            disabled={!isStepValid(activeStep)}
+            onClick={handleNext}
             sx={{
-              display: 'flex',
-              gap: 2,
-              justifyContent: 'center',
-              ...(activeStep === 2 && {
-                position: 'fixed',
-                bottom: 0,
-                left: { xs: 0, lg: '280px' },
-                right: 0,
-                bgcolor: 'rgba(255, 255, 255, 0.15)',
-                backdropFilter: 'blur(4px)',
-                p: 3,
-                borderTop: '1px solid #E5E7EB',
-                zIndex: 1000,
-                boxShadow: '0 -4px 6px -1px rgb(0 0 0 / 0.1)',
-              })
+              bgcolor: '#415EDE',
+              color: 'white',
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: '24px',
+              px: 4,
+              py: 1,
+              '&:hover': { bgcolor: '#354BB1' },
             }}
           >
-            <Button
-              disabled={activeStep === 0 || isSubmitting}
-              onClick={handleBack}
-              sx={{
-                bgcolor: '#F3F4F6',
-                color: activeStep === 0 ? '#9CA3AF' : '#4B5563',
-                textTransform: 'none',
-                fontWeight: 500,
-                borderRadius: '8px',
-                px: { xs: 2, sm: 3 },
-                py: 1,
-                boxShadow: 'none',
-                '&:hover': { bgcolor: '#E5E7EB', boxShadow: 'none' },
-                '&.Mui-disabled': { bgcolor: '#F3F4F6', color: '#9CA3AF' },
-              }}
-            >
-              Anterior
-            </Button>
-
-            <Button
-              disabled={isSubmitting}
-              onClick={() => window.history.back()}
-              sx={{
-                bgcolor: '#F3F4F6',
-                color: '#4B5563',
-                textTransform: 'none',
-                fontWeight: 500,
-                borderRadius: '8px',
-                px: { xs: 2, sm: 3 },
-                py: 1,
-                boxShadow: 'none',
-                '&:hover': { bgcolor: '#E5E7EB', boxShadow: 'none' },
-              }}
-            >
-              Cancelar
-            </Button>
-
-            {activeStep < STEPS.length - 1 ? (
-              <Button
-                variant="contained"
-                disabled={!isStepValid(activeStep)}
-                onClick={handleNext}
-                sx={{
-                  bgcolor: '#415EDE',
-                  color: 'white',
-                  textTransform: 'none',
-                  fontWeight: 500,
-                  borderRadius: '8px',
-                  px: { xs: 2, sm: 3 },
-                  py: 1,
-                  boxShadow: 'none',
-                  '&:hover': { bgcolor: '#354BB1', boxShadow: 'none' },
-                  '&.Mui-disabled': { bgcolor: '#9CA3AF', color: '#F3F4F6' },
-                }}
-              >
-                Siguiente
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                disabled={isSubmitting}
-                onClick={() => void handleSubmit()}
-                startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : undefined}
-                sx={{
-                  bgcolor: '#415EDE',
-                  color: 'white',
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  borderRadius: '8px',
-                  px: { xs: 2, sm: 3 },
-                  py: 1,
-                  boxShadow: 'none',
-                  '&:hover': { bgcolor: '#354BB1', boxShadow: 'none' },
-                }}
-              >
-                {isSubmitting ? 'Guardando...' : 'Confirmar Asignación'}
-              </Button>
-            )}
-          </Box>
-        </Box>
+            Siguiente
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            disabled={isSubmitting}
+            onClick={() => void handleSubmit()}
+            startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : undefined}
+            sx={{
+              bgcolor: '#415EDE',
+              color: 'white',
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: '24px',
+              px: 4,
+              py: 1,
+              '&:hover': { bgcolor: '#354BB1' },
+            }}
+          >
+            {isSubmitting ? 'Guardando...' : 'Confirmar Asignación'}
+          </Button>
+        )}
       </Box>
 
       <Snackbar
