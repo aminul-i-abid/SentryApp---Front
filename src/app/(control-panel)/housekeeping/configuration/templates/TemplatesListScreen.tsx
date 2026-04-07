@@ -403,7 +403,7 @@ const TemplatesListScreen: React.FC = () => {
 
   return (
     <Root header={
-      <TopbarHeader title="Templates de Checklist" description="Gestiona las plantillas de checklist para tareas de housekeeping" />
+      <TopbarHeader title="Templates de Checklist" description="Gestiona las plantillas de checklist para tareas de housekeeping" isRightVisible={false} />
     } content={
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header */}

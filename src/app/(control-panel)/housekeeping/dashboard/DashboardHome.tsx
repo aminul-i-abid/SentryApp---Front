@@ -418,7 +418,7 @@ const DashboardHome: React.FC = () => {
         <TopbarHeader
           title="Housekeeping Dashboard"
           description="Dashboard de gestión de tareas de housekeeping. Monitorea KPIs y discrepancias en tiempo real."
-
+          isRightVisible={false}
         />
         // <Box
         //   sx={{

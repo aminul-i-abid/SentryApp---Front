@@ -232,6 +232,7 @@ const TaskAssignmentScreen: React.FC = () => {
       <TopbarHeader
         title="Nueva Asignación de Operarios"
         description="Sigue los pasos para asignar operarios a habitaciones del campamento."
+        isRightVisible={false}
       />
       {/* <Box sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>

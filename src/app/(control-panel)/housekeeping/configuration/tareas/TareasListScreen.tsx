@@ -554,7 +554,7 @@ const TareasListScreen: React.FC = () => {
 
   return (
     <Root header={
-      <TopbarHeader title="Tareas de Limpieza" description='Gestión de tareas maestras para el sistema de Housekeeping' />
+      <TopbarHeader title="Tareas de Limpieza" description='Gestión de tareas maestras para el sistema de Housekeeping' isRightVisible={false} />
     } content={
       <Box
         sx={{

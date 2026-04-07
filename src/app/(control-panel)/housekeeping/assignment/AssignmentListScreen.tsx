@@ -269,6 +269,7 @@ const AssignmentListScreen: React.FC = () => {
       <TopbarHeader
         title="Asignaciones de Operarios"
         description="Gestiona los grupos de asignación de operarios a habitaciones."
+        isRightVisible={false}
       />
     } content={
       <Container maxWidth="xl" sx={{ py: 4 }}>

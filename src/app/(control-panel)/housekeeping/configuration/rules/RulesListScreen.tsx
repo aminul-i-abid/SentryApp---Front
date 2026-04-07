@@ -413,7 +413,7 @@ const RulesListScreen: React.FC = () => {
     <Root header={
       <TopbarHeader title="Reglas de Limpieza" description={`
         ${filteredAndSortedRules.length} regla${filteredAndSortedRules.length !== 1 ? 's' : ''} encontrada${filteredAndSortedRules.length !== 1 ? 's' : ''}
-        `} />
+        `} isRightVisible={false} />
     } content={
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header */}
