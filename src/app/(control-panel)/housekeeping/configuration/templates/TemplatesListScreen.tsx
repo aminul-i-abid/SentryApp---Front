@@ -55,6 +55,8 @@ import {
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
 } from '@mui/icons-material';
+import FusePageSimple from "@fuse/core/FusePageSimple";
+import { styled } from "@mui/material/styles";
 import StyledTable, { type TableColumnDef } from '@/components/ui/StyledTable';
 import { useSnackbar } from 'notistack';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -63,6 +65,7 @@ import useUser from '@auth/useUser';
 import { useCategoriesData } from './hooks';
 import type { ChecklistTemplate } from '@/store/housekeeping/housekeepingTypes';
 import type { TemplatesListState } from './types/templateEditorTypes';
+import TopbarHeader from '@/components/TopbarHeader';
 
 const TemplatesListScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -376,312 +379,338 @@ const TemplatesListScreen: React.FC = () => {
     return filteredTemplates.slice(start, start + state.pageSize);
   }, [filteredTemplates, state.page, state.pageSize]);
 
+  const Root = styled(FusePageSimple)(({ theme }) => ({
+    "& .FusePageSimple-header": {
+      backgroundColor: theme.palette.background.paper,
+      borderBottomWidth: 1,
+      borderStyle: "solid",
+      borderColor: theme.palette.divider,
+    },
+    "& .FusePageSimple-content": {},
+    "& .FusePageSimple-content > .container": {
+      maxWidth: "100% !important",
+      padding: "0 !important",
+      width: "100%",
+    },
+    "& .FusePageSimple-header > .container": {
+      maxWidth: "100% !important",
+      padding: "0 !important",
+      width: "100%",
+    },
+    "& .FusePageSimple-sidebarHeader": {},
+    "& .FusePageSimple-sidebarContent": {},
+  }));
+
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
+    <Root header={
+      <TopbarHeader title="Templates de Checklist" description="Gestiona las plantillas de checklist para tareas de housekeeping" />
+    } content={
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        {/* Header */}
+        {/* <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom>
           Templates de Checklist
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Gestiona las plantillas de checklist para tareas de housekeeping
         </Typography>
-      </Box>
+      </Box> */}
 
-      {/* Error Alert */}
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+        {/* Error Alert */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-      {/* Filters and Actions */}
-      <Paper sx={{ p: 3, mb: 3, backgroundColor: "white" }}>
-        <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-          {/* Search */}
-          <TextField
-            placeholder="Buscar por nombre..."
-            value={state.filters.searchTerm}
-            onChange={handleSearchChange}
-            size="small"
-            sx={{
-              minWidth: 250,
-              '& .MuiOutlinedInput-root': {
-                bgcolor: 'white',
-                '&:hover fieldset': {
-                  borderColor: '#415EDE',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#415EDE',
-                  borderWidth: '2px',
-                }
-              },
-            }}
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-            }}
-          />
-
-          {/* Category Filter */}
-          <FormControl
-            size="small"
-            sx={{
-              minWidth: 200,
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: '#415EDE',
-              },
-            }}
-          >
-            <InputLabel>Categoría</InputLabel>
-            <Select
-              value={state.filters.categoryId || ''}
-              onChange={handleCategoryChange}
-              label="Categoría"
+        {/* Filters and Actions */}
+        <Paper sx={{ p: 3, mb: 3, backgroundColor: "white" }}>
+          <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
+            {/* Search */}
+            <TextField
+              placeholder="Buscar por nombre..."
+              value={state.filters.searchTerm}
+              onChange={handleSearchChange}
+              size="small"
               sx={{
-                backgroundColor: "white",
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#415EDE',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#415EDE',
-                  borderWidth: '2px',
+                minWidth: 250,
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'white',
+                  '&:hover fieldset': {
+                    borderColor: '#415EDE',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#415EDE',
+                    borderWidth: '2px',
+                  }
                 },
               }}
-              MenuProps={{
-                PaperProps: {
-                  sx: { backgroundColor: 'white !important' }
-                }
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+              }}
+            />
+
+            {/* Category Filter */}
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 200,
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#415EDE',
+                },
               }}
             >
-              <MenuItem value="">Todas</MenuItem>
-              {categories.map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>
-                  {cat.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              <InputLabel>Categoría</InputLabel>
+              <Select
+                value={state.filters.categoryId || ''}
+                onChange={handleCategoryChange}
+                label="Categoría"
+                sx={{
+                  backgroundColor: "white",
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                    borderWidth: '2px',
+                  },
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: { backgroundColor: 'white !important' }
+                  }
+                }}
+              >
+                <MenuItem value="">Todas</MenuItem>
+                {categories.map((cat) => (
+                  <MenuItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-          {/* Active Status Filter */}
-          <FormControl
-            size="small"
-            sx={{
-              minWidth: 150,
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: '#415EDE',
-              },
-            }}
-          >
-            <InputLabel>Estado</InputLabel>
-            <Select
-              value={state.filters.isActive === undefined ? '' : String(state.filters.isActive)}
-              onChange={handleActiveStatusChange}
-              label="Estado"
+            {/* Active Status Filter */}
+            <FormControl
+              size="small"
               sx={{
-                backgroundColor: "white",
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#415EDE',
+                minWidth: 150,
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#415EDE',
                 },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#415EDE',
-                  borderWidth: '2px',
-                },
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: { backgroundColor: 'white !important' }
-                }
               }}
             >
-              <MenuItem value="">Todos</MenuItem>
-              <MenuItem value="true">Activos</MenuItem>
-              <MenuItem value="false">Inactivos</MenuItem>
-            </Select>
-          </FormControl>
-
-          <Box sx={{ flexGrow: 1 }} />
-
-          {/* Bulk Actions */}
-          {state.selectedTemplates.length > 0 && (
-            <>
-              <Button
-                variant="outlined"
-                startIcon={<img src="/assets/icons/on.png" alt="Activate" />}
-                onClick={() => handleBulkAction('activate')}
-                size="small"
+              <InputLabel>Estado</InputLabel>
+              <Select
+                value={state.filters.isActive === undefined ? '' : String(state.filters.isActive)}
+                onChange={handleActiveStatusChange}
+                label="Estado"
+                sx={{
+                  backgroundColor: "white",
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#415EDE',
+                    borderWidth: '2px',
+                  },
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: { backgroundColor: 'white !important' }
+                  }
+                }}
               >
-                Activar ({state.selectedTemplates.length})
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<img src="/assets/icons/off.png" alt="Deactivate" />}
-                onClick={() => handleBulkAction('deactivate')}
-                size="small"
-              >
-                Desactivar ({state.selectedTemplates.length})
-              </Button>
-            </>
-          )}
+                <MenuItem value="">Todos</MenuItem>
+                <MenuItem value="true">Activos</MenuItem>
+                <MenuItem value="false">Inactivos</MenuItem>
+              </Select>
+            </FormControl>
 
-          {/* Create Button */}
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-            sx={{ backgroundColor: '#415EDE', color: 'white' }}
-          >
-            Nuevo Template
-          </Button>
-        </Stack>
-      </Paper>
+            <Box sx={{ flexGrow: 1 }} />
 
-      {/* Table */}
-      <StyledTable
-        columns={columns}
-        data={paginatedData}
-        getRowId={(row) => row.id}
-        loading={loading || loadingCategories}
-        selectable
-        selected={state.selectedTemplates}
-        onSelectAll={(e) => {
-          if (e.target.checked) {
-            setState((prev) => ({ ...prev, selectedTemplates: filteredTemplates.map(t => t.id) }));
-          } else {
-            setState((prev) => ({ ...prev, selectedTemplates: [] }));
-          }
-        }}
-        onSelectRow={(_, id) => {
-          handleRowSelectionChange(id);
-        }}
-        order={state.sortOrder}
-        orderBy={state.sortBy}
-        onSort={(columnId) => {
-          setState((prev) => ({
-            ...prev,
-            sortBy: columnId as "name" | "priority" | "createdAt",
-            sortOrder: prev.sortBy === columnId && prev.sortOrder === 'asc' ? 'desc' : 'asc',
-          }));
-        }}
-        renderActions={(row) => (
-          <Stack direction="row" spacing={0.5} justifyContent="center">
-            <Tooltip title="Editar template">
-              <IconButton size="small" onClick={() => handleEdit(row.id)}>
-                <img src="./assets/icons/edit-black.png" alt="" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Duplicar template">
-              <IconButton size="small" onClick={() => handleDuplicate(row)}>
-                <DuplicateIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={row.isActive ? 'Desactivar' : 'Activar'}>
-              <IconButton size="small" onClick={() => handleToggleActive(row.id, row.isActive)}>
-                {row.isActive ? (
-                  <img src="./assets/icons/off.png" alt="" />
-                ) : (
-                  <img src="./assets/icons/on.png" alt="" />
-                )}
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Eliminar template">
-              <IconButton size="small" onClick={() => handleDeleteClick(row.id)} color="error">
-                <img src="./assets/icons/delete.png" alt="" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={expandedRows.has(row.id) ? 'Ocultar items' : 'Ver items'}>
-              <IconButton size="small" onClick={() => handleToggleExpand(row.id)}>
-                {expandedRows.has(row.id) ? (
-                  <ExpandLessIcon fontSize="small" />
-                ) : (
-                  <ExpandMoreIcon fontSize="small" />
-                )}
-              </IconButton>
-            </Tooltip>
+            {/* Bulk Actions */}
+            {state.selectedTemplates.length > 0 && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<img src="/assets/icons/on.png" alt="Activate" />}
+                  onClick={() => handleBulkAction('activate')}
+                  size="small"
+                >
+                  Activar ({state.selectedTemplates.length})
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<img src="/assets/icons/off.png" alt="Deactivate" />}
+                  onClick={() => handleBulkAction('deactivate')}
+                  size="small"
+                >
+                  Desactivar ({state.selectedTemplates.length})
+                </Button>
+              </>
+            )}
+
+            {/* Create Button */}
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+              sx={{ backgroundColor: '#415EDE', color: 'white' }}
+            >
+              Nuevo Template
+            </Button>
           </Stack>
-        )}
-        isRowExpanded={(row) => expandedRows.has(row.id)}
-        renderDetailPanel={(row) => (
-          <Box sx={{ p: 2, backgroundColor: 'background.default', mx: 2, my: 1, borderRadius: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Items del Template (mostrando primeros 5)
-            </Typography>
-            <List dense>
-              {(row.items ?? []).slice(0, 5).map((item, idx) => (
-                <ListItem key={idx}>
-                  <ListItemText
-                    primary={item.description}
-                    secondary={
-                      <>
-                        {item.isMandatory && (
-                          <Chip label="Obligatorio" size="small" color="error" sx={{ mr: 1 }} />
-                        )}
-                        Orden: {item.order}
-                      </>
-                    }
-                  />
-                </ListItem>
-              ))}
-              {(row.items ?? []).length > 5 && (
-                <ListItem>
-                  <ListItemText
-                    secondary={`... y ${(row.items ?? []).length - 5} items más`}
-                  />
-                </ListItem>
-              )}
-            </List>
-          </Box>
-        )}
-        pagination={{
-          count: filteredTemplates.length,
-          page: state.page,
-          rowsPerPage: state.pageSize,
-          onPageChange: (_, newPage) => setState((prev) => ({ ...prev, page: newPage })),
-        }}
-      />
+        </Paper>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-      >
-        <DialogTitle>Confirmar Eliminación</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            ¿Está seguro de que desea eliminar este template? Esta acción no se puede deshacer.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
-            Cancelar
-          </Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-            Eliminar
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {/* Table */}
+        <StyledTable
+          columns={columns}
+          data={paginatedData}
+          getRowId={(row) => row.id}
+          loading={loading || loadingCategories}
+          selectable
+          selected={state.selectedTemplates}
+          onSelectAll={(e) => {
+            if (e.target.checked) {
+              setState((prev) => ({ ...prev, selectedTemplates: filteredTemplates.map(t => t.id) }));
+            } else {
+              setState((prev) => ({ ...prev, selectedTemplates: [] }));
+            }
+          }}
+          onSelectRow={(_, id) => {
+            handleRowSelectionChange(id);
+          }}
+          order={state.sortOrder}
+          orderBy={state.sortBy}
+          onSort={(columnId) => {
+            setState((prev) => ({
+              ...prev,
+              sortBy: columnId as "name" | "priority" | "createdAt",
+              sortOrder: prev.sortBy === columnId && prev.sortOrder === 'asc' ? 'desc' : 'asc',
+            }));
+          }}
+          renderActions={(row) => (
+            <Stack direction="row" spacing={0.5} justifyContent="center">
+              <Tooltip title="Editar template">
+                <IconButton size="small" onClick={() => handleEdit(row.id)}>
+                  <img src="./assets/icons/edit-black.png" alt="" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Duplicar template">
+                <IconButton size="small" onClick={() => handleDuplicate(row)}>
+                  <DuplicateIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={row.isActive ? 'Desactivar' : 'Activar'}>
+                <IconButton size="small" onClick={() => handleToggleActive(row.id, row.isActive)}>
+                  {row.isActive ? (
+                    <img src="./assets/icons/off.png" alt="" />
+                  ) : (
+                    <img src="./assets/icons/on.png" alt="" />
+                  )}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Eliminar template">
+                <IconButton size="small" onClick={() => handleDeleteClick(row.id)} color="error">
+                  <img src="./assets/icons/delete.png" alt="" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={expandedRows.has(row.id) ? 'Ocultar items' : 'Ver items'}>
+                <IconButton size="small" onClick={() => handleToggleExpand(row.id)}>
+                  {expandedRows.has(row.id) ? (
+                    <ExpandLessIcon fontSize="small" />
+                  ) : (
+                    <ExpandMoreIcon fontSize="small" />
+                  )}
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          )}
+          isRowExpanded={(row) => expandedRows.has(row.id)}
+          renderDetailPanel={(row) => (
+            <Box sx={{ p: 2, backgroundColor: 'background.default', mx: 2, my: 1, borderRadius: 2 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Items del Template (mostrando primeros 5)
+              </Typography>
+              <List dense>
+                {(row.items ?? []).slice(0, 5).map((item, idx) => (
+                  <ListItem key={idx}>
+                    <ListItemText
+                      primary={item.description}
+                      secondary={
+                        <>
+                          {item.isMandatory && (
+                            <Chip label="Obligatorio" size="small" color="error" sx={{ mr: 1 }} />
+                          )}
+                          Orden: {item.order}
+                        </>
+                      }
+                    />
+                  </ListItem>
+                ))}
+                {(row.items ?? []).length > 5 && (
+                  <ListItem>
+                    <ListItemText
+                      secondary={`... y ${(row.items ?? []).length - 5} items más`}
+                    />
+                  </ListItem>
+                )}
+              </List>
+            </Box>
+          )}
+          pagination={{
+            count: filteredTemplates.length,
+            page: state.page,
+            rowsPerPage: state.pageSize,
+            onPageChange: (_, newPage) => setState((prev) => ({ ...prev, page: newPage })),
+          }}
+        />
 
-      {/* Bulk Action Confirmation Dialog */}
-      <Dialog
-        open={bulkActionDialogOpen}
-        onClose={() => setBulkActionDialogOpen(false)}
-      >
-        <DialogTitle>Confirmar Acción Masiva</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            ¿Está seguro de que desea {bulkAction === 'activate' ? 'activar' : 'desactivar'}{' '}
-            {state.selectedTemplates.length} template(s)?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBulkActionDialogOpen(false)}>
-            Cancelar
-          </Button>
-          <Button onClick={handleBulkActionConfirm} color="primary" variant="contained">
-            Confirmar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+        >
+          <DialogTitle>Confirmar Eliminación</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              ¿Está seguro de que desea eliminar este template? Esta acción no se puede deshacer.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+              Eliminar
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Bulk Action Confirmation Dialog */}
+        <Dialog
+          open={bulkActionDialogOpen}
+          onClose={() => setBulkActionDialogOpen(false)}
+        >
+          <DialogTitle>Confirmar Acción Masiva</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              ¿Está seguro de que desea {bulkAction === 'activate' ? 'activar' : 'desactivar'}{' '}
+              {state.selectedTemplates.length} template(s)?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setBulkActionDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleBulkActionConfirm} color="primary" variant="contained">
+              Confirmar
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    } />
   );
 };
 

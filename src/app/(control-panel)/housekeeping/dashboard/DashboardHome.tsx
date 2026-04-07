@@ -55,6 +55,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import BuildIcon from '@mui/icons-material/Build';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import TopbarHeader from '@/components/TopbarHeader';
 
 /**
  * KPI cards to hide from the dashboard.
@@ -414,20 +415,25 @@ const DashboardHome: React.FC = () => {
   return (
     <Root
       header={
-        <Box
-          sx={{
-            py: 3,
-            px: 4,
-            backgroundColor: "white",
-          }}
-        >
-          <Typography variant="h5" fontWeight={700}>
-            Housekeeping Dashboard
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Dashboard de gestión de tareas de housekeeping. Monitorea KPIs y discrepancias en tiempo real.
-          </Typography>
-        </Box>
+        <TopbarHeader
+          title="Housekeeping Dashboard"
+          description="Dashboard de gestión de tareas de housekeeping. Monitorea KPIs y discrepancias en tiempo real."
+
+        />
+        // <Box
+        //   sx={{
+        //     py: 3,
+        //     px: 4,
+        //     backgroundColor: "white",
+        //   }}
+        // >
+        //   <Typography variant="h5" fontWeight={700}>
+        //     Housekeeping Dashboard
+        //   </Typography>
+        //   <Typography variant="body2" color="text.secondary">
+        //     Dashboard de gestión de tareas de housekeeping. Monitorea KPIs y discrepancias en tiempo real.
+        //   </Typography>
+        // </Box>
       }
       content={
         <Box sx={{ py: 3, px: 3, width: '100%', backgroundColor: "white" }}>

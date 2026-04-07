@@ -61,6 +61,8 @@ import {
   DeleteSweep as BulkDeleteIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import FusePageSimple from "@fuse/core/FusePageSimple";
+import { styled } from "@mui/material/styles";
 import { useSnackbar } from 'notistack';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchRules, deleteRule, updateRule, createRule, fetchTemplates } from '@/store/housekeeping/housekeepingThunks';
@@ -69,6 +71,7 @@ import { RuleTester } from './components';
 import { useRuleTesting } from './hooks';
 import type { CleaningRule, RuleTriggerType, JobTagValue } from '@/store/housekeeping/housekeepingTypes';
 import type { RulesListState } from './types/ruleConfiguratorTypes';
+import TopbarHeader from '@/components/TopbarHeader';
 
 /**
  * Helper to format trigger description
@@ -384,511 +387,539 @@ const RulesListScreen: React.FC = () => {
     );
   }
 
+  const Root = styled(FusePageSimple)(({ theme }) => ({
+    "& .FusePageSimple-header": {
+      backgroundColor: theme.palette.background.paper,
+      borderBottomWidth: 1,
+      borderStyle: "solid",
+      borderColor: theme.palette.divider,
+    },
+    "& .FusePageSimple-content": {},
+    "& .FusePageSimple-content > .container": {
+      maxWidth: "100% !important",
+      padding: "0 !important",
+      width: "100%",
+    },
+    "& .FusePageSimple-header > .container": {
+      maxWidth: "100% !important",
+      padding: "0 !important",
+      width: "100%",
+    },
+    "& .FusePageSimple-sidebarHeader": {},
+    "& .FusePageSimple-sidebarContent": {},
+  }));
+
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Header */}
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box>
+    <Root header={
+      <TopbarHeader title="Reglas de Limpieza" description={`
+        ${filteredAndSortedRules.length} regla${filteredAndSortedRules.length !== 1 ? 's' : ''} encontrada${filteredAndSortedRules.length !== 1 ? 's' : ''}
+        `} />
+    } content={
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        {/* Header */}
+        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+          {/* <Box>
           <Typography variant="h4" component="h1" gutterBottom>
             Reglas de Limpieza
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {filteredAndSortedRules.length} regla{filteredAndSortedRules.length !== 1 ? 's' : ''} encontrada{filteredAndSortedRules.length !== 1 ? 's' : ''}
           </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/housekeeping/rules/new')}
-          size="large"
-          sx={{
-            bgcolor: '#415EDE',
-            color: 'white',
-            textTransform: 'none',
-            fontWeight: 600,
-          }}
-        >
-          Nueva Regla
-        </Button>
-      </Box>
-
-      {/* Alert informativo */}
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          Las reglas de limpieza están en versión beta. La conexión con el backend se activará próximamente.
-        </Typography>
-      </Alert>
-
-      {/* Filters */}
-      <Paper sx={{ p: 3, mb: 3, bgcolor: 'white' }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              label="Buscar por nombre"
-              value={listState.filters.searchTerm}
-              onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'white',
-                  '&:hover fieldset': {
-                    borderColor: '#415EDE',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#415EDE',
-                    borderWidth: '2px',
-                  }
-                },
-                '& .MuiInputLabel-root': {
-                  color: '#415EDE',
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth>
-              <InputLabel
-                sx={{
-                  '&.Mui-focused': { color: '#415EDE' }
-                }}
-              >
-                Template
-              </InputLabel>
-              <Select
-                value={listState.filters.templateId || ''}
-                onChange={(e) => handleFilterChange('templateId', e.target.value || undefined)}
-                label="Template"
-                sx={{
-                  bgcolor: 'white',
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#415EDE',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#415EDE',
-                    borderWidth: '2px',
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      bgcolor: 'white',
-                    },
-                  },
-                }}
-              >
-                <MenuItem value="">Todos</MenuItem>
-                {templates.map((template) => (
-                  <MenuItem key={template.id} value={template.id}>
-                    {template.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12} md={2}>
-            <FormControl fullWidth>
-              <InputLabel
-                sx={{
-                  '&.Mui-focused': { color: '#415EDE' }
-                }}
-              >
-                Tipo de Trigger
-              </InputLabel>
-              <Select
-                value={listState.filters.triggerType || ''}
-                onChange={(e) => handleFilterChange('triggerType', e.target.value || undefined)}
-                label="Tipo de Trigger"
-                sx={{
-                  bgcolor: 'white',
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#415EDE',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#415EDE',
-                    borderWidth: '2px',
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      bgcolor: 'white',
-                    },
-                  },
-                }}
-              >
-                <MenuItem value="">Todos</MenuItem>
-                <MenuItem value="interval">Intervalo</MenuItem>
-                <MenuItem value="checkout">Checkout</MenuItem>
-                <MenuItem value="checkin">Checkin</MenuItem>
-                <MenuItem value="manual">Manual</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12} md={2}>
-            <FormControl fullWidth>
-              <InputLabel
-                sx={{
-                  '&.Mui-focused': { color: '#415EDE' }
-                }}
-              >
-                Estado
-              </InputLabel>
-              <Select
-                value={listState.filters.isActive === undefined ? '' : String(listState.filters.isActive)}
-                onChange={(e) => handleFilterChange('isActive', e.target.value === '' ? undefined : e.target.value === 'true')}
-                label="Estado"
-                sx={{
-                  bgcolor: 'white',
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#415EDE',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#415EDE',
-                    borderWidth: '2px',
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      bgcolor: 'white',
-                    },
-                  },
-                }}
-              >
-                <MenuItem value="">Todos</MenuItem>
-                <MenuItem value="true">Activa</MenuItem>
-                <MenuItem value="false">Inactiva</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12} md={1}>
-            <FormControl fullWidth size="small">
-              <InputLabel
-                sx={{
-                  '&.Mui-focused': { color: '#415EDE' }
-                }}
-              >
-                Categoría
-              </InputLabel>
-              <Select
-                value={listState.filters.targetJobTag ?? ''}
-                onChange={(e) => handleFilterChange('targetJobTag', (e.target.value as JobTagValue) || undefined)}
-                label="Categoría"
-                sx={{
-                  bgcolor: 'white',
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#415EDE',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#415EDE',
-                    borderWidth: '2px',
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      bgcolor: 'white',
-                    },
-                  },
-                }}
-              >
-                <MenuItem value="">Todos</MenuItem>
-                <MenuItem value="CategoriaA">Gerente</MenuItem>
-                <MenuItem value="CategoriaB">Supervisor</MenuItem>
-                <MenuItem value="CategoriaC">Trabajador</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12} md={1}>
-            <Tooltip title="Limpiar filtros">
-              <IconButton
-                onClick={() => setListState((prev) => ({
-                  ...prev,
-                  filters: {
-                    searchTerm: '',
-                    templateId: undefined,
-                    triggerType: undefined,
-                    isActive: undefined,
-                    targetJobTag: undefined,
-                  },
-                  page: 0,
-                }))}
-              >
-                <FilterIcon />
-              </IconButton>
-            </Tooltip>
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Bulk Actions */}
-      {listState.selectedRules.length > 0 && (
-        <Paper sx={{ p: 2, mb: 2, bgcolor: 'white' }}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Typography variant="body2">
-              {listState.selectedRules.length} seleccionada{listState.selectedRules.length !== 1 ? 's' : ''}
-            </Typography>
-            <Button
-              size="small"
-              startIcon={<ActiveIcon />}
-              onClick={() => handleBulkActivate(true)}
-            >
-              Activar
-            </Button>
-            <Button
-              size="small"
-              startIcon={<InactiveIcon />}
-              onClick={() => handleBulkActivate(false)}
-            >
-              Desactivar
-            </Button>
-          </Stack>
-        </Paper>
-      )}
-
-      {/* Rules Grid */}
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
-        </Box>
-      ) : paginatedRules.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography variant="h6" color="text.secondary">
-            No se encontraron reglas
-          </Typography>
+        </Box> */}
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={handleCreate}
-            sx={{ mt: 2 }}
+            onClick={() => navigate('/housekeeping/rules/new')}
+            size="large"
+            sx={{
+              bgcolor: '#415EDE',
+              color: 'white',
+              textTransform: 'none',
+              fontWeight: 600,
+            }}
           >
-            Crear Primera Regla
+            Nueva Regla
           </Button>
+        </Box>
+
+        {/* Alert informativo */}
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <Typography variant="body2">
+            Las reglas de limpieza están en versión beta. La conexión con el backend se activará próximamente.
+          </Typography>
+        </Alert>
+
+        {/* Filters */}
+        <Paper sx={{ p: 3, mb: 3, bgcolor: 'white' }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={3}>
+              <TextField
+                fullWidth
+                label="Buscar por nombre"
+                value={listState.filters.searchTerm}
+                onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'white',
+                    '&:hover fieldset': {
+                      borderColor: '#415EDE',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#415EDE',
+                      borderWidth: '2px',
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#415EDE',
+                  },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={3}>
+              <FormControl fullWidth>
+                <InputLabel
+                  sx={{
+                    '&.Mui-focused': { color: '#415EDE' }
+                  }}
+                >
+                  Template
+                </InputLabel>
+                <Select
+                  value={listState.filters.templateId || ''}
+                  onChange={(e) => handleFilterChange('templateId', e.target.value || undefined)}
+                  label="Template"
+                  sx={{
+                    bgcolor: 'white',
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
+                      borderWidth: '2px',
+                    },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        bgcolor: 'white',
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="">Todos</MenuItem>
+                  {templates.map((template) => (
+                    <MenuItem key={template.id} value={template.id}>
+                      {template.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel
+                  sx={{
+                    '&.Mui-focused': { color: '#415EDE' }
+                  }}
+                >
+                  Tipo de Trigger
+                </InputLabel>
+                <Select
+                  value={listState.filters.triggerType || ''}
+                  onChange={(e) => handleFilterChange('triggerType', e.target.value || undefined)}
+                  label="Tipo de Trigger"
+                  sx={{
+                    bgcolor: 'white',
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
+                      borderWidth: '2px',
+                    },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        bgcolor: 'white',
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="">Todos</MenuItem>
+                  <MenuItem value="interval">Intervalo</MenuItem>
+                  <MenuItem value="checkout">Checkout</MenuItem>
+                  <MenuItem value="checkin">Checkin</MenuItem>
+                  <MenuItem value="manual">Manual</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel
+                  sx={{
+                    '&.Mui-focused': { color: '#415EDE' }
+                  }}
+                >
+                  Estado
+                </InputLabel>
+                <Select
+                  value={listState.filters.isActive === undefined ? '' : String(listState.filters.isActive)}
+                  onChange={(e) => handleFilterChange('isActive', e.target.value === '' ? undefined : e.target.value === 'true')}
+                  label="Estado"
+                  sx={{
+                    bgcolor: 'white',
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
+                      borderWidth: '2px',
+                    },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        bgcolor: 'white',
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="">Todos</MenuItem>
+                  <MenuItem value="true">Activa</MenuItem>
+                  <MenuItem value="false">Inactiva</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} md={1}>
+              <FormControl fullWidth size="small">
+                <InputLabel
+                  sx={{
+                    '&.Mui-focused': { color: '#415EDE' }
+                  }}
+                >
+                  Categoría
+                </InputLabel>
+                <Select
+                  value={listState.filters.targetJobTag ?? ''}
+                  onChange={(e) => handleFilterChange('targetJobTag', (e.target.value as JobTagValue) || undefined)}
+                  label="Categoría"
+                  sx={{
+                    bgcolor: 'white',
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#415EDE',
+                      borderWidth: '2px',
+                    },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        bgcolor: 'white',
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="">Todos</MenuItem>
+                  <MenuItem value="CategoriaA">Gerente</MenuItem>
+                  <MenuItem value="CategoriaB">Supervisor</MenuItem>
+                  <MenuItem value="CategoriaC">Trabajador</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} md={1}>
+              <Tooltip title="Limpiar filtros">
+                <IconButton
+                  onClick={() => setListState((prev) => ({
+                    ...prev,
+                    filters: {
+                      searchTerm: '',
+                      templateId: undefined,
+                      triggerType: undefined,
+                      isActive: undefined,
+                      targetJobTag: undefined,
+                    },
+                    page: 0,
+                  }))}
+                >
+                  <FilterIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </Grid>
         </Paper>
-      ) : (
-        <>
-          <Grid container spacing={2}>
-            {paginatedRules.map((rule) => (
-              <Grid item xs={12} key={rule.id}>
-                <Card sx={{ bgcolor: 'white' }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                      <Checkbox
-                        checked={listState.selectedRules.includes(rule.id)}
-                        onChange={() => handleRuleSelection(rule.id)}
-                      />
 
-                      <Box sx={{ flex: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-                          <Typography variant="h6" component="h3">
-                            {rule.name}
-                          </Typography>
-                          <Chip
-                            label={rule.isActive ? 'Activa' : 'Inactiva'}
-                            color={rule.isActive ? 'success' : 'default'}
-                            size="small"
-                            icon={rule.isActive ? <ActiveIcon /> : <InactiveIcon />}
-                          />
-                          <Chip
-                            label={`Prioridad: ${rule.priority}`}
-                            size="small"
-                            variant="outlined"
-                          />
-                        </Box>
+        {/* Bulk Actions */}
+        {listState.selectedRules.length > 0 && (
+          <Paper sx={{ p: 2, mb: 2, bgcolor: 'white' }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography variant="body2">
+                {listState.selectedRules.length} seleccionada{listState.selectedRules.length !== 1 ? 's' : ''}
+              </Typography>
+              <Button
+                size="small"
+                startIcon={<ActiveIcon />}
+                onClick={() => handleBulkActivate(true)}
+              >
+                Activar
+              </Button>
+              <Button
+                size="small"
+                startIcon={<InactiveIcon />}
+                onClick={() => handleBulkActivate(false)}
+              >
+                Desactivar
+              </Button>
+            </Stack>
+          </Paper>
+        )}
 
-                        <Grid container spacing={2}>
-                          <Grid item xs={12} md={3}>
-                            <Typography variant="caption" color="text.secondary">
-                              Template
-                            </Typography>
-                            <Typography variant="body2">
-                              {rule.templateName || 'Sin especificar'}
-                            </Typography>
-                          </Grid>
+        {/* Rules Grid */}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+            <CircularProgress />
+          </Box>
+        ) : paginatedRules.length === 0 ? (
+          <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <Typography variant="h6" color="text.secondary">
+              No se encontraron reglas
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+              sx={{ mt: 2 }}
+            >
+              Crear Primera Regla
+            </Button>
+          </Paper>
+        ) : (
+          <>
+            <Grid container spacing={2}>
+              {paginatedRules.map((rule) => (
+                <Grid item xs={12} key={rule.id}>
+                  <Card sx={{ bgcolor: 'white' }}>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                        <Checkbox
+                          checked={listState.selectedRules.includes(rule.id)}
+                          onChange={() => handleRuleSelection(rule.id)}
+                        />
 
-                          <Grid item xs={12} md={3}>
-                            <Typography variant="caption" color="text.secondary">
-                              Trigger
-                            </Typography>
-                            <Typography variant="body2">
-                              {formatTriggerDescription(rule)}
-                            </Typography>
-                          </Grid>
-
-                          <Grid item xs={12} md={2}>
-                            <Typography variant="caption" color="text.secondary">
-                              Aplica a
-                            </Typography>
-                            <Typography variant="body2">
-                              {formatTargetDescription(rule)}
-                            </Typography>
-                          </Grid>
-
-                          <Grid item xs={12} md={2}>
-                            <Typography variant="caption" color="text.secondary" display="block">
-                              Categoría
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                            <Typography variant="h6" component="h3">
+                              {rule.name}
                             </Typography>
                             <Chip
-                              label={formatJobTag(rule.targetJobTag)}
-                              color={getJobTagColor(rule.targetJobTag)}
+                              label={rule.isActive ? 'Activa' : 'Inactiva'}
+                              color={rule.isActive ? 'success' : 'default'}
                               size="small"
+                              icon={rule.isActive ? <ActiveIcon /> : <InactiveIcon />}
                             />
-                          </Grid>
+                            <Chip
+                              label={`Prioridad: ${rule.priority}`}
+                              size="small"
+                              variant="outlined"
+                            />
+                          </Box>
 
-                          <Grid item xs={12} md={2}>
-                            <Typography variant="caption" color="text.secondary">
-                              Creada
-                            </Typography>
-                            <Typography variant="body2">
-                              {new Date(rule.createdAt).toLocaleDateString()}
-                            </Typography>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} md={3}>
+                              <Typography variant="caption" color="text.secondary">
+                                Template
+                              </Typography>
+                              <Typography variant="body2">
+                                {rule.templateName || 'Sin especificar'}
+                              </Typography>
+                            </Grid>
+
+                            <Grid item xs={12} md={3}>
+                              <Typography variant="caption" color="text.secondary">
+                                Trigger
+                              </Typography>
+                              <Typography variant="body2">
+                                {formatTriggerDescription(rule)}
+                              </Typography>
+                            </Grid>
+
+                            <Grid item xs={12} md={2}>
+                              <Typography variant="caption" color="text.secondary">
+                                Aplica a
+                              </Typography>
+                              <Typography variant="body2">
+                                {formatTargetDescription(rule)}
+                              </Typography>
+                            </Grid>
+
+                            <Grid item xs={12} md={2}>
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Categoría
+                              </Typography>
+                              <Chip
+                                label={formatJobTag(rule.targetJobTag)}
+                                color={getJobTagColor(rule.targetJobTag)}
+                                size="small"
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} md={2}>
+                              <Typography variant="caption" color="text.secondary">
+                                Creada
+                              </Typography>
+                              <Typography variant="body2">
+                                {new Date(rule.createdAt).toLocaleDateString()}
+                              </Typography>
+                            </Grid>
                           </Grid>
-                        </Grid>
+                        </Box>
+
+                        <IconButton
+                          onClick={(e) => handleMenuOpen(e, rule.id)}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+
+                        <Menu
+                          anchorEl={anchorEl[rule.id]}
+                          open={Boolean(anchorEl[rule.id])}
+                          onClose={() => handleMenuClose(rule.id)}
+                          PaperProps={{
+                            sx: {
+                              bgcolor: 'white',
+                              border: '6px solid #f3f4f6',
+                            },
+                          }}
+                        >
+                          <MenuItem onClick={() => handleEdit(rule.id)}>
+                            <ListItemIcon>
+                              <img src="./assets/icons/edit-black.png" alt="" />
+                            </ListItemIcon>
+                            <ListItemText>Editar</ListItemText>
+                          </MenuItem>
+
+                          <MenuItem onClick={() => handleDuplicate(rule)}>
+                            <ListItemIcon>
+                              <DuplicateIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Duplicar</ListItemText>
+                          </MenuItem>
+
+                          <MenuItem onClick={() => handleToggleActive(rule)}>
+                            <ListItemIcon>
+                              <ToggleIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>
+                              {rule.isActive ? 'Desactivar' : 'Activar'}
+                            </ListItemText>
+                          </MenuItem>
+
+                          <MenuItem onClick={() => handleTestClick(rule)}>
+                            <ListItemIcon>
+                              <TestIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Probar</ListItemText>
+                          </MenuItem>
+
+                          <Divider />
+
+                          <MenuItem onClick={() => handleDeleteClick(rule)}>
+                            <ListItemIcon>
+                              <img src="./assets/icons/delete.png" alt="" />
+                            </ListItemIcon>
+                            <ListItemText>Eliminar</ListItemText>
+                          </MenuItem>
+                        </Menu>
                       </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
 
-                      <IconButton
-                        onClick={(e) => handleMenuOpen(e, rule.id)}
-                      >
-                        <MoreVertIcon />
-                      </IconButton>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <Pagination
+                  count={totalPages}
+                  page={listState.page + 1}
+                  onChange={handlePageChange}
+                  color="primary"
+                  showFirstButton
+                  showLastButton
+                />
+              </Box>
+            )}
+          </>
+        )}
 
-                      <Menu
-                        anchorEl={anchorEl[rule.id]}
-                        open={Boolean(anchorEl[rule.id])}
-                        onClose={() => handleMenuClose(rule.id)}
-                        PaperProps={{
-                          sx: {
-                            bgcolor: 'white',
-                            border: '6px solid #f3f4f6',
-                          },
-                        }}
-                      >
-                        <MenuItem onClick={() => handleEdit(rule.id)}>
-                          <ListItemIcon>
-                            <img src="./assets/icons/edit-black.png" alt="" />
-                          </ListItemIcon>
-                          <ListItemText>Editar</ListItemText>
-                        </MenuItem>
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+          <DialogTitle>Confirmar Eliminación</DialogTitle>
+          <DialogContent>
+            <Typography>
+              ¿Está seguro que desea eliminar la regla "{ruleToDelete?.name}"?
+            </Typography>
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              Esta acción no se puede deshacer.
+            </Alert>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              color="error"
+              variant="contained"
+            >
+              Eliminar
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-                        <MenuItem onClick={() => handleDuplicate(rule)}>
-                          <ListItemIcon>
-                            <DuplicateIcon fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText>Duplicar</ListItemText>
-                        </MenuItem>
-
-                        <MenuItem onClick={() => handleToggleActive(rule)}>
-                          <ListItemIcon>
-                            <ToggleIcon fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText>
-                            {rule.isActive ? 'Desactivar' : 'Activar'}
-                          </ListItemText>
-                        </MenuItem>
-
-                        <MenuItem onClick={() => handleTestClick(rule)}>
-                          <ListItemIcon>
-                            <TestIcon fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText>Probar</ListItemText>
-                        </MenuItem>
-
-                        <Divider />
-
-                        <MenuItem onClick={() => handleDeleteClick(rule)}>
-                          <ListItemIcon>
-                            <img src="./assets/icons/delete.png" alt="" />
-                          </ListItemIcon>
-                          <ListItemText>Eliminar</ListItemText>
-                        </MenuItem>
-                      </Menu>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <Pagination
-                count={totalPages}
-                page={listState.page + 1}
-                onChange={handlePageChange}
-                color="primary"
-                showFirstButton
-                showLastButton
+        {/* Test Dialog */}
+        <Dialog
+          open={testDialogOpen}
+          onClose={handleTestClose}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            Probar Regla: {ruleToTest?.name}
+          </DialogTitle>
+          <DialogContent>
+            {ruleToTest && (
+              <RuleTester
+                rule={ruleToTest}
+                onTest={testRule}
+                isLoading={isTestingRule}
+                testResult={testResult}
               />
-            </Box>
-          )}
-        </>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Confirmar Eliminación</DialogTitle>
-        <DialogContent>
-          <Typography>
-            ¿Está seguro que desea eliminar la regla "{ruleToDelete?.name}"?
-          </Typography>
-          <Alert severity="warning" sx={{ mt: 2 }}>
-            Esta acción no se puede deshacer.
-          </Alert>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleDeleteConfirm}
-            color="error"
-            variant="contained"
-          >
-            Eliminar
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Test Dialog */}
-      <Dialog
-        open={testDialogOpen}
-        onClose={handleTestClose}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          Probar Regla: {ruleToTest?.name}
-        </DialogTitle>
-        <DialogContent>
-          {ruleToTest && (
-            <RuleTester
-              rule={ruleToTest}
-              onTest={testRule}
-              isLoading={isTestingRule}
-              testResult={testResult}
-            />
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleTestClose}>
-            Cerrar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleTestClose}>
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    } />
   );
 };
 

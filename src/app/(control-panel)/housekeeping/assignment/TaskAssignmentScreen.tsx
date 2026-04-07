@@ -61,6 +61,7 @@ const CustomConnector = styled(StepConnector)(({ theme }) => ({
 }));
 
 import { StepIconProps } from '@mui/material';
+import TopbarHeader from '@/components/TopbarHeader';
 
 const CustomStepIcon = (props: StepIconProps) => {
   const { active, completed, className, icon } = props;
@@ -228,14 +229,18 @@ const TaskAssignmentScreen: React.FC = () => {
         pb: 15, // Space for the fixed pill footer
       }}
     >
-      <Box sx={{ mb: 3 }}>
+      <TopbarHeader
+        title="Nueva Asignación de Operarios"
+        description="Sigue los pasos para asignar operarios a habitaciones del campamento."
+      />
+      {/* <Box sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
           Nueva Asignación de Operarios
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Sigue los pasos para asignar operarios a habitaciones del campamento.
         </Typography>
-      </Box>
+      </Box> */}
 
       <Box className='p-4 bg-[#f7f7f7] rounded-[8px]'>
         <Box

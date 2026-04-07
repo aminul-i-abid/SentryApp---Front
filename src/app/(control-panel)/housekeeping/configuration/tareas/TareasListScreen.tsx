@@ -41,6 +41,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import FusePageSimple from "@fuse/core/FusePageSimple";
+import { styled } from "@mui/material/styles";
 import { useSnackbar } from 'notistack';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -343,6 +345,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import TopbarHeader from '@/components/TopbarHeader';
 
 const TareasListScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -527,252 +530,278 @@ const TareasListScreen: React.FC = () => {
     </Grid>
   );
 
+  const Root = styled(FusePageSimple)(({ theme }) => ({
+    "& .FusePageSimple-header": {
+      backgroundColor: theme.palette.background.paper,
+      borderBottomWidth: 1,
+      borderStyle: "solid",
+      borderColor: theme.palette.divider,
+    },
+    "& .FusePageSimple-content": {},
+    "& .FusePageSimple-content > .container": {
+      maxWidth: "100% !important",
+      padding: "0 !important",
+      width: "100%",
+    },
+    "& .FusePageSimple-header > .container": {
+      maxWidth: "100% !important",
+      padding: "0 !important",
+      width: "100%",
+    },
+    "& .FusePageSimple-sidebarHeader": {},
+    "& .FusePageSimple-sidebarContent": {},
+  }));
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100%',
-        bgcolor: '#fff',
-        p: { xs: 2, md: 4 },
-      }}
-    >
-      {/* Header */}
+    <Root header={
+      <TopbarHeader title="Tareas de Limpieza" description='Gestión de tareas maestras para el sistema de Housekeeping' />
+    } content={
       <Box
         sx={{
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
+          flexDirection: 'column',
+          minHeight: '100%',
+          bgcolor: '#fff',
+          p: { xs: 2, md: 4 },
         }}
       >
-        <Box>
+        {/* Header */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 3,
+          }}
+        >
+          {/* <Box>
           <Typography variant="h5" sx={{ fontWeight: 600, color: '#111827', mb: 0.5 }}>
             Tareas de Limpieza
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Gestión de tareas maestras para el sistema de Housekeeping
           </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleCreate}
-          disabled={loading}
-          sx={{
-            backgroundColor: "#415EDE",
-            color: "white",
-            borderRadius: '8px',
-            px: 3,
-            py: 1,
-            textTransform: 'none',
-            fontWeight: 500,
-            boxShadow: 'none',
-            '&:hover': {
-              backgroundColor: '#354BB1',
+        </Box> */}
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
+            disabled={loading}
+            sx={{
+              backgroundColor: "#415EDE",
+              color: "white",
+              borderRadius: '8px',
+              px: 3,
+              py: 1,
+              textTransform: 'none',
+              fontWeight: 500,
               boxShadow: 'none',
-            }
+              '&:hover': {
+                backgroundColor: '#354BB1',
+                boxShadow: 'none',
+              }
+            }}
+          >
+            Nueva Tarea
+          </Button>
+        </Box>
+
+        {/* Main Content Card */}
+        <Box
+          sx={{
+            bgcolor: '#f7f7f7',
+            borderRadius: '12px',
+            border: '1px solid #E5E7EB',
+            p: { xs: 2, md: 3 },
+            minHeight: '600px',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          Nueva Tarea
-        </Button>
-      </Box>
+          {/* Inner Header with Stats */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827' }}>
+              Todas las tareas
+            </Typography>
+            {!loading && tareas.length > 0 && (
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ border: '1px solid #E5E7EB', borderRadius: '8px', px: 2, py: 0.75, bgcolor: '#FFFFFF' }}>
+                  <Typography variant="body2" sx={{ color: '#374151', fontWeight: 500 }}>
+                    Total tareas: {tareas.length < 10 ? `0${tareas.length}` : tareas.length}
+                  </Typography>
+                </Box>
+                <Box sx={{ border: '1px solid #E5E7EB', borderRadius: '8px', px: 2, py: 0.75, bgcolor: '#FFFFFF' }}>
+                  <Typography variant="body2" sx={{ color: '#374151', fontWeight: 500 }}>
+                    Tareas activas: {tareas.filter(t => t.isActive).length < 10 ? `0${tareas.filter(t => t.isActive).length}` : tareas.filter(t => t.isActive).length}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+          </Box>
 
-      {/* Main Content Card */}
-      <Box
-        sx={{
-          bgcolor: '#f7f7f7',
-          borderRadius: '12px',
-          border: '1px solid #E5E7EB',
-          p: { xs: 2, md: 3 },
-          minHeight: '600px',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        {/* Inner Header with Stats */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: '#111827' }}>
-            Todas las tareas
-          </Typography>
-          {!loading && tareas.length > 0 && (
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Box sx={{ border: '1px solid #E5E7EB', borderRadius: '8px', px: 2, py: 0.75, bgcolor: '#FFFFFF' }}>
-                <Typography variant="body2" sx={{ color: '#374151', fontWeight: 500 }}>
-                  Total tareas: {tareas.length < 10 ? `0${tareas.length}` : tareas.length}
-                </Typography>
-              </Box>
-              <Box sx={{ border: '1px solid #E5E7EB', borderRadius: '8px', px: 2, py: 0.75, bgcolor: '#FFFFFF' }}>
-                <Typography variant="body2" sx={{ color: '#374151', fontWeight: 500 }}>
-                  Tareas activas: {tareas.filter(t => t.isActive).length < 10 ? `0${tareas.filter(t => t.isActive).length}` : tareas.filter(t => t.isActive).length}
-                </Typography>
-              </Box>
-            </Box>
+          {/* Store error */}
+          {storeError && (
+            <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
+              {storeError}
+            </Alert>
           )}
+
+          {/* Tareas Grid */}
+          <Grid container spacing={2.5}>
+            {loading && tareas.length === 0
+              ? renderSkeletons()
+              : tareas.length === 0
+                ? renderEmpty()
+                : tareas.map((tarea) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={tarea.id}>
+                    <Card
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        bgcolor: 'white',
+                        borderRadius: '12px',
+                        border: '1px solid #E5E7EB',
+                        boxShadow: 'none',
+                      }}
+                    >
+                      <CardContent sx={{ flexGrow: 1, p: 2.5, pb: 1.5 }}>
+                        {/* Nombre y estado */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            mb: 1,
+                          }}
+                        >
+                          <Typography
+                            variant="subtitle1"
+                            sx={{ fontWeight: 600, color: '#111827', lineHeight: 1.2, pr: 1, wordBreak: 'break-word' }}
+                          >
+                            {tarea.nombre}
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                            <Typography variant="caption" sx={{ color: tarea.isActive ? '#10B981' : '#6B7280', fontWeight: 500 }}>
+                              {tarea.isActive ? 'Activa' : 'Inactiva'}
+                            </Typography>
+                            {tarea.isActive ? (
+                              <CheckCircleOutlineIcon sx={{ fontSize: 16, color: '#10B981' }} />
+                            ) : (
+                              <CancelOutlinedIcon sx={{ fontSize: 16, color: '#6B7280' }} />
+                            )}
+                          </Box>
+                        </Box>
+
+                        {/* Descripcion */}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: '#6B7280',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {tarea.descripcion || 'Sin descripción'}
+                        </Typography>
+                      </CardContent>
+
+                      {/* Actions */}
+                      <CardActions sx={{ p: 2.5, pt: 0, gap: 1.5 }}>
+                        <Button
+                          size="small"
+                          endIcon={<img src="/assets/icons/pencil-edit-01.png" alt="Edit" />}
+                          onClick={() => handleEdit(tarea)}
+                          fullWidth
+                          sx={{
+                            bgcolor: '#F7F7F7',
+                            color: '#4F46E5',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            borderRadius: '8px',
+                            py: 0.75,
+                            boxShadow: 'none',
+                            '&:hover': { bgcolor: '#E0E7FF', boxShadow: 'none' },
+                            '& .MuiButton-startIcon': { mr: 0.5 }
+                          }}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          size="small"
+                          endIcon={<img src="/assets/icons/delete.png" alt="Delete" />}
+                          onClick={() => handleDeleteOpen(tarea)}
+                          fullWidth
+                          sx={{
+                            bgcolor: '#FEF2F2',
+                            color: '#EF4444',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            borderRadius: '8px',
+                            py: 0.75,
+                            boxShadow: 'none',
+                            '&:hover': { bgcolor: '#FEE2E2', boxShadow: 'none' },
+                            '& .MuiButton-startIcon': { mr: 0.5 }
+                          }}
+                        >
+                          Eliminar
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                ))}
+          </Grid>
         </Box>
 
-        {/* Store error */}
-        {storeError && (
-          <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
-            {storeError}
-          </Alert>
-        )}
+        {/* Tarea Form Dialog */}
+        <TareaFormDialog
+          open={formDialogOpen}
+          tarea={selectedTarea}
+          onClose={handleFormClose}
+          onSave={handleSave}
+          isSaving={isSaving}
+        />
 
-        {/* Tareas Grid */}
-        <Grid container spacing={2.5}>
-          {loading && tareas.length === 0
-            ? renderSkeletons()
-            : tareas.length === 0
-              ? renderEmpty()
-              : tareas.map((tarea) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={tarea.id}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      bgcolor: 'white',
-                      borderRadius: '12px',
-                      border: '1px solid #E5E7EB',
-                      boxShadow: 'none',
-                    }}
-                  >
-                    <CardContent sx={{ flexGrow: 1, p: 2.5, pb: 1.5 }}>
-                      {/* Nombre y estado */}
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-start',
-                          mb: 1,
-                        }}
-                      >
-                        <Typography
-                          variant="subtitle1"
-                          sx={{ fontWeight: 600, color: '#111827', lineHeight: 1.2, pr: 1, wordBreak: 'break-word' }}
-                        >
-                          {tarea.nombre}
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-                          <Typography variant="caption" sx={{ color: tarea.isActive ? '#10B981' : '#6B7280', fontWeight: 500 }}>
-                            {tarea.isActive ? 'Activa' : 'Inactiva'}
-                          </Typography>
-                          {tarea.isActive ? (
-                            <CheckCircleOutlineIcon sx={{ fontSize: 16, color: '#10B981' }} />
-                          ) : (
-                            <CancelOutlinedIcon sx={{ fontSize: 16, color: '#6B7280' }} />
-                          )}
-                        </Box>
-                      </Box>
-
-                      {/* Descripcion */}
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: '#6B7280',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {tarea.descripcion || 'Sin descripción'}
-                      </Typography>
-                    </CardContent>
-
-                    {/* Actions */}
-                    <CardActions sx={{ p: 2.5, pt: 0, gap: 1.5 }}>
-                      <Button
-                        size="small"
-                        endIcon={<img src="/assets/icons/pencil-edit-01.png" alt="Edit" />}
-                        onClick={() => handleEdit(tarea)}
-                        fullWidth
-                        sx={{
-                          bgcolor: '#F7F7F7',
-                          color: '#4F46E5',
-                          textTransform: 'none',
-                          fontWeight: 600,
-                          borderRadius: '8px',
-                          py: 0.75,
-                          boxShadow: 'none',
-                          '&:hover': { bgcolor: '#E0E7FF', boxShadow: 'none' },
-                          '& .MuiButton-startIcon': { mr: 0.5 }
-                        }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        size="small"
-                        endIcon={<img src="/assets/icons/delete.png" alt="Delete" />}
-                        onClick={() => handleDeleteOpen(tarea)}
-                        fullWidth
-                        sx={{
-                          bgcolor: '#FEF2F2',
-                          color: '#EF4444',
-                          textTransform: 'none',
-                          fontWeight: 600,
-                          borderRadius: '8px',
-                          py: 0.75,
-                          boxShadow: 'none',
-                          '&:hover': { bgcolor: '#FEE2E2', boxShadow: 'none' },
-                          '& .MuiButton-startIcon': { mr: 0.5 }
-                        }}
-                      >
-                        Eliminar
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))}
-        </Grid>
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={handleDeleteCancel}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: { borderRadius: '12px' }
+          }}
+        >
+          <DialogTitle fontWeight={600} sx={{ color: '#111827' }}> Confirmar eliminación</DialogTitle>
+          <DialogContent>
+            <Typography sx={{ color: '#374151' }}>
+              ¿Eliminar esta tarea?{' '}
+              <strong>{tareaToDelete?.nombre}</strong>
+            </Typography>
+            <Alert severity="warning" sx={{ mt: 2, borderRadius: '8px' }}>
+              Los templates asociados a esta tarea perderán la referencia.
+            </Alert>
+          </DialogContent>
+          <DialogActions sx={{ p: 2, pt: 0 }}>
+            <Button onClick={handleDeleteCancel} disabled={isDeleting} sx={{ color: '#4B5563', textTransform: 'none', fontWeight: 500 }}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              variant="contained"
+              color="error"
+              disabled={isDeleting}
+              startIcon={isDeleting ? <CircularProgress size={18} /> : undefined}
+              sx={{ textTransform: 'none', fontWeight: 500, borderRadius: '8px', boxShadow: 'none' }}
+            >
+              {isDeleting ? 'Eliminando...' : 'Eliminar'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
-
-      {/* Tarea Form Dialog */}
-      <TareaFormDialog
-        open={formDialogOpen}
-        tarea={selectedTarea}
-        onClose={handleFormClose}
-        onSave={handleSave}
-        isSaving={isSaving}
-      />
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={handleDeleteCancel}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: { borderRadius: '12px' }
-        }}
-      >
-        <DialogTitle fontWeight={600} sx={{ color: '#111827' }}> Confirmar eliminación</DialogTitle>
-        <DialogContent>
-          <Typography sx={{ color: '#374151' }}>
-            ¿Eliminar esta tarea?{' '}
-            <strong>{tareaToDelete?.nombre}</strong>
-          </Typography>
-          <Alert severity="warning" sx={{ mt: 2, borderRadius: '8px' }}>
-            Los templates asociados a esta tarea perderán la referencia.
-          </Alert>
-        </DialogContent>
-        <DialogActions sx={{ p: 2, pt: 0 }}>
-          <Button onClick={handleDeleteCancel} disabled={isDeleting} sx={{ color: '#4B5563', textTransform: 'none', fontWeight: 500 }}>
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleDeleteConfirm}
-            variant="contained"
-            color="error"
-            disabled={isDeleting}
-            startIcon={isDeleting ? <CircularProgress size={18} /> : undefined}
-            sx={{ textTransform: 'none', fontWeight: 500, borderRadius: '8px', boxShadow: 'none' }}
-          >
-            {isDeleting ? 'Eliminando...' : 'Eliminar'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+    } />
   );
 };
 

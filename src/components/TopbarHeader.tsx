@@ -2,7 +2,15 @@ import NavbarToggleButton from "@/components/theme-layouts/components/navbar/Nav
 import useUser from "@auth/useUser";
 import { useMediaQuery, useTheme } from "@mui/material";
 
-export default function TopbarHeader() {
+export default function TopbarHeader({
+  title,
+  description,
+  isRightVisible = true,
+}: {
+  title?: string;
+  description?: string;
+  isRightVisible?: boolean;
+}) {
   const { data: user } = useUser();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
@@ -15,29 +23,31 @@ export default function TopbarHeader() {
         {isMobile && <NavbarToggleButton className="h-10 w-10 p-0" />}
         <div>
           <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
-            ¡Bienvenido de nuevo, {firstName}!
+            {title ? title : `¡Bienvenido de nuevo, ${firstName}!`}
           </h2>
           <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">
-            Que tengas un buen dia. Consulte su Panel de Control.
+            {description ? description : "Que tengas un buen dia. Consulte su Panel de Control."}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <div className="w-12 h-12 rounded-full bg-black dark:bg-gray-700 text-white dark:text-white flex items-center justify-center font-bold text-md">
-            {firstName?.charAt(0)?.toUpperCase() || "U"}
-          </div>
-          <div className="hidden lg:block">
-            <p className="text-lg text-slate-700 font-bold dark:text-slate-100 leading-tight mb-0.5">
-              {user?.displayName || ""}
-            </p>
-            <p className="text-sm text-slate-400 dark:text-slate-400">
-              {user?.email || ""}
-            </p>
+      {isRightVisible && (
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-12 h-12 rounded-full bg-black dark:bg-gray-700 text-white dark:text-white flex items-center justify-center font-bold text-md">
+              {firstName?.charAt(0)?.toUpperCase() || "U"}
+            </div>
+            <div className="hidden lg:block">
+              <p className="text-lg text-slate-700 font-bold dark:text-slate-100 leading-tight mb-0.5">
+                {user?.displayName || ""}
+              </p>
+              <p className="text-sm text-slate-400 dark:text-slate-400">
+                {user?.email || ""}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
